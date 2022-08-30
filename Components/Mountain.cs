@@ -34,7 +34,8 @@ public sealed class Mountain
 
             foreach (int j in vals)
             {
-                if (!sanma || !(j > 1 && j < 9)) {
+                if (!sanma || !(j > 1 && j < 9))
+                {
 
                     Value val = (Value) Enum.ToObject(typeof(Value), j);
                     wall.Enqueue(new Tile(val));
@@ -53,6 +54,6 @@ public sealed class Mountain
 
     private void FlipDora()
     {
-        
+
     }
 }
