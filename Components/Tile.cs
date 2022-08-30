@@ -25,4 +25,23 @@ public struct Tile
 
         return val > 60 || val % 10 == 1 || val % 10 == 9;
     }
+
+    public static bool IsTerminal(Tile tile)
+    {
+        int val = (int) tile.value;
+
+        return val == 64 || val == 83 || val % 10 == 1 || val % 10 == 9;
+    }
+
+    public static Value DoraValue(Tile tile)
+    {
+        int val = (int) tile.value;
+
+        if (val == 64) val = 61;
+        else if (val == 83) val = 81;
+        else if (val % 10 == 9) val -= 8;
+        else val ++;
+
+        return (Value) Enum.ToObject(typeof(Value), val);
+    }
 }

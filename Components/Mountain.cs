@@ -20,6 +20,8 @@ public sealed class Mountain
     public void SetMountain(bool sanma, bool akadora)
     {
         CreateTiles(sanma, akadora);
+        SplitDeadWall();
+        FlipDora(sanma);
     }
 
     private void CreateTiles(bool sanma, bool akadora)
@@ -52,8 +54,8 @@ public sealed class Mountain
         }
     }
 
-    private void FlipDora()
+    private void FlipDora(bool sanma)
     {
-
+        // TODO
     }
 }
