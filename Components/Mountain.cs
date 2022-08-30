@@ -10,20 +10,20 @@ public sealed class Mountain
     readonly IDictionary<Value, int> doraList = new Dictionary<Value, int>();
     readonly IDictionary<Value, int> uraDoraList = new Dictionary<Value, int>();
 
-    public Mountain(bool sanma, bool akadora) {
-
+    public Mountain(bool sanma, bool akadora)
+    {
         PrepareWall(sanma, akadora);
     }
 
-    public void PrepareWall(bool sanma, bool akadora) {
-
+    public void PrepareWall(bool sanma, bool akadora)
+    {
         CreateTiles(sanma, akadora);
         ShuffleWall();
         DetermineWinds();
     }
 
-    private void CreateTiles(bool sanma, bool akadora) {
-
+    private void CreateTiles(bool sanma, bool akadora)
+    {
         if (wall.Any()) wall.Clear();
 
         for (int i = 0; i < 4; i++) {
@@ -39,8 +39,8 @@ public sealed class Mountain
         }
     }
 
-    private void ShuffleWall() {
-
+    private void ShuffleWall()
+    {
         for (int i = wall.Count - 1; i > 0; i--) {
 
             int swap = Mountain.rand.Next(i + 1);
@@ -50,8 +50,8 @@ public sealed class Mountain
         }
     }
 
-    private void DetermineWinds() {
-
+    private void DetermineWinds()
+    {
         int group = wall.Count / 4;
         int quadrant = rand.Next(1, 5);
         int offset = (new[] {-1, 1})[rand.Next(2)];
@@ -69,4 +69,6 @@ public sealed class Mountain
             }
         }
     }
+
+    
 }

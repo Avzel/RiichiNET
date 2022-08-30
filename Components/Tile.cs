@@ -19,8 +19,8 @@ public sealed class Tile
         this.value = val;
     }
 
-    public static bool IsYaoChuu(Tile tile) {
-
+    public static bool IsYaoChuu(Tile tile)
+    {
         int val = (int) tile.value;
 
         return val > 60 || val % 10 == 1 || val % 10 == 9;
