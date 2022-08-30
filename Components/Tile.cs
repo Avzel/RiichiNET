@@ -1,9 +1,9 @@
 namespace OpenRiichi.Components;
 
-public sealed class Tile
+public struct Tile
 {
-    public Value value { get; }
-    public Wind wind { get; set; }
+    public readonly Value value { get; }
+    public Wind? wind { get; set; } = null;
     public bool akadora { get; internal set; } = false;
     public bool visible { get; set; } = false;
     public bool called { get; set; } = false;
