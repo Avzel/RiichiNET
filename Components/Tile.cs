@@ -18,22 +18,28 @@ public struct Tile
     {
         this.value = val;
     }
+}
 
-    public static bool IsYaoChuu(Tile tile)
+public static class TileExtensions
+{
+    public static bool IsTerminal(this Tile tile)
     {
         int val = (int) tile.value;
 
-        return val > 60 || val % 10 == 1 || val % 10 == 9;
+        return val % 10 == 1 || val % 10 == 9;
     }
 
-    public static bool IsTerminal(Tile tile)
+    public static bool IsHonor(this Tile tile)
     {
-        int val = (int) tile.value;
-
-        return val == 64 || val == 83 || val % 10 == 1 || val % 10 == 9;
+        return (int) tile.value > 60;
     }
 
-    public static Value DoraValue(Tile tile)
+    public static bool IsYaoChuu(this Tile tile)
+    {
+        return tile.IsHonor() && tile.IsTerminal();
+    }
+
+    public static Value DoraValue(this Tile tile)
     {
         int val = (int) tile.value;
 

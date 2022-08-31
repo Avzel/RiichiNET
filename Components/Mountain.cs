@@ -6,11 +6,11 @@ public sealed class Mountain
 {
     static readonly Random rand = new Random();
 
-    readonly Queue<Tile> wall = new Queue<Tile>();
-    readonly Tile[] deadWall = new Tile[14];
+    readonly LinkedList<Tile> wall = new LinkedList<Tile>();
+    readonly Tile[] deadWall = new Tile[18];
 
-    readonly IDictionary<Value, int> doraList = new Dictionary<Value, int>();
-    readonly IDictionary<Value, int> uraDoraList = new Dictionary<Value, int>();
+    readonly Dictionary<Value, int> doraList = new Dictionary<Value, int>();
+    readonly Dictionary<Value, int> uraDoraList = new Dictionary<Value, int>();
 
     public Mountain(bool sanma, bool akadora)
     {
@@ -21,7 +21,7 @@ public sealed class Mountain
     {
         CreateTiles(sanma, akadora);
         SplitDeadWall();
-        FlipDora(sanma);
+        FlipDora(sanma, 0);
     }
 
     private void CreateTiles(bool sanma, bool akadora)
@@ -40,7 +40,7 @@ public sealed class Mountain
                 {
 
                     Value val = (Value) Enum.ToObject(typeof(Value), j);
-                    wall.Enqueue(new Tile(val));
+                    wall.AddFirst(new Tile(val));
                 }
             }
         }
@@ -48,14 +48,29 @@ public sealed class Mountain
 
     private void SplitDeadWall()
     {
-        for (int i = deadWall.Count() - 1; i >= 0; i--)
+        for (int i = 13; i >= 0; i--)
         {
-            deadWall[i] = wall.Dequeue();
+            deadWall[i] = wall.Last();
+            wall.RemoveLast();
         }
     }
 
-    private void FlipDora(bool sanma)
+    private void FlipDora(bool sanma, int kanCount)
     {
-        // TODO
+        int index = sanma == false ? 5 : 9;
+        index += kanCount * 2;
+
+        deadWall[index].visible = true;
+        Value dora = deadWall[index].DoraValue();
+        Value uraDora = deadWall[index - 1].DoraValue();
+
+        doraList.Add(dora, doraList.GetValueOrDefault(dora) + 1);
+        uraDoraList.Add(uraDora, uraDoraList.GetValueOrDefault(uraDora) + 1);
+
+        if (kanCount > 0)
+        {
+            deadWall[13 + kanCount] = wall.First();
+            wall.RemoveFirst();
+        }
     }
 }
