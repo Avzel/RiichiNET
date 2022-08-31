@@ -6,6 +6,5 @@ public enum Meld
     Chii,
     Pon,
     AnKan,
-    MinKan,
-    Kuwaeta
+    MinKan
 }

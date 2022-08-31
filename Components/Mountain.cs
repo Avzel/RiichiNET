@@ -12,13 +12,8 @@ public sealed class Mountain
     readonly Dictionary<Value, int> doraList = new Dictionary<Value, int>();
     readonly Dictionary<Value, int> uraDoraList = new Dictionary<Value, int>();
 
-    private readonly bool sanma;
-    private readonly bool akadora;
-
-    public Mountain(bool sanma, bool akadora)
+    public Mountain()
     {
-        this.sanma = sanma;
-        this.akadora = akadora;
         SetMountain();
     }
 
@@ -35,18 +30,27 @@ public sealed class Mountain
 
         Array vals = Enum.GetValues(typeof(Value));
 
+        int m5 = rand.Next(4);
+        int p5 = rand.Next(4);
+        int s5 = rand.Next(4);
+
         for (int i = 0; i < 4; i++)
         {
             vals.Shuffle(rand);
 
             foreach (int j in vals)
             {
-                if (!sanma || !(j > 1 && j < 9))
-                {
+                Value val = (Value) Enum.ToObject(typeof(Value), j);
+                Tile tile = new Tile(val);
 
-                    Value val = (Value) Enum.ToObject(typeof(Value), j);
-                    wall.AddFirst(new Tile(val));
+                if ((tile.value == Value.M5 && i == m5) ||
+                    (tile.value == Value.P5 && i == p5) ||
+                    (tile.value == Value.S5 && i == s5))
+                {
+                    tile.akadora = true;
                 }
+
+                wall.AddFirst(tile);
             }
         }
     }
@@ -58,13 +62,20 @@ public sealed class Mountain
             deadWall[i] = wall.Last();
             wall.RemoveLast();
         }
+
+        for (int i = 14; i < 18; i++)
+        {
+            deadWall[i] = new Tile(Value.None);
+        }
+
+        if (doraList.Any()) doraList.Clear();
+        if (uraDoraList.Any()) uraDoraList.Clear();
     }
 
     public void FlipDora()
     {
-        int index = sanma == false ? 5 : 9;
+        int index = 5;
         int kanCount = 0;
-
         for (;;kanCount++)
         {
             if (deadWall[index].visible) index += 2;
@@ -87,8 +98,31 @@ public sealed class Mountain
 
     public Tile Draw()
     {
-        Tile tile = wall.Last();
-        wall.RemoveLast();
-        return tile;
+        if (wall.Any())
+        {
+            Tile tile = wall.Last();
+            wall.RemoveLast();
+            return tile;
+        }
+        else return new Tile(Value.None);
+    }
+
+    public Tile Rinshan()
+    {
+        Tile empty = new Tile(Value.None);
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (deadWall[i].value == Value.None) continue;
+
+            else
+            {
+                Tile tile = deadWall[i];
+                deadWall[i] = empty;
+                return tile;
+            }
+        }
+
+        return empty;
     }
 }
