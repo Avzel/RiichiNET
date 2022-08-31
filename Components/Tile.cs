@@ -3,16 +3,16 @@ namespace OpenRiichi.Components;
 public struct Tile
 {
     public readonly Value value { get; }
-    public Wind? wind { get; set; } = null;
+    public Wind wind { get; internal set; } = Wind.None;
     public bool akadora { get; internal set; } = false;
-    public bool visible { get; set; } = false;
-    public bool called { get; set; } = false;
+    public bool visible { get; internal set; } = false;
+    public bool called { get; internal set; } = false;
 
-    public bool pon { get; set; } = false;
-    public bool chii { get; set; } = false;
-    public bool minKan { get; set; } = false;
-    public bool anKan { get; set; } = false;
-    public bool kuwaeta { get; set; } = false;
+    public bool pon { get; internal set; } = false;
+    public bool chii { get; internal set; } = false;
+    public bool minKan { get; internal set; } = false;
+    public bool anKan { get; internal set; } = false;
+    public bool kuwaeta { get; internal set; } = false;
 
     public Tile(Value val)
     {
