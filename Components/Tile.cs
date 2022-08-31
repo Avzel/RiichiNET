@@ -4,15 +4,10 @@ public struct Tile
 {
     public readonly Value value { get; }
     public Wind wind { get; internal set; } = Wind.None;
+    public Meld meld { get; internal set; } = Meld.None;
     public bool akadora { get; internal set; } = false;
     public bool visible { get; internal set; } = false;
     public bool called { get; internal set; } = false;
-
-    public bool pon { get; internal set; } = false;
-    public bool chii { get; internal set; } = false;
-    public bool minKan { get; internal set; } = false;
-    public bool anKan { get; internal set; } = false;
-    public bool kuwaeta { get; internal set; } = false;
 
     public Tile(Value val)
     {
