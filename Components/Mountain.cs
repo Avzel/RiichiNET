@@ -6,25 +6,30 @@ public sealed class Mountain
 {
     static readonly Random rand = new Random();
 
-    readonly LinkedList<Tile> wall = new LinkedList<Tile>();
+    private readonly LinkedList<Tile> wall = new LinkedList<Tile>();
     readonly Tile[] deadWall = new Tile[18];
 
     readonly Dictionary<Value, int> doraList = new Dictionary<Value, int>();
     readonly Dictionary<Value, int> uraDoraList = new Dictionary<Value, int>();
 
+    private readonly bool sanma;
+    private readonly bool akadora;
+
     public Mountain(bool sanma, bool akadora)
     {
-        SetMountain(sanma, akadora);
+        this.sanma = sanma;
+        this.akadora = akadora;
+        SetMountain();
     }
 
-    public void SetMountain(bool sanma, bool akadora)
+    public void SetMountain()
     {
-        CreateTiles(sanma, akadora);
+        CreateTiles();
         SplitDeadWall();
-        FlipDora(sanma, 0);
+        FlipDora();
     }
 
-    private void CreateTiles(bool sanma, bool akadora)
+    private void CreateTiles()
     {
         if (wall.Any()) wall.Clear();
 
@@ -55,10 +60,16 @@ public sealed class Mountain
         }
     }
 
-    private void FlipDora(bool sanma, int kanCount)
+    public void FlipDora()
     {
         int index = sanma == false ? 5 : 9;
-        index += kanCount * 2;
+        int kanCount = 0;
+
+        for (;;kanCount++)
+        {
+            if (deadWall[index].visible) index += 2;
+            else break;
+        }
 
         deadWall[index].visible = true;
         Value dora = deadWall[index].DoraValue();
@@ -72,5 +83,12 @@ public sealed class Mountain
             deadWall[13 + kanCount] = wall.First();
             wall.RemoveFirst();
         }
+    }
+
+    public Tile Draw()
+    {
+        Tile tile = wall.Last();
+        wall.RemoveLast();
+        return tile;
     }
 }
