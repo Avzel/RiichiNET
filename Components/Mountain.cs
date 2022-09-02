@@ -1,18 +1,17 @@
 namespace OpenRiichi.Components;
 
-using Value = Enums.Value;
-
 using OpenRiichi.Util;
+using Enums;
 
 public sealed class Mountain
 {
-    static readonly Random rand = new Random();
+    static readonly Random Rand = new Random();
 
-    private readonly LinkedList<Tile> wall = new LinkedList<Tile>();
-    readonly Tile[] deadWall = new Tile[18];
+    private readonly LinkedList<Tile> _wall = new LinkedList<Tile>();
+    private readonly Tile[] _deadWall = new Tile[18];
 
-    readonly Dictionary<Value, int> doraList = new Dictionary<Value, int>();
-    readonly Dictionary<Value, int> uraDoraList = new Dictionary<Value, int>();
+    public Dictionary<Value, int> DoraList { get; } = new Dictionary<Value, int>();
+    public Dictionary<Value, int> UraDoraList { get; } = new Dictionary<Value, int>();
 
     public Mountain()
     {
@@ -28,31 +27,31 @@ public sealed class Mountain
 
     private void CreateTiles()
     {
-        if (wall.Any()) wall.Clear();
+        if (_wall.Any()) _wall.Clear();
 
         Array vals = Enum.GetValues(typeof(Value));
 
-        int m5 = rand.Next(4);
-        int p5 = rand.Next(4);
-        int s5 = rand.Next(4);
+        int m5 = Rand.Next(4);
+        int p5 = Rand.Next(4);
+        int s5 = Rand.Next(4);
 
         for (int i = 0; i < 4; i++)
         {
-            vals.Shuffle(rand);
+            vals.Shuffle(Rand);
 
             foreach (int j in vals)
             {
                 Value val = (Value) Enum.ToObject(typeof(Value), j);
                 Tile tile = new Tile(val);
 
-                if ((tile.value == Value.M5 && i == m5) ||
-                    (tile.value == Value.P5 && i == p5) ||
-                    (tile.value == Value.S5 && i == s5))
+                if ((tile.Value == Value.M5 && i == m5) ||
+                    (tile.Value == Value.P5 && i == p5) ||
+                    (tile.Value == Value.S5 && i == s5))
                 {
-                    tile.akadora = true;
+                    tile.Akadora = true;
                 }
 
-                wall.AddFirst(tile);
+                _wall.AddFirst(tile);
             }
         }
     }
@@ -61,17 +60,17 @@ public sealed class Mountain
     {
         for (int i = 13; i >= 0; i--)
         {
-            deadWall[i] = wall.Last();
-            wall.RemoveLast();
+            _deadWall[i] = _wall.Last();
+            _wall.RemoveLast();
         }
 
         for (int i = 14; i < 18; i++)
         {
-            deadWall[i] = new Tile(Value.None);
+            _deadWall[i] = new Tile(Value.None);
         }
 
-        if (doraList.Any()) doraList.Clear();
-        if (uraDoraList.Any()) uraDoraList.Clear();
+        if (DoraList.Any()) DoraList.Clear();
+        if (UraDoraList.Any()) UraDoraList.Clear();
     }
 
     public void FlipDora()
@@ -80,30 +79,30 @@ public sealed class Mountain
         int kanCount = 0;
         for (;;kanCount++)
         {
-            if (deadWall[index].visible) index += 2;
+            if (_deadWall[index].Visible) index += 2;
             else break;
         }
 
-        deadWall[index].visible = true;
-        Value dora = deadWall[index].DoraValue();
-        Value uraDora = deadWall[index - 1].DoraValue();
+        _deadWall[index].Visible = true;
+        Value dora = _deadWall[index].DoraValue();
+        Value uraDora = _deadWall[index - 1].DoraValue();
 
-        doraList.Add(dora, doraList.GetValueOrDefault(dora) + 1);
-        uraDoraList.Add(uraDora, uraDoraList.GetValueOrDefault(uraDora) + 1);
+        DoraList.Add(dora, DoraList.GetValueOrDefault(dora) + 1);
+        UraDoraList.Add(uraDora, UraDoraList.GetValueOrDefault(uraDora) + 1);
 
         if (kanCount > 0)
         {
-            deadWall[13 + kanCount] = wall.First();
-            wall.RemoveFirst();
+            _deadWall[13 + kanCount] = _wall.First();
+            _wall.RemoveFirst();
         }
     }
 
     public Tile Draw()
     {
-        if (wall.Any())
+        if (_wall.Any())
         {
-            Tile tile = wall.Last();
-            wall.RemoveLast();
+            Tile tile = _wall.Last();
+            _wall.RemoveLast();
             return tile;
         }
         else return new Tile(Value.None);
@@ -115,12 +114,12 @@ public sealed class Mountain
 
         for (int i = 0; i < 4; i++)
         {
-            if (deadWall[i].value == Value.None) continue;
+            if (_deadWall[i].Value == Value.None) continue;
 
             else
             {
-                Tile tile = deadWall[i];
-                deadWall[i] = empty;
+                Tile tile = _deadWall[i];
+                _deadWall[i] = empty;
                 return tile;
             }
         }

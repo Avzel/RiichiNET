@@ -1,25 +1,73 @@
 namespace OpenRiichi.Components;
 
-using Value = Enums.Value;
-using Wind = Enums.Wind;
-using Seat = Enums.Seat;
+using Enums;
 
 public sealed class Player
 {
-    public Seat seat { get; }
-    public Wind wind { get; internal set;}
-    public int score { get; internal set;} = 25000;
+    public Seat Seat { get; }
+    public Wind Wind { get; internal set; }
+    public int Score { get; private set; } = 25000;
+    public int ScoreChange { get; internal set; } = 0;
 
-    private readonly Tile[] hand = new Tile[14];
-    private readonly Dictionary<Value, int> handCount = new Dictionary<Value, int>();
+    public List<Tile> Hand { get; } = new List<Tile>();
+    public Dictionary<Value, int> HandCount { get; } = new Dictionary<Value, int>();
+    public List<Meld> OpenHand { get; } = new List<Meld>();
+    public Tile[] Graveyard { get; } = new Tile[20];
+    public HashSet<Tile> GraveyardContents { get; } = new HashSet<Tile>();
 
-    
+    public int Shanten { get; private set; } = -2;
+    public Dictionary<Naki, Dictionary<Value, int>> CallableValuesToIndex { get; } = new Dictionary<Naki, Dictionary<Value, int>>();
+    public HashSet<Flag> SpecialFlags { get; } = new HashSet<Flag>();
+    public int KanCount { get; internal set; } = 0;
+    public Value JustCalled { get; internal set; } = Value.None;
 
     public Player(Seat seat)
     {
-        this.seat = seat;
-        this.wind = (Wind) Enum.ToObject(typeof(Wind), (int) seat + 1);
+        this.Seat = seat;
+        this.Wind = (Wind) Enum.ToObject(typeof(Wind), (int) seat + 1);
     }
 
-    
+    public bool IsOpen()
+    {
+        return this.OpenHand.Any();
+    }
+
+    public bool IsDefeated()
+    {
+        return this.Score <= 0;
+    }
+
+    public bool IsTenpai()
+    {
+        return 
+            CallableValuesToIndex.ContainsKey(Naki.Ron)
+            || CallableValuesToIndex.ContainsKey(Naki.Tsumo);
+    }
+
+    public bool IsFuriten()
+    {
+        return
+            CallableValuesToIndex.ContainsKey(Naki.Tsumo)
+            && !CallableValuesToIndex.ContainsKey(Naki.Ron);
+    }
+
+    public bool CanCallOnDraw()
+    {
+        return
+            CallableValuesToIndex.ContainsKey(Naki.AnKan)
+            || CallableValuesToIndex.ContainsKey(Naki.ShouMinKan)
+            || CallableValuesToIndex.ContainsKey(Naki.Riichi)
+            || CallableValuesToIndex.ContainsKey(Naki.Tsumo);
+    }
+
+    public bool CanCallOnDiscard()
+    {
+        return 
+            CallableValuesToIndex.ContainsKey(Naki.Ron)
+            || CallableValuesToIndex.ContainsKey(Naki.Pon)
+            || CallableValuesToIndex.ContainsKey(Naki.DaiMinKan)
+            || CallableValuesToIndex.ContainsKey(Naki.ChiiLower)
+            || CallableValuesToIndex.ContainsKey(Naki.ChiiUpper)
+            || CallableValuesToIndex.ContainsKey(Naki.ChiiMiddle);
+    }
 }

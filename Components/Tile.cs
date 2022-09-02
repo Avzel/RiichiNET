@@ -1,21 +1,17 @@
 namespace OpenRiichi.Components;
 
-using Value = Enums.Value;
-using Wind = Enums.Wind;
-using Meld = Enums.Meld;
+using Enums;
 
 public struct Tile
 {
-    public Value value { get; }
-    public Wind wind { get; internal set; } = Wind.None;
-    public Meld meld { get; internal set; } = Meld.None;
-    public bool akadora { get; internal set; } = false;
-    public bool visible { get; internal set; } = false;
-    public bool called { get; internal set; } = false;
+    public Value Value { get; }
+    public bool Akadora { get; internal set; } = false;
+    public bool Visible { get; internal set; } = false;  // TODO remove
+    public bool Called { get; internal set; } = false;  // TODO remove
 
     public Tile(Value val)
     {
-        this.value = val;
+        this.Value = val;
     }
 }
 
@@ -23,14 +19,14 @@ public static class TileExtensions
 {
     public static bool IsTerminal(this Tile tile)
     {
-        int val = (int) tile.value;
+        int val = (int) tile.Value;
 
         return val % 10 == 1 || val % 10 == 9;
     }
 
     public static bool IsHonor(this Tile tile)
     {
-        return (int) tile.value > 60;
+        return (int) tile.Value > 60;
     }
 
     public static bool IsYaoChuu(this Tile tile)
@@ -40,7 +36,7 @@ public static class TileExtensions
 
     public static Value DoraValue(this Tile tile)
     {
-        int val = (int) tile.value;
+        int val = (int) tile.Value;
 
         if (val == 64) val = 61;
         else if (val == 83) val = 81;
