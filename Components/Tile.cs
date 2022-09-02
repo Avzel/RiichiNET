@@ -1,8 +1,12 @@
 namespace OpenRiichi.Components;
 
+using Value = Enums.Value;
+using Wind = Enums.Wind;
+using Meld = Enums.Meld;
+
 public struct Tile
 {
-    public readonly Value value { get; }
+    public Value value { get; }
     public Wind wind { get; internal set; } = Wind.None;
     public Meld meld { get; internal set; } = Meld.None;
     public bool akadora { get; internal set; } = false;

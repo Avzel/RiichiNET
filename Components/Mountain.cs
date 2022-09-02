@@ -1,5 +1,7 @@
 namespace OpenRiichi.Components;
 
+using Value = Enums.Value;
+
 using OpenRiichi.Util;
 
 public sealed class Mountain

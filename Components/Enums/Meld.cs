@@ -1,4 +1,4 @@
-namespace OpenRiichi.Components;
+namespace OpenRiichi.Components.Enums;
 
 public enum Meld
 {
