@@ -1,4 +1,4 @@
-namespace OpenRiichi.Components.Enums;
+namespace RiichiNET.Components.Enums;
 
 public enum Seat
 {

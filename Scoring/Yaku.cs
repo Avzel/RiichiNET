@@ -1,4 +1,4 @@
-namespace OpenRiichi.Scoring;
+namespace RiichiNET.Scoring;
 
 public class Yaku
 {

@@ -1,4 +1,4 @@
-namespace OpenRiichi.Components;
+namespace RiichiNET.Components;
 
 public sealed class Table
 {

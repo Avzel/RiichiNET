@@ -1,4 +1,4 @@
-namespace OpenRiichi.Components;
+namespace RiichiNET.Components;
 
 using Naki = Enums.Naki;
 using Value = Enums.Value;

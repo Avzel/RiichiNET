@@ -1,4 +1,4 @@
-namespace OpenRiichi.Util;
+namespace RiichiNET.Util;
 
 public static class ArrayExtensions
 {

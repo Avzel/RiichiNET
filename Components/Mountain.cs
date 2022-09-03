@@ -1,6 +1,6 @@
-namespace OpenRiichi.Components;
+namespace RiichiNET.Components;
 
-using OpenRiichi.Util;
+using RiichiNET.Util;
 using Enums;
 
 public sealed class Mountain
