@@ -14,10 +14,11 @@ public sealed class Player
     public List<Meld> OpenHand { get; } = new List<Meld>();
     public Tile[] Graveyard { get; } = new Tile[20];
     public HashSet<Tile> GraveyardContents { get; } = new HashSet<Tile>();
+    public int RiichiTile { get; private set; } = -1;
 
     public int Shanten { get; private set; } = -2;
     public Dictionary<Naki, Dictionary<Value, int>> CallableValuesToIndex { get; } = new Dictionary<Naki, Dictionary<Value, int>>();
-    public HashSet<Flag> SpecialFlags { get; } = new HashSet<Flag>();
+    public HashSet<Flag> Flags { get; } = new HashSet<Flag>();
     public int KanCount { get; internal set; } = 0;
     public Value JustCalled { get; internal set; } = Value.None;
 
@@ -25,6 +26,11 @@ public sealed class Player
     {
         this.Seat = seat;
         this.Wind = (Wind) Enum.ToObject(typeof(Wind), (int) seat + 1);
+    }
+
+    public void SortHand()
+    {
+        Hand.Sort();
     }
 
     public bool IsOpen()

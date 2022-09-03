@@ -75,15 +75,9 @@ public sealed class Mountain
 
     public void FlipDora()
     {
-        int index = 5;
-        int kanCount = 0;
-        for (;;kanCount++)
-        {
-            if (_deadWall[index].Visible) index += 2;
-            else break;
-        }
+        int kanCount = DoraList.Values.Sum();
+        int index = 5 + (kanCount * 2);
 
-        _deadWall[index].Visible = true;
         Value dora = _deadWall[index].DoraValue();
         Value uraDora = _deadWall[index - 1].DoraValue();
 
@@ -110,20 +104,14 @@ public sealed class Mountain
 
     public Tile Rinshan()
     {
-        Tile empty = new Tile(Value.None);
+        int index = DoraList.Values.Sum();
+        Tile tile = _deadWall[index];
 
-        for (int i = 0; i < 4; i++)
+        if (tile.Value != Value.None)
         {
-            if (_deadWall[i].Value == Value.None) continue;
-
-            else
-            {
-                Tile tile = _deadWall[i];
-                _deadWall[i] = empty;
-                return tile;
-            }
+            _deadWall[index] = new Tile(Value.None);
         }
 
-        return empty;
+        return tile;
     }
 }

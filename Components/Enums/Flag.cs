@@ -3,11 +3,11 @@ namespace OpenRiichi.Components.Enums;
 public enum Flag
 {
     HangingRinshan,
-    Riichi,
+    NormalRiichi,
     HangingRiichi,
     DoubleRiichi,
     IppatsuRiichi,
-    Ron,
+    NormalRon,
     ChankanRon,
     Tsumo,
 }

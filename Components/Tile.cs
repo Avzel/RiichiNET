@@ -2,16 +2,19 @@ namespace OpenRiichi.Components;
 
 using Enums;
 
-public struct Tile
+public struct Tile : IComparable<Tile>
 {
     public Value Value { get; }
     public bool Akadora { get; internal set; } = false;
-    public bool Visible { get; internal set; } = false;  // TODO remove
-    public bool Called { get; internal set; } = false;  // TODO remove
 
     public Tile(Value val)
     {
         this.Value = val;
+    }
+
+    public int CompareTo(Tile other)
+    {
+        return this.Value.CompareTo(other.Value);
     }
 }
 
