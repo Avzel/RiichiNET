@@ -73,4 +73,34 @@ public sealed class Player
             || CallableValues.ContainsKey(Naki.ChiiUpper)
             || CallableValues.ContainsKey(Naki.ChiiMiddle);
     }
+
+    public void Draw(Tile tile)
+    {
+        // TODO
+    }
+
+    public void Discard(Tile tile)
+    {
+        // TODO
+    }
+
+    public void CreateMeld(Meld meld)
+    {
+        // TODO
+    }
+
+    public void DeclareRiichi()
+    {
+        // TODO
+    }
+
+    public void CalculateShanten()
+    {
+        // TODO
+    }
+
+    public void NextRound()
+    {
+        // TODO
+    }
 }
