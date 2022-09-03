@@ -11,6 +11,5 @@ public enum Naki
     DaiMinKan,
     AnKan,
     Riichi,
-    Ron,
-    Tsumo
+    Agari
 }

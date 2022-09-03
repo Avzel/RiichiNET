@@ -11,14 +11,16 @@ public sealed class Player
 
     public SortedDictionary<Tile, int> Hand { get; } = new SortedDictionary<Tile, int>();
     public List<Meld> Melds { get; } = new List<Meld>();
-    public Tile[] Graveyard { get; } = new Tile[20];
+    public List<Tile> Graveyard { get; } = new List<Tile>();
     public HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
-    public int RiichiTile { get; private set; } = -1;
+    public int? RiichiTile { get; private set; } = null;
 
-    public int Shanten { get; private set; } = -2;
     public Dictionary<Naki, List<Value>> CallableValues { get; } = new Dictionary<Naki, List<Value>>();
-    public HashSet<Flag> Flags { get; } = new HashSet<Flag>();
-    public Value JustCalled { get; internal set; } = Value.None;
+    public Value JustCalled { get; private set; } = Value.None;
+
+    public int? Shanten { get; private set; } = null;
+    public HashSet<Value> WinningTiles { get; } = new HashSet<Value>();
+    public bool Furiten { get; internal set; } = false;
 
     public Player(Seat seat)
     {
@@ -33,7 +35,12 @@ public sealed class Player
 
     public bool IsOpen()
     {
-        return this.Melds.Any();
+        foreach (Meld meld in Melds)
+        {
+            if (meld.naki != Naki.AnKan) return true;
+        }
+
+        return false;
     }
 
     public bool IsDefeated()
@@ -44,15 +51,7 @@ public sealed class Player
     public bool IsTenpai()
     {
         return 
-            CallableValues.ContainsKey(Naki.Ron)
-            || CallableValues.ContainsKey(Naki.Tsumo);
-    }
-
-    public bool IsFuriten()
-    {
-        return
-            CallableValues.ContainsKey(Naki.Tsumo)
-            && !CallableValues.ContainsKey(Naki.Ron);
+            CallableValues.ContainsKey(Naki.Agari);
     }
 
     public bool CanCallOnDraw()
@@ -61,13 +60,13 @@ public sealed class Player
             CallableValues.ContainsKey(Naki.AnKan)
             || CallableValues.ContainsKey(Naki.ShouMinKan)
             || CallableValues.ContainsKey(Naki.Riichi)
-            || CallableValues.ContainsKey(Naki.Tsumo);
+            || CallableValues.ContainsKey(Naki.Agari);
     }
 
     public bool CanCallOnDiscard()
     {
         return 
-            CallableValues.ContainsKey(Naki.Ron)
+            CallableValues.ContainsKey(Naki.Agari)
             || CallableValues.ContainsKey(Naki.Pon)
             || CallableValues.ContainsKey(Naki.DaiMinKan)
             || CallableValues.ContainsKey(Naki.ChiiLower)

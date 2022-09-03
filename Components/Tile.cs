@@ -21,16 +21,23 @@ public struct Tile : IComparable<Tile>
 
     public static implicit operator Tile(int n)
     {
-        if (n < 0) return new Tile()
-        { 
-            value = (Value) Enum.ToObject(typeof(Value), n * -1),
-            akadora = true
-        };
-        else return new Tile()
+        try
         {
-            value = (Value) Enum.ToObject(typeof(Value), n),
-            akadora = false
-        };
+            if (n < 0) return new Tile()
+            { 
+                value = (Value) Enum.ToObject(typeof(Value), n * -1),
+                akadora = true
+            };
+            else return new Tile()
+            {
+                value = (Value) Enum.ToObject(typeof(Value), n),
+                akadora = false
+            };
+        }
+        catch (ArgumentException)
+        {
+            return new Tile(Value.None);
+        }
     }
 
     public int CompareTo(Tile other)
