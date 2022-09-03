@@ -4,17 +4,38 @@ using Enums;
 
 public struct Tile : IComparable<Tile>
 {
-    public Value Value { get; }
-    public bool Akadora { get; internal set; } = false;
+    public Value value;
+    public bool akadora;
 
     public Tile(Value val)
     {
-        this.Value = val;
+        this.value = val;
+        this.akadora = false;
+    }
+
+    public Tile(Value val, bool aka)
+    {
+        this.value = val;
+        this.akadora = aka;
+    }
+
+    public static implicit operator Tile(int n)
+    {
+        if (n < 0) return new Tile()
+        { 
+            value = (Value) Enum.ToObject(typeof(Value), n * -1),
+            akadora = true
+        };
+        else return new Tile()
+        {
+            value = (Value) Enum.ToObject(typeof(Value), n),
+            akadora = false
+        };
     }
 
     public int CompareTo(Tile other)
     {
-        return this.Value.CompareTo(other.Value);
+        return this.value.CompareTo(other.value);
     }
 }
 
@@ -22,14 +43,14 @@ public static class TileExtensions
 {
     public static bool IsTerminal(this Tile tile)
     {
-        int val = (int) tile.Value;
+        int val = (int) tile.value;
 
         return val % 10 == 1 || val % 10 == 9;
     }
 
     public static bool IsHonor(this Tile tile)
     {
-        return (int) tile.Value > 60;
+        return (int) tile.value > 60;
     }
 
     public static bool IsYaoChuu(this Tile tile)
@@ -39,7 +60,7 @@ public static class TileExtensions
 
     public static Value DoraValue(this Tile tile)
     {
-        int val = (int) tile.Value;
+        int val = (int) tile.value;
 
         if (val == 64) val = 61;
         else if (val == 83) val = 81;

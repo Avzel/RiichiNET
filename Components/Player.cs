@@ -9,10 +9,10 @@ public sealed class Player
     public int Score { get; private set; } = 25000;
     public int ScoreChange { get; internal set; } = 0;
 
-    public SortedDictionary<Value, List<Tile>> Hand { get; } = new SortedDictionary<Value, List<Tile>>();
+    public SortedDictionary<Tile, int> Hand { get; } = new SortedDictionary<Tile, int>();
     public List<Meld> Melds { get; } = new List<Meld>();
     public Tile[] Graveyard { get; } = new Tile[20];
-    public HashSet<Tile> GraveyardContents { get; } = new HashSet<Tile>();
+    public HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
     public int RiichiTile { get; private set; } = -1;
 
     public int Shanten { get; private set; } = -2;
@@ -28,7 +28,7 @@ public sealed class Player
 
     public int HandLength()
     {
-        return (3 * Melds.Count);
+        return Hand.Values.Sum() + (3 * Melds.Count);
     }
 
     public bool IsOpen()

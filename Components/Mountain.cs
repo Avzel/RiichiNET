@@ -44,11 +44,11 @@ public sealed class Mountain
                 Value val = (Value) Enum.ToObject(typeof(Value), j);
                 Tile tile = new Tile(val);
 
-                if ((tile.Value == Value.M5 && i == m5) ||
-                    (tile.Value == Value.P5 && i == p5) ||
-                    (tile.Value == Value.S5 && i == s5))
+                if ((tile.value == Value.M5 && i == m5) ||
+                    (tile.value == Value.P5 && i == p5) ||
+                    (tile.value == Value.S5 && i == s5))
                 {
-                    tile.Akadora = true;
+                    tile.akadora = true;
                 }
 
                 _wall.AddFirst(tile);
@@ -107,7 +107,7 @@ public sealed class Mountain
         int index = DoraList.Values.Sum();
         Tile tile = _deadWall[index];
 
-        if (tile.Value != Value.None)
+        if (tile.value != Value.None)
         {
             _deadWall[index] = new Tile(Value.None);
         }
