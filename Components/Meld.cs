@@ -4,7 +4,7 @@ using Naki = Enums.Naki;
 using Value = Enums.Value;
 using Seat = Enums.Seat;
 
-public struct Meld
+internal struct Meld
 {
     public Naki naki;
     public Value value;

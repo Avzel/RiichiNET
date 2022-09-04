@@ -2,38 +2,38 @@ namespace RiichiNET.Components;
 
 using Enums;
 
-public sealed class Player
+internal sealed class Player
 {
-    public Seat Seat { get; }
-    public Wind Wind { get; internal set; }
-    public int Score { get; private set; } = 25000;
-    public int ScoreChange { get; internal set; } = 0;
+    internal Seat Seat { get; }
+    internal Wind Wind { get; set; }
+    internal int Score { get; private set; } = 25000;
+    internal int ScoreChange { get; set; } = 0;
 
-    public SortedDictionary<Tile, int> Hand { get; } = new SortedDictionary<Tile, int>();
-    public List<Meld> Melds { get; } = new List<Meld>();
-    public List<Tile> Graveyard { get; } = new List<Tile>();
-    public HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
-    public int? RiichiTile { get; private set; } = null;
+    internal SortedDictionary<Tile, int> Hand { get; } = new SortedDictionary<Tile, int>();
+    internal List<Meld> Melds { get; } = new List<Meld>();
+    internal List<Tile> Graveyard { get; } = new List<Tile>();
+    internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
+    internal int? RiichiTile { get; private set; } = null;
 
-    public Dictionary<Naki, List<Value>> CallableValues { get; } = new Dictionary<Naki, List<Value>>();
-    public Value JustCalled { get; private set; } = Value.None;
+    internal Dictionary<Naki, List<Value>> CallableValues { get; } = new Dictionary<Naki, List<Value>>();
+    internal Value JustCalled { get; private set; } = Value.None;
 
-    public int? Shanten { get; private set; } = null;
-    public HashSet<Value> WinningTiles { get; } = new HashSet<Value>();
-    public bool Furiten { get; internal set; } = false;
+    internal int? Shanten { get; private set; } = null;
+    internal HashSet<Value> WinningTiles { get; } = new HashSet<Value>();
+    internal bool Furiten { get; set; } = false;
 
-    public Player(Seat seat)
+    internal Player(Seat seat)
     {
         this.Seat = seat;
         this.Wind = (Wind) Enum.ToObject(typeof(Wind), (int) seat + 1);
     }
 
-    public int HandLength()
+    internal int HandLength()
     {
         return Hand.Values.Sum() + (3 * Melds.Count);
     }
 
-    public bool IsOpen()
+    internal bool IsOpen()
     {
         foreach (Meld meld in Melds)
         {
@@ -43,18 +43,18 @@ public sealed class Player
         return false;
     }
 
-    public bool IsDefeated()
+    internal bool IsDefeated()
     {
         return this.Score <= 0;
     }
 
-    public bool IsTenpai()
+    internal bool IsTenpai()
     {
         return 
             CallableValues.ContainsKey(Naki.Agari);
     }
 
-    public bool CanCallOnDraw()
+    internal bool CanCallOnDraw()
     {
         return
             CallableValues.ContainsKey(Naki.AnKan)
@@ -63,7 +63,7 @@ public sealed class Player
             || CallableValues.ContainsKey(Naki.Agari);
     }
 
-    public bool CanCallOnDiscard()
+    internal bool CanCallOnDiscard()
     {
         return 
             CallableValues.ContainsKey(Naki.Agari)
@@ -74,32 +74,32 @@ public sealed class Player
             || CallableValues.ContainsKey(Naki.ChiiMiddle);
     }
 
-    public void Draw(Tile tile)
+    internal void Draw(Tile tile)
     {
         // TODO
     }
 
-    public void Discard(Tile tile)
+    internal void Discard(Tile tile)
     {
         // TODO
     }
 
-    public void CreateMeld(Meld meld)
+    internal void CreateMeld(Meld meld)
     {
         // TODO
     }
 
-    public void DeclareRiichi()
+    internal void DeclareRiichi()
     {
         // TODO
     }
 
-    public void CalculateShanten()
+    internal void CalculateShanten()
     {
         // TODO
     }
 
-    public void NextRound()
+    internal void NextRound()
     {
         // TODO
     }

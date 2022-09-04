@@ -3,22 +3,22 @@ namespace RiichiNET.Components;
 using RiichiNET.Util;
 using Enums;
 
-public sealed class Mountain
+internal sealed class Mountain
 {
     static readonly Random Rand = new Random();
 
     private readonly LinkedList<Tile> _wall = new LinkedList<Tile>();
     private readonly Tile[] _deadWall = new Tile[18];
 
-    public Dictionary<Value, int> DoraList { get; } = new Dictionary<Value, int>();
-    public Dictionary<Value, int> UraDoraList { get; } = new Dictionary<Value, int>();
+    internal Dictionary<Value, int> DoraList { get; } = new Dictionary<Value, int>();
+    internal Dictionary<Value, int> UraDoraList { get; } = new Dictionary<Value, int>();
 
-    public Mountain()
+    internal Mountain()
     {
         SetMountain();
     }
 
-    public void SetMountain()
+    internal void SetMountain()
     {
         CreateTiles();
         SplitDeadWall();
@@ -73,7 +73,7 @@ public sealed class Mountain
         if (UraDoraList.Any()) UraDoraList.Clear();
     }
 
-    public void FlipDora()
+    internal void FlipDora()
     {
         int kanCount = DoraList.Values.Sum();
         int index = 5 + (kanCount * 2);
@@ -91,7 +91,7 @@ public sealed class Mountain
         }
     }
 
-    public Tile Draw()
+    internal Tile Draw()
     {
         if (_wall.Any())
         {
@@ -102,7 +102,7 @@ public sealed class Mountain
         else return new Tile(Value.None);
     }
 
-    public Tile Rinshan()
+    internal Tile Rinshan()
     {
         int index = DoraList.Values.Sum();
         Tile tile = _deadWall[index];

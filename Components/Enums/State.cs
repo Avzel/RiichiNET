@@ -1,6 +1,6 @@
 namespace RiichiNET.Components.Enums;
 
-public enum State
+internal enum State
 {
     Draw,
     Discard,

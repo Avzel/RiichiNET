@@ -1,6 +1,6 @@
 namespace RiichiNET.Components.Enums;
 
-public enum Seat
+internal enum Seat
 {
     First,
     Second,

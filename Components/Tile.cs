@@ -2,18 +2,18 @@ namespace RiichiNET.Components;
 
 using Enums;
 
-public struct Tile : IComparable<Tile>
+internal struct Tile : IComparable<Tile>
 {
-    public Value value;
-    public bool akadora;
+    internal Value value;
+    internal bool akadora;
 
-    public Tile(Value val)
+    internal Tile(Value val)
     {
         this.value = val;
         this.akadora = false;
     }
 
-    public Tile(Value val, bool aka)
+    internal Tile(Value val, bool aka)
     {
         this.value = val;
         this.akadora = aka;
@@ -46,26 +46,26 @@ public struct Tile : IComparable<Tile>
     }
 }
 
-public static class TileExtensions
+internal static class TileExtensions
 {
-    public static bool IsTerminal(this Tile tile)
+    internal static bool IsTerminal(this Tile tile)
     {
         int val = (int) tile.value;
 
         return val % 10 == 1 || val % 10 == 9;
     }
 
-    public static bool IsHonor(this Tile tile)
+    internal static bool IsHonor(this Tile tile)
     {
         return (int) tile.value > 60;
     }
 
-    public static bool IsYaoChuu(this Tile tile)
+    internal static bool IsYaoChuu(this Tile tile)
     {
         return tile.IsHonor() && tile.IsTerminal();
     }
 
-    public static Value DoraValue(this Tile tile)
+    internal static Value DoraValue(this Tile tile)
     {
         int val = (int) tile.value;
 

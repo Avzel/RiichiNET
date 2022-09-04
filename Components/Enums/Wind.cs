@@ -1,6 +1,6 @@
 namespace RiichiNET.Components.Enums;
 
-public enum Wind
+internal enum Wind
 {
     None=0,
     East,

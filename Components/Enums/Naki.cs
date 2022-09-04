@@ -1,6 +1,6 @@
 namespace RiichiNET.Components.Enums;
 
-public enum Naki
+internal enum Naki
 {
     None,
     ChiiLower,
