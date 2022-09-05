@@ -89,9 +89,9 @@ internal sealed class Player
         GraveyardContents.Add(tile.value);
     }
 
-    internal void AddCalledGroup(Meld meld)
+    internal void AddMeld(Meld meld)
     {
-        // TODO
+        Melds.Add(meld);
     }
 
     internal void DeclareRiichi(Tile tile)
