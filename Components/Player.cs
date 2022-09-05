@@ -10,7 +10,7 @@ internal sealed class Player
     internal int ScoreChange { get; set; } = 0;
 
     internal SortedDictionary<Tile, int> Hand { get; } = new SortedDictionary<Tile, int>();
-    internal List<Meld> OpenMelds { get; } = new List<Meld>();
+    internal List<Meld> Melds { get; } = new List<Meld>();
     internal List<Tile> Graveyard { get; } = new List<Tile>();
     internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
     internal int? RiichiTile { get; private set; } = null;
@@ -20,7 +20,6 @@ internal sealed class Player
 
     internal int? Shanten { get; private set; } = null;
     internal bool Furiten { get; set; } = false;
-    internal List<Meld> WinningHand { get; } = new List<Meld>();
 
     internal Player(Seat seat)
     {
@@ -30,12 +29,12 @@ internal sealed class Player
 
     internal int HandLength()
     {
-        return Hand.Values.Sum() + (3 * OpenMelds.Count);
+        return Hand.Values.Sum() + (3 * Melds.Count);
     }
 
     internal bool IsOpen()
     {
-        foreach (Meld meld in OpenMelds)
+        foreach (Meld meld in Melds)
         {
             if (meld.origin != Seat) return true;
         }
