@@ -7,16 +7,16 @@ internal struct Tile : IComparable<Tile>
     internal Value value;
     internal bool akadora;
 
-    internal Tile(Value val)
+    internal Tile(Value value)
     {
-        this.value = val;
+        this.value = value;
         this.akadora = false;
     }
 
-    internal Tile(Value val, bool aka)
+    internal Tile(Value value, bool akadora)
     {
-        this.value = val;
-        this.akadora = aka;
+        this.value = value;
+        this.akadora = akadora;
     }
 
     public static implicit operator Tile(int n)

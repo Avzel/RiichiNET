@@ -1,21 +1,13 @@
 namespace RiichiNET.Components;
 
-using Naki = Enums.Naki;
-using Value = Enums.Value;
-using Seat = Enums.Seat;
+using Enums;
 
 internal struct Meld
 {
-    public Naki naki;
-    public Value value;
-    public Seat origin;
-    public (bool, Naki) akadora;
+    internal Mentsu mentsu;
+    internal Naki naki;
+    internal Seat origin;
+    internal Value value;
 
-    public Meld(Naki naki, Value value, Seat origin, (bool, Naki) akadora)
-    {
-        this.naki = naki;
-        this.value = value;
-        this.origin = origin;
-        this.akadora = akadora;
-    }
+    internal Naki? akadora;
 }

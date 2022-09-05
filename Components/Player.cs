@@ -10,17 +10,17 @@ internal sealed class Player
     internal int ScoreChange { get; set; } = 0;
 
     internal SortedDictionary<Tile, int> Hand { get; } = new SortedDictionary<Tile, int>();
-    internal List<Meld> Melds { get; } = new List<Meld>();
+    internal List<Meld> OpenMelds { get; } = new List<Meld>();
     internal List<Tile> Graveyard { get; } = new List<Tile>();
     internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
     internal int? RiichiTile { get; private set; } = null;
 
-    internal Dictionary<Naki, List<Value>> CallableValues { get; } = new Dictionary<Naki, List<Value>>();
+    internal Dictionary<Naki, HashSet<Value>> CallableValues { get; } = new Dictionary<Naki, HashSet<Value>>();
     internal Value JustCalled { get; private set; } = Value.None;
 
     internal int? Shanten { get; private set; } = null;
-    internal HashSet<Value> WinningTiles { get; } = new HashSet<Value>();
     internal bool Furiten { get; set; } = false;
+    internal List<Meld> WinningHand { get; } = new List<Meld>();
 
     internal Player(Seat seat)
     {
@@ -30,14 +30,14 @@ internal sealed class Player
 
     internal int HandLength()
     {
-        return Hand.Values.Sum() + (3 * Melds.Count);
+        return Hand.Values.Sum() + (3 * OpenMelds.Count);
     }
 
     internal bool IsOpen()
     {
-        foreach (Meld meld in Melds)
+        foreach (Meld meld in OpenMelds)
         {
-            if (meld.naki != Naki.AnKan) return true;
+            if (meld.origin != Seat) return true;
         }
 
         return false;
@@ -45,7 +45,7 @@ internal sealed class Player
 
     internal bool IsDefeated()
     {
-        return this.Score <= 0;
+        return Score <= 0;
     }
 
     internal bool IsTenpai()
@@ -76,22 +76,28 @@ internal sealed class Player
 
     internal void Draw(Tile tile)
     {
-        // TODO
+        if (Hand.ContainsKey(tile)) Hand[tile] ++;
+        else Hand[tile] = 1;
     }
 
     internal void Discard(Tile tile)
     {
-        // TODO
+        if (!Hand.ContainsKey(tile)) return;
+        else if (Hand[tile] == 1) Hand.Remove(tile);
+        else Hand[tile] --;
+
+        Graveyard.Add(tile);
+        GraveyardContents.Add(tile.value);
     }
 
-    internal void CreateMeld(Meld meld)
+    internal void AddCalledGroup(Meld meld)
     {
         // TODO
     }
 
-    internal void DeclareRiichi()
+    internal void DeclareRiichi(Tile tile)
     {
-        // TODO
+        RiichiTile = Graveyard.Count - 1;
     }
 
     internal void CalculateShanten()
