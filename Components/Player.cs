@@ -20,6 +20,7 @@ internal sealed class Player
 
     internal int? Shanten { get; private set; } = null;
     internal bool Furiten { get; set; } = false;
+    internal Dictionary<Mentsu, List<Tile>> WinningHand = new Dictionary<Mentsu, List<Tile>>();
 
     internal Player(Seat seat)
     {
