@@ -1,6 +1,7 @@
 namespace RiichiNET.Components;
 
 using Enums;
+using Groups;
 
 internal sealed class Player
 {
@@ -10,7 +11,7 @@ internal sealed class Player
     internal int ScoreChange { get; set; } = 0;
 
     internal SortedDictionary<Tile, int> Hand { get; } = new SortedDictionary<Tile, int>();
-    internal List<Meld> Melds { get; } = new List<Meld>();
+    internal List<Group> Melds { get; } = new List<Group>();
     internal List<Tile> Graveyard { get; } = new List<Tile>();
     internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
     internal int? RiichiTile { get; private set; } = null;
@@ -20,7 +21,13 @@ internal sealed class Player
 
     internal int? Shanten { get; private set; } = null;
     internal bool Furiten { get; set; } = false;
-    internal Dictionary<Mentsu, List<List<Tile>>> WinningHand = new Dictionary<Mentsu, List<List<Tile>>>();
+    internal Dictionary<Mentsu, List<Group>> WinningHand = new Dictionary<Mentsu, List<Group>>()
+    {
+        {Mentsu.Jantou, new List<Group>()},
+        {Mentsu.Shuntsu, new List<Group>()},
+        {Mentsu.Koutsu, new List<Group>()},
+        {Mentsu.Kantsu, new List<Group>()}
+    };
 
     internal Player(Seat seat)
     {
@@ -35,9 +42,9 @@ internal sealed class Player
 
     internal bool IsOpen()
     {
-        foreach (Meld meld in Melds)
+        foreach (Group group in Melds)
         {
-            if (meld.origin != Seat) return true;
+            if (group.Naki != Naki.AnKan) return true;
         }
 
         return false;
@@ -90,9 +97,11 @@ internal sealed class Player
         GraveyardContents.Add(tile.value);
     }
 
-    internal void AddMeld(Meld meld)
+    internal void AddMeld(Group meld)
     {
         Melds.Add(meld);
+
+        // TODO (add to winning hand)
     }
 
     internal void DeclareRiichi(Tile tile)

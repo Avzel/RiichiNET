@@ -7,16 +7,19 @@ internal struct Tile : IComparable<Tile>
     internal Value value;
     internal bool akadora;
 
-    internal Tile(Value value)
-    {
-        this.value = value;
-        this.akadora = false;
-    }
-
-    internal Tile(Value value, bool akadora)
+    internal Tile(Value value, bool akadora=false)
     {
         this.value = value;
         this.akadora = akadora;
+    }
+
+    public static implicit operator Tile(Value v)
+    {
+        return new Tile()
+        {
+            value = v,
+            akadora = false
+        };
     }
 
     public static implicit operator Tile(int n)
@@ -38,6 +41,15 @@ internal struct Tile : IComparable<Tile>
         {
             return new Tile(Value.None);
         }
+    }
+
+    public static Tile operator+ (Tile tile, int i)
+    {
+        int val = (int) tile.value + i;
+
+        if (i > 8 || !Enum.IsDefined(typeof(Value), val)) return (Tile) Value.None;
+        
+        else return new Tile((Value)Enum.ToObject(typeof(Value), val));
     }
 
     public int CompareTo(Tile other)
@@ -63,6 +75,13 @@ internal static class TileExtensions
     internal static bool IsYaoChuu(this Tile tile)
     {
         return tile.IsHonor() && tile.IsTerminal();
+    }
+
+    internal static bool IsGreen(this Tile tile)
+    {
+        int val = (int) tile.value;
+
+        return (val > 40 && val < 60) || val == 82;
     }
 
     internal static Value DoraValue(this Tile tile)
