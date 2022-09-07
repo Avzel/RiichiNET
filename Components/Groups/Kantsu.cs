@@ -2,7 +2,7 @@ namespace RiichiNET.Components.Groups;
 
 using Enums;
 
-internal class Kantsu: Group
+internal sealed class Kantsu: Group
 {
     internal override Mentsu Mentsu { get => Mentsu.Kantsu; }
 

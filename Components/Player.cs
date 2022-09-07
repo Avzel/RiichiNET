@@ -11,7 +11,7 @@ internal sealed class Player
     internal int ScoreChange { get; set; } = 0;
 
     internal SortedDictionary<Tile, int> Hand { get; } = new SortedDictionary<Tile, int>();
-    internal List<Group> Melds { get; } = new List<Group>();
+    internal List<Group> OpenGroups { get; } = new List<Group>();
     internal List<Tile> Graveyard { get; } = new List<Tile>();
     internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
     internal int? RiichiTile { get; private set; } = null;
@@ -37,12 +37,12 @@ internal sealed class Player
 
     internal int HandLength()
     {
-        return Hand.Values.Sum() + (3 * Melds.Count);
+        return Hand.Values.Sum() + (3 * OpenGroups.Count);
     }
 
     internal bool IsOpen()
     {
-        foreach (Group group in Melds)
+        foreach (Group group in OpenGroups)
         {
             if (group.Naki != Naki.AnKan) return true;
         }
@@ -97,11 +97,18 @@ internal sealed class Player
         GraveyardContents.Add(tile.value);
     }
 
-    internal void AddMeld(Group meld)
+    private void AddToWinningHand(Mentsu mentsu, Group group)
     {
-        Melds.Add(meld);
+        WinningHand.GetValueOrDefault(mentsu)?.Add(group);
+    }
 
-        // TODO (add to winning hand)
+    internal void AddOpenGroup(Group group)
+    {
+        if (group.Naki == Naki.None) return;  // Prevent this method from receiving an incompatible group / prevent Group from setting incompatible Naki
+
+        OpenGroups.Add(group);
+
+        AddToWinningHand(group.Mentsu, group);
     }
 
     internal void DeclareRiichi(Tile tile)
