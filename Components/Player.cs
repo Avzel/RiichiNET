@@ -11,7 +11,7 @@ internal sealed class Player
     internal int ScoreChange { get; set; } = 0;
 
     internal SortedDictionary<Tile, int> Hand { get; } = new SortedDictionary<Tile, int>();
-    internal List<Group> OpenGroups { get; } = new List<Group>();
+    internal List<OpenGroup> OpenGroups { get; } = new List<OpenGroup>();
     internal List<Tile> Graveyard { get; } = new List<Tile>();
     internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
     internal int? RiichiTile { get; private set; } = null;
@@ -44,7 +44,7 @@ internal sealed class Player
     {
         foreach (Group group in OpenGroups)
         {
-            if (group.IsOpen()) return true;
+            if (group.Open) return true;
         }
 
         return false;
@@ -76,9 +76,9 @@ internal sealed class Player
             CallableValues.ContainsKey(Naki.Agari)
             || CallableValues.ContainsKey(Naki.Pon)
             || CallableValues.ContainsKey(Naki.DaiMinKan)
-            || CallableValues.ContainsKey(Naki.ChiiLower)
-            || CallableValues.ContainsKey(Naki.ChiiUpper)
-            || CallableValues.ContainsKey(Naki.ChiiMiddle);
+            || CallableValues.ContainsKey(Naki.ChiiShimo)
+            || CallableValues.ContainsKey(Naki.ChiiNaka)
+            || CallableValues.ContainsKey(Naki.ChiiKami);
     }
 
     internal void Draw(Tile tile)
@@ -102,10 +102,8 @@ internal sealed class Player
         WinningHand.GetValueOrDefault(mentsu)?.Add(group);
     }
 
-    internal void AddOpenGroup(Group group)
+    internal void AddOpenGroup(OpenGroup group)
     {
-        if (group.Naki == Naki.None) return;  // Prevent this method from receiving an incompatible group / prevent Group from setting incompatible Naki
-
         OpenGroups.Add(group);
 
         AddToWinningHand(group.Mentsu, group);

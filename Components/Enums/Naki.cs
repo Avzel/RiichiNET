@@ -3,9 +3,9 @@ namespace RiichiNET.Components.Enums;
 internal enum Naki
 {
     None=0,
-    ChiiLower,
-    ChiiUpper,
-    ChiiMiddle,
+    ChiiShimo,
+    ChiiNaka,
+    ChiiKami,
     Pon,
     ShouMinKan,
     DaiMinKan,

@@ -52,6 +52,15 @@ internal struct Tile : IComparable<Tile>
         else return new Tile((Value)Enum.ToObject(typeof(Value), val));
     }
 
+    public static Tile operator- (Tile tile, int i)
+    {
+        int val = (int) tile.value - i;
+
+        if (i > 8 || !Enum.IsDefined(typeof(Value), val)) return (Tile) Value.None;
+        
+        else return new Tile((Value)Enum.ToObject(typeof(Value), val));
+    }
+
     public int CompareTo(Tile other)
     {
         return this.value.CompareTo(other.value);
