@@ -105,7 +105,6 @@ internal sealed class Player
     internal void AddOpenGroup(OpenGroup group)
     {
         OpenGroups.Add(group);
-
         AddToWinningHand(group.Mentsu, group);
     }
 
@@ -115,6 +114,11 @@ internal sealed class Player
     }
 
     internal void CalculateShanten()
+    {
+        // TODO
+    }
+
+    internal void NextTurn()
     {
         // TODO
     }
