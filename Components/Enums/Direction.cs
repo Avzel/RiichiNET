@@ -2,7 +2,7 @@ namespace RiichiNET.Components.Enums;
 
 internal enum Direction
 {
-    Left,
+    Right,
     Up,
-    Right
+    Left
 }
