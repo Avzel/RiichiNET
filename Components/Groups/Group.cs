@@ -6,26 +6,29 @@ internal abstract class Group
 {
     internal abstract Mentsu Mentsu { get; }
     private protected Value _value;
-    private protected bool _open;
 
-    internal virtual Naki Naki { get; set; }
-    internal virtual Seat Origin { get; set; }
-    internal virtual Naki? Akadora { get; set; }
+    internal Naki Naki { get; }
+    internal Seat Origin { get; }
+    internal Naki? Akadora { get; set; }
 
-    internal Group(Tile tile, bool akadora=false, bool open=false)
+    internal Group(Tile tile, Seat origin, bool akadora=false, Naki naki=Naki.None)
     {
         _value = tile.value;
-        _open = open;
+        Naki = naki;
 
         if (tile.akadora || akadora) Akadora = Naki.None;
+
+        Origin = origin;
     }
 
-    internal Group(Value value, bool akadora=false, bool open=false)
+    internal Group(Value value, Seat origin, bool akadora=false, Naki naki=Naki.None)
     {
         _value = value;
-        _open = open;
+        Naki = naki;
 
         if (akadora) Akadora = Naki.None;
+
+        Origin = origin;
     }
 
     internal abstract List<Tile> GetTiles();
@@ -48,5 +51,10 @@ internal abstract class Group
     internal bool OnlyGreens()
     {
         return ((Tile)this._value).IsGreen();
+    }
+
+    internal bool IsOpen()
+    {
+        return Naki == Naki.None || Naki == Naki.AnKan;
     }
 }

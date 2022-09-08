@@ -6,11 +6,11 @@ internal sealed class Shuntsu: Group
 {
     internal override Mentsu Mentsu { get => Mentsu.Shuntsu; }
 
-    internal Shuntsu(Tile tile, bool open=false)
-    : base(tile, open) {}
+    internal Shuntsu(Tile tile, Seat origin, bool akadora=false, Naki naki=Naki.None)
+    : base(tile, origin, akadora, naki) {}
 
-    internal Shuntsu(Value first, bool akadora=false, bool open=false)
-    : base(first, akadora, open) {}
+    internal Shuntsu(Value value, Seat origin, bool akadora=false, Naki naki=Naki.None)
+    : base(value, origin, akadora, naki) {}
 
     internal override List<Tile> GetTiles()
     {

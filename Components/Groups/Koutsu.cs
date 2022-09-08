@@ -6,11 +6,11 @@ internal sealed class Koutsu: Group
 {
     internal override Mentsu Mentsu { get => Mentsu.Koutsu; }
 
-    internal Koutsu(Tile tile, bool open=false)
-    : base(tile, open) {}
+    internal Koutsu(Tile tile, Seat origin, bool akadora=false, Naki naki=Naki.None)
+    : base(tile, origin, akadora, naki) {}
 
-    internal Koutsu(Value value, bool akadora=false, bool open=false)
-    : base(value, akadora, open) {}
+    internal Koutsu(Value value, Seat origin, bool akadora=false, Naki naki=Naki.None)
+    : base(value, origin, akadora, naki) {}
 
     internal override List<Tile> GetTiles()
     {

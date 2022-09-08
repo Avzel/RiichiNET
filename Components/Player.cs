@@ -32,7 +32,7 @@ internal sealed class Player
     internal Player(Seat seat)
     {
         this.Seat = seat;
-        this.Wind = (Wind) Enum.ToObject(typeof(Wind), (int) seat + 1);
+        this.Wind = (Wind) Enum.ToObject(typeof(Wind), (int)seat);
     }
 
     internal int HandLength()
@@ -44,7 +44,7 @@ internal sealed class Player
     {
         foreach (Group group in OpenGroups)
         {
-            if (group.Naki != Naki.AnKan) return true;
+            if (group.IsOpen()) return true;
         }
 
         return false;

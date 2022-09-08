@@ -6,11 +6,11 @@ internal sealed class Kantsu: Group
 {
     internal override Mentsu Mentsu { get => Mentsu.Kantsu; }
 
-    internal Kantsu(Tile tile, bool open=false)
-    : base(tile, open) {}
+    internal Kantsu(Tile tile, Seat origin, bool akadora=false, Naki naki=Naki.None)
+    : base(tile, origin, akadora, naki) {}
 
-    internal Kantsu(Value value, bool akadora=false, bool open=false)
-    : base(value, akadora, open) {}
+    internal Kantsu(Value value, Seat origin, bool akadora=false, Naki naki=Naki.None)
+    : base(value, origin, akadora, naki) {}
 
     internal override List<Tile> GetTiles()
     {

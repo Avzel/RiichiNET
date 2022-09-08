@@ -2,7 +2,7 @@ namespace RiichiNET.Components.Enums;
 
 internal enum Naki
 {
-    None,
+    None=0,
     ChiiLower,
     ChiiUpper,
     ChiiMiddle,

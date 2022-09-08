@@ -6,15 +6,11 @@ internal sealed class Jantou: Group
 {
     internal override Mentsu Mentsu { get => Mentsu.Jantou; }
 
-    internal override Naki Naki { get => Naki.None; }
-    internal override Seat Origin { get => Seat.None; }
-    internal override Naki? Akadora { get => null; }
+    internal Jantou(Tile tile, Seat origin, bool akadora=false, Naki naki=Naki.None)
+    : base(tile, origin, akadora, naki) {}
 
-    internal Jantou(Tile tile, bool open=false)
-    : base(tile, open) {}
-
-    internal Jantou(Value value, bool akadora=false, bool open=false)
-    : base(value, akadora, open) {}
+    internal Jantou(Value value, Seat origin, bool akadora=false, Naki naki=Naki.None)
+    : base(value, origin, akadora, naki) {}
 
     internal override List<Tile> GetTiles()
     {
