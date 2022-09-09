@@ -11,7 +11,7 @@ internal sealed class Player
     internal int ScoreChange { get; set; } = 0;
 
     internal SortedDictionary<Tile, int> Hand { get; } = new SortedDictionary<Tile, int>();
-    internal List<OpenGroup> OpenGroups { get; } = new List<OpenGroup>();
+    internal List<Group> Melds { get; } = new List<Group>();
     internal List<Tile> Graveyard { get; } = new List<Tile>();
     internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
     internal int? RiichiTile { get; private set; } = null;
@@ -37,12 +37,12 @@ internal sealed class Player
 
     internal int HandLength()
     {
-        return Hand.Values.Sum() + (3 * OpenGroups.Count);
+        return Hand.Values.Sum() + (3 * Melds.Count);
     }
 
     internal bool IsOpen()
     {
-        foreach (Group group in OpenGroups)
+        foreach (Group group in Melds)
         {
             if (group.Open) return true;
         }
@@ -104,7 +104,7 @@ internal sealed class Player
 
     internal void AddOpenGroup(OpenGroup group)
     {
-        OpenGroups.Add(group);
+        Melds.Add(group);
         AddToWinningHand(group.Mentsu, group);
     }
 
