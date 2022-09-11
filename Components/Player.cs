@@ -3,6 +3,8 @@ namespace RiichiNET.Components;
 using Enums;
 using Groups;
 
+using Util;
+
 internal sealed class Player
 {
     internal Seat Seat { get; }
@@ -118,13 +120,26 @@ internal sealed class Player
         // TODO
     }
 
-    internal void NextTurn()
+    internal void CalculateFuriten()
     {
-        // TODO
+        var furiten = CallableValues.GetValueOrDefault(Naki.Agari)?.Intersect(GraveyardContents);
+
+        if (furiten != null && furiten.Any()) Furiten = true;
     }
 
     internal void NextRound()
     {
-        // TODO
+        Wind = Wind.Next<Wind>();
+        Score += ScoreChange;
+        Hand.Clear();
+        Melds.Clear();
+        Graveyard.Clear();
+        GraveyardContents.Clear();
+        RiichiTile = null;
+        CallableValues.Clear();
+        JustCalled = Value.None;
+        Shanten = null;
+        Furiten = false;
+        WinningHand.Clear();
     }
 }
