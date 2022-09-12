@@ -1,6 +1,7 @@
 namespace RiichiNET.Components;
 
 using RiichiNET.Util;
+
 using Enums;
 
 internal sealed class Mountain
