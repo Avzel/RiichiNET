@@ -1,9 +1,9 @@
 namespace RiichiNET.Components;
 
+using RiichiNET.Util;
+
 using Enums;
 using Groups;
-
-using Util;
 
 internal sealed class Player
 {
@@ -16,12 +16,23 @@ internal sealed class Player
     internal List<Group> Melds { get; } = new List<Group>();
     internal List<Tile> Graveyard { get; } = new List<Tile>();
     internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
-    internal int? RiichiTile { get; private set; } = null;
+    private int? _riichiTile = null;
 
-    internal Dictionary<Naki, HashSet<Value>> CallableValues { get; } = new Dictionary<Naki, HashSet<Value>>();
+    internal Dictionary<Naki, HashSet<Value>> CallableValues { get; } = new Dictionary<Naki, HashSet<Value>>()
+    {
+        {Naki.ChiiShimo, new HashSet<Value>()},
+        {Naki.ChiiNaka, new HashSet<Value>()},
+        {Naki.ChiiKami, new HashSet<Value>()},
+        {Naki.Pon, new HashSet<Value>()},
+        {Naki.ShouMinKan, new HashSet<Value>()},
+        {Naki.DaiMinKan, new HashSet<Value>()},
+        {Naki.AnKan, new HashSet<Value>()},
+        {Naki.Riichi, new HashSet<Value>()},
+        {Naki.Agari, new HashSet<Value>()}
+    };
     internal Value JustCalled { get; private set; } = Value.None;
 
-    internal int? Shanten { get; private set; } = null;
+    internal bool Tenpai { get; private set; } = false;
     internal bool Furiten { get; set; } = false;
     internal Dictionary<Mentsu, List<Group>> WinningHand = new Dictionary<Mentsu, List<Group>>()
     {
@@ -52,15 +63,14 @@ internal sealed class Player
         return false;
     }
 
+    internal bool IsRiichi()
+    {
+        return _riichiTile != null;
+    }
+
     internal bool IsDefeated()
     {
         return Score <= 0;
-    }
-
-    internal bool IsTenpai()
-    {
-        return 
-            CallableValues.ContainsKey(Naki.Agari);
     }
 
     internal bool CanCallOnDraw()
@@ -112,19 +122,27 @@ internal sealed class Player
 
     internal void DeclareRiichi(Tile tile)
     {
-        RiichiTile = Graveyard.Count - 1;
+        _riichiTile = Graveyard.Count - 1;
     }
 
-    internal void CalculateShanten()
+    internal void DetermineTenpai()
     {
-        // TODO
+        if (ShantenCalculator.Calculate(Hand, Melds) == 0) Tenpai = true;
+        else Tenpai = false;
+
+        CallableValues[Naki.Agari] = ShantenCalculator.GetWinningTiles(Hand, Melds);
     }
 
-    internal void CalculateFuriten()
+    internal void DetermineFuriten()
     {
-        var furiten = CallableValues.GetValueOrDefault(Naki.Agari)?.Intersect(GraveyardContents);
+        HashSet<Value>? winningTiles = CallableValues.GetValueOrDefault(Naki.Agari);
 
-        if (furiten != null && furiten.Any()) Furiten = true;
+        if (winningTiles != null) foreach (Value value in winningTiles)
+        {
+            if (GraveyardContents.Contains(value)) Furiten = true; return;
+        }
+
+        Furiten = false; return;
     }
 
     internal void NextRound()
@@ -135,11 +153,12 @@ internal sealed class Player
         Melds.Clear();
         Graveyard.Clear();
         GraveyardContents.Clear();
-        RiichiTile = null;
-        CallableValues.Clear();
+        _riichiTile = null;
         JustCalled = Value.None;
-        Shanten = null;
+        Tenpai = false;
         Furiten = false;
-        WinningHand.Clear();
+
+        foreach (HashSet<Value> set in CallableValues.Values) set.Clear();
+        foreach (List<Group> list in WinningHand.Values) list.Clear();
     }
 }
