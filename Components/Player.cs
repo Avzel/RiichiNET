@@ -127,10 +127,7 @@ internal sealed class Player
 
     internal void DetermineTenpai()
     {
-        if (ShantenCalculator.Calculate(Hand, Melds) == 0) Tenpai = true;
-        else Tenpai = false;
-
-        CallableValues[Naki.Agari] = ShantenCalculator.GetWinningTiles(Hand, Melds);
+        // TODO
     }
 
     internal void DetermineFuriten()
