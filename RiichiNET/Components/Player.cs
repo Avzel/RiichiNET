@@ -72,6 +72,26 @@ internal sealed class Player
         return Score <= 0;
     }
 
+    internal bool CheckAnKan()
+    {
+        // TODO
+    }
+
+    internal bool CheckShouMinKan()
+    {
+        // TODO
+    }
+
+    internal bool CheckRiichi()
+    {
+        // TODO
+    }
+
+    internal bool CheckTsumo()
+    {
+        // TODO
+    }
+
     internal bool CanCallOnDraw()
     {
         return
@@ -81,15 +101,45 @@ internal sealed class Player
             || CallableValues.ContainsKey(Naki.Agari);
     }
 
+    internal bool CheckPon(Value value)
+    {
+        // TODO
+    }
+
+    internal bool CheckDaiMinKan(Value value)
+    {
+        // TODO
+    }
+
+    internal bool CheckChiiShimo(Value value)
+    {
+        // TODO
+    }
+
+    internal bool CheckChiiNaka(Value value)
+    {
+        // TODO
+    }
+
+    internal bool CheckChiiKami(Value value)
+    {
+        // TODO
+    }
+
+    internal bool CheckRon(Value value)
+    {
+        // TODO
+    }
+
     internal bool CanCallOnDiscard()
     {
         return 
-            CallableValues.ContainsKey(Naki.Agari)
-            || CallableValues.ContainsKey(Naki.Pon)
+            CallableValues.ContainsKey(Naki.Pon)
             || CallableValues.ContainsKey(Naki.DaiMinKan)
             || CallableValues.ContainsKey(Naki.ChiiShimo)
             || CallableValues.ContainsKey(Naki.ChiiNaka)
-            || CallableValues.ContainsKey(Naki.ChiiKami);
+            || CallableValues.ContainsKey(Naki.ChiiKami)
+            || CallableValues.ContainsKey(Naki.Agari);
     }
 
     internal void Draw(Tile tile)
@@ -113,7 +163,7 @@ internal sealed class Player
         WinningHand.GetValueOrDefault(mentsu)?.Add(group);
     }
 
-    internal void AddOpenGroup(OpenGroup group)
+    internal void AddMeld(Group group)
     {
         Melds.Add(group);
         AddToWinningHand(group.Mentsu, group);
@@ -124,8 +174,14 @@ internal sealed class Player
         _riichiTile = Graveyard.Count - 1;
     }
 
+    private List<List<Tile>> TreeOfHands()
+    {
+        // TODO
+    }
+
     internal void DetermineTenpai()
     {
+    
         // TODO
     }
 
