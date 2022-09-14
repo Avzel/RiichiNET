@@ -1,6 +1,7 @@
 namespace RiichiNET.Core.Components;
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using RiichiNET.Util.Extensions;
@@ -75,28 +76,33 @@ internal sealed class Player
         return Score <= 0;
     }
 
-    internal bool CheckAnKan()
+    private void CheckAnKan()
     {
         // TODO
     }
 
-    internal bool CheckShouMinKan()
+    private void CheckShouMinKan()
     {
         // TODO
     }
 
-    internal bool CheckRiichi()
+    private void CheckRiichi()
     {
         // TODO
     }
 
-    internal bool CheckTsumo()
+    private void CheckTsumo()
     {
         // TODO
     }
 
     internal bool CanCallOnDraw()
     {
+        CheckAnKan();
+        CheckShouMinKan();
+        CheckRiichi();
+        CheckTsumo();
+
         return
             CallableValues.ContainsKey(Naki.AnKan)
             || CallableValues.ContainsKey(Naki.ShouMinKan)
@@ -104,38 +110,45 @@ internal sealed class Player
             || CallableValues.ContainsKey(Naki.Agari);
     }
 
-    internal bool CheckPon(Value value)
+    private void CheckPon(Value value)
     {
         // TODO
     }
 
-    internal bool CheckDaiMinKan(Value value)
+    private void CheckDaiMinKan(Value value)
     {
         // TODO
     }
 
-    internal bool CheckChiiShimo(Value value)
+    private void CheckChiiShimo(Value value)
     {
         // TODO
     }
 
-    internal bool CheckChiiNaka(Value value)
+    private void CheckChiiNaka(Value value)
     {
         // TODO
     }
 
-    internal bool CheckChiiKami(Value value)
+    private void CheckChiiKami(Value value)
     {
         // TODO
     }
 
-    internal bool CheckRon(Value value)
+    private void CheckRon(Value value)
     {
         // TODO
     }
 
-    internal bool CanCallOnDiscard()
+    internal bool CanCallOnDiscard(Value value)
     {
+        CheckPon(value);
+        CheckDaiMinKan(value);
+        CheckChiiShimo(value);
+        CheckChiiNaka(value);
+        CheckChiiKami(value);
+        CheckRon(value);
+
         return 
             CallableValues.ContainsKey(Naki.Pon)
             || CallableValues.ContainsKey(Naki.DaiMinKan)
@@ -179,6 +192,7 @@ internal sealed class Player
 
     private List<List<Tile>> TreeOfHands()
     {
+        return new List<List<Tile>>();
         // TODO
     }
 
