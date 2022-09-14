@@ -22,6 +22,11 @@ internal sealed class Mountain
         SetMountain();
     }
 
+    internal bool IsEmpty()
+    {
+        return !_wall.Any();
+    }
+
     internal void SetMountain()
     {
         CreateTiles();
