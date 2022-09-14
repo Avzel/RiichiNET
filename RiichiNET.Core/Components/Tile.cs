@@ -28,7 +28,7 @@ internal struct Tile : IComparable<Tile>
     {
         try
         {
-            if (n < 0) return new Tile()
+            if (n < 0 && n % 5 == 0) return new Tile()
             { 
                 value = (Value) Enum.ToObject(typeof(Value), n * -1),
                 akadora = true
@@ -63,6 +63,16 @@ internal struct Tile : IComparable<Tile>
         else return new Tile((Value)Enum.ToObject(typeof(Value), val));
     }
 
+    public static Tile operator~ (Tile tile)
+    {
+        if (tile.IsFive()) return tile;
+
+        if (tile.akadora) tile.akadora = false;
+        else tile.akadora = true;
+
+        return tile;
+    }
+
     public int CompareTo(Tile other)
     {
         return this.value.CompareTo(other.value);
@@ -93,6 +103,11 @@ internal static class TileExtensions
         int val = (int) tile.value;
 
         return (val > 40 && val < 60) || val == 82;
+    }
+
+    internal static bool IsFive(this Tile tile)
+    {
+        return tile.value == Value.M5 || tile.value == Value.P5 || tile.value == Value.S5;
     }
 
     internal static Value DoraValue(this Tile tile)
