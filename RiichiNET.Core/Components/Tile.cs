@@ -77,42 +77,39 @@ internal struct Tile : IComparable<Tile>
     {
         return this.value.CompareTo(other.value);
     }
-}
 
-internal static class TileExtensions
-{
-    internal static bool IsTerminal(this Tile tile)
+    internal bool IsTerminal()
     {
-        int val = (int) tile.value;
+        int val = (int) value;
 
         return val % 10 == 1 || val % 10 == 9;
     }
 
-    internal static bool IsHonor(this Tile tile)
+    internal bool IsHonor()
     {
-        return (int) tile.value > 60;
+        return (int) value > 60;
     }
 
-    internal static bool IsYaoChuu(this Tile tile)
+    internal bool IsYaoChuu()
     {
-        return tile.IsHonor() && tile.IsTerminal();
+        return IsHonor() && IsTerminal();
     }
 
-    internal static bool IsGreen(this Tile tile)
+    internal bool IsGreen()
     {
-        int val = (int) tile.value;
+        int val = (int) value;
 
         return (val > 40 && val < 60) || val == 82;
     }
 
-    internal static bool IsFive(this Tile tile)
+    internal bool IsFive()
     {
-        return tile.value == Value.M5 || tile.value == Value.P5 || tile.value == Value.S5;
+        return value == Value.M5 || value == Value.P5 || value == Value.S5;
     }
 
-    internal static Value DoraValue(this Tile tile)
+    internal Value DoraValue()
     {
-        int val = (int) tile.value;
+        int val = (int) value;
 
         if (val == 64) val = 61;
         else if (val == 83) val = 81;

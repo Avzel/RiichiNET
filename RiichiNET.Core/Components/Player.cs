@@ -191,9 +191,13 @@ internal sealed class Player
         Melds.Add(group);
         AddToWinningHand(group.Mentsu, group);
 
+        Value value = group.GetSortedTiles()[0].value;
+
+        JustCalled = value;
+
         if (group.Open && group.Mentsu == Mentsu.Koutsu)
         {
-            _callableValues[Naki.ShouMinKan]?.Add(group.GetSortedTiles()[0].value);
+            _callableValues[Naki.ShouMinKan]?.Add(value);
         }
     }
 
@@ -216,13 +220,15 @@ internal sealed class Player
 
     internal void CalculateShanten()
     {
-        // TODO
+        // Perhaps create every possible meld from a hand and separately
+        // check all legal combinations
     }
 
     internal void NextRound()
     {
         Wind = Wind.Next<Wind>();
         Score += ScoreChange;
+        ScoreChange = 0;
         Hand.Clear();
         Melds.Clear();
         Graveyard.Clear();
