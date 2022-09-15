@@ -21,7 +21,7 @@ internal sealed class Player
     internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
     private int? _riichiTile = null;
 
-    internal Dictionary<Naki, HashSet<Value>> CallableValues { get; private set; } = new Dictionary<Naki, HashSet<Value>>()
+    private Dictionary<Naki, HashSet<Value>> _callableValues = new Dictionary<Naki, HashSet<Value>>()
     {
         {Naki.ChiiShimo, new HashSet<Value>()},
         {Naki.ChiiNaka, new HashSet<Value>()},
@@ -76,13 +76,39 @@ internal sealed class Player
         return Score <= 0;
     }
 
+    internal bool CanCall(Naki naki, Value value=Value.None)
+    {
+        if (value != Value.None) return _callableValues[naki].Contains(value);
+        else return _callableValues[naki].Any();
+    }
+
+    internal bool CanCallOnDraw()
+    {
+        return
+            CanCall(Naki.ShouMinKan)
+            || CanCall(Naki.AnKan)
+            || CanCall(Naki.Riichi)
+            || CanCall(Naki.Agari);
+    }
+
+    internal bool CanCallOnDiscard(Value value)
+    {
+        return
+            CanCall(Naki.ChiiShimo, value)
+            || CanCall(Naki.ChiiNaka, value)
+            || CanCall(Naki.ChiiKami, value)
+            || CanCall(Naki.Pon, value)
+            || CanCall(Naki.DaiMinKan, value)
+            || CanCall(Naki.Agari, value);
+    }
+
     private void DetermineCallOnDraw()
     {
         CalculateShanten();
 
         foreach (Tile tile in Hand.Keys)
         {
-            if (Hand[tile] == 4) CallableValues[Naki.AnKan]?.Add(tile.value);
+            if (Hand[tile] == 4) _callableValues[Naki.AnKan]?.Add(tile.value);
         }
     }
 
@@ -117,27 +143,27 @@ internal sealed class Player
 
             if (Hand[tile] == 2 || Hand[tile] == 3)
             {
-                CallableValues[Naki.Pon]?.Add(value);
+                _callableValues[Naki.Pon]?.Add(value);
             }
 
             if (Hand[tile] == 3)
             {
-                CallableValues[Naki.DaiMinKan]?.Add(value);
+                _callableValues[Naki.DaiMinKan]?.Add(value);
             }
 
             if (!tile.IsYaoChuu() && Hand.ContainsKey(tile + 1))
             {
-                CallableValues[Naki.ChiiShimo]?.Add((tile - 1).value);
+                _callableValues[Naki.ChiiShimo]?.Add((tile - 1).value);
             }
 
             if (Hand.ContainsKey(tile + 2))
             {
-                CallableValues[Naki.ChiiNaka]?.Add((tile + 1).value);
+                _callableValues[Naki.ChiiNaka]?.Add((tile + 1).value);
             }
 
             if (!tile.IsYaoChuu() && Hand.ContainsKey(tile - 1))
             {
-                CallableValues[Naki.ChiiKami]?.Add((tile + 1).value);
+                _callableValues[Naki.ChiiKami]?.Add((tile + 1).value);
             }
         }
     }
@@ -167,7 +193,7 @@ internal sealed class Player
 
         if (group.Open && group.Mentsu == Mentsu.Koutsu)
         {
-            CallableValues[Naki.ShouMinKan]?.Add(group.GetSortedTiles()[0].value);
+            _callableValues[Naki.ShouMinKan]?.Add(group.GetSortedTiles()[0].value);
         }
     }
 
@@ -178,7 +204,7 @@ internal sealed class Player
 
     internal void DetermineFuriten()
     {
-        HashSet<Value>? winningTiles = CallableValues.GetValueOrDefault(Naki.Agari);
+        HashSet<Value>? winningTiles = _callableValues.GetValueOrDefault(Naki.Agari);
 
         if (winningTiles != null) foreach (Value value in winningTiles)
         {
@@ -206,7 +232,7 @@ internal sealed class Player
         Tenpai = false;
         Furiten = false;
 
-        foreach (HashSet<Value> set in CallableValues.Values) set.Clear();
+        foreach (HashSet<Value> set in _callableValues.Values) set.Clear();
         foreach (List<Group> list in WinningHand.Values) list.Clear();
     }
 }
