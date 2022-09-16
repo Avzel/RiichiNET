@@ -12,7 +12,7 @@ public sealed class Table
     private State _state = State.None;
     private Wind _wind = Wind.East;
     private int _round = 0;
-    private int _turn = 0;
+    private Seat _turn = 0;
     
     private int _pool = 0;
 
