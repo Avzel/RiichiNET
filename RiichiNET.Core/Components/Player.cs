@@ -289,9 +289,9 @@ internal sealed class Player
             Value value = tile.value;
             bool akadora = tile.akadora;
 
-            if (Hand[tile] >= 2) pairs.Add(new AnJan(value, akadora));
-            if (Hand[tile] >= 3) triples.Add(new AnKou(value, akadora));
-            if (Hand[tile] == 4) pairs.Add(new AnJan(value, akadora));
+            if (Hand[tile] >= 2) pairs.Add(new AnJan(value));
+            if (Hand[tile] >= 3) triples.Add(new AnKou(value));
+            if (Hand[tile] == 4) pairs.Add(new AnJan(value));
 
             for (int i = 0; i < SequenceCount(tile); i++)
             {
