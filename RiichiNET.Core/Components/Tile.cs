@@ -99,12 +99,17 @@ internal struct Tile : IComparable<Tile>
     {
         int val = (int) value;
 
-        return (val > 40 && val < 60) || val == 82;
+        return (val >= 42 && val <= 44) || val == 46 || val == 48 || val == 82;
     }
 
     internal bool IsFive()
     {
         return value == Value.M5 || value == Value.P5 || value == Value.S5;
+    }
+
+    internal bool CanStartSequence()
+    {
+        return (int)value % 10 < 8;
     }
 
     internal Value DoraValue()

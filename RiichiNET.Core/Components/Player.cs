@@ -170,9 +170,26 @@ internal sealed class Player
 
     internal void Discard(Tile tile)
     {
-        if (!Hand.ContainsKey(tile)) return;
-        else if (Hand[tile] == 1) Hand.Remove(tile);
-        else Hand[tile]--;
+        if (!(Hand.ContainsKey(tile) || Hand.ContainsKey(~tile))) return;
+
+        int count;
+        if (tile.akadora && Hand.ContainsKey(tile))
+        {
+            count = Hand[tile] - 1;
+            Hand.Remove(tile);
+            if (count > 0) Hand[~tile] = count;
+        }
+        else if (!tile.akadora && Hand.ContainsKey(tile))
+        {
+            if (Hand[tile] == 1) Hand.Remove(tile);
+            else Hand[tile]--;
+        }
+        else if (!tile.akadora && Hand.ContainsKey(~tile))
+        {
+            if (Hand[tile] == 1) return;
+            else Hand[~tile]--;
+        }
+        else return;
 
         Graveyard.Add(tile);
         GraveyardContents.Add(tile.value);
@@ -218,12 +235,6 @@ internal sealed class Player
         Furiten = false; return;
     }
 
-    internal void CalculateShanten()
-    {
-        // Perhaps create every possible meld from a hand and separately
-        // check all legal combinations
-    }
-
     internal void NextRound()
     {
         Wind = Wind.Next<Wind>();
@@ -240,5 +251,55 @@ internal sealed class Player
 
         foreach (HashSet<Value> set in _callableValues.Values) set.Clear();
         foreach (List<Group> list in WinningHand.Values) list.Clear();
+    }
+
+    private int HandCount(Value value)
+    {
+        Tile normal = (Tile)value;
+        Tile special = ~((Tile)value);
+
+        if (Hand.ContainsKey(normal)) return Hand[normal];
+        else if (Hand.ContainsKey(special)) return Hand[special];
+        else return 0;
+    }
+
+    private int SequenceCount(Tile tile)
+    {
+        int firstCount = HandCount(tile.value);
+        int secondCount = HandCount(tile.value.Next());
+        int thirdCount = HandCount(tile.value.Next().Next());
+
+        if (!tile.IsHonor() && 
+            tile.CanStartSequence() && 
+            secondCount > 0 && 
+            thirdCount > 0)
+        {
+            return (new int[] {firstCount, secondCount, thirdCount}).Min();
+        }
+        else return 0;
+    }
+
+    internal void CalculateShanten()
+    {
+        List<Group> pairs = new List<Group>();
+        List<Group> triples = new List<Group>();
+
+        foreach (Tile tile in Hand.Keys)
+        {
+            Value value = tile.value;
+            bool akadora = tile.akadora;
+
+            if (Hand[tile] >= 2) pairs.Add(new AnJan(value, akadora));
+            if (Hand[tile] >= 3) triples.Add(new AnKou(value, akadora));
+            if (Hand[tile] == 4) pairs.Add(new AnJan(value, akadora));
+
+            for (int i = 0; i < SequenceCount(tile); i++)
+            {
+                triples.Add(new AnJun(value));
+            }
+        }
+
+        // TODO: take combinations of 1 pair and 4 triples, 7 pairs, or 14 singles
+        // TODO: handle akadora
     }
 }
