@@ -9,6 +9,11 @@ using RiichiNET.Core.Enums;
 
 internal sealed class Mountain
 {
+    static readonly int DORA_FIRST = 5;
+    static readonly int DEAD_WALL_LAST = 13;
+    static readonly int EXTRA_TILES_FIRST = 14;
+    static readonly int EXTRA_TILES_LAST = 18;
+
     static readonly Random Rand = new Random();
 
     private readonly LinkedList<Tile> _wall = new LinkedList<Tile>();
@@ -67,13 +72,13 @@ internal sealed class Mountain
 
     private void SplitDeadWall()
     {
-        for (int i = 13; i >= 0; i--)
+        for (int i = DEAD_WALL_LAST; i >= 0; i--)
         {
             _deadWall[i] = _wall.Last();
             _wall.RemoveLast();
         }
 
-        for (int i = 14; i < 18; i++)
+        for (int i = EXTRA_TILES_FIRST; i < EXTRA_TILES_LAST; i++)
         {
             _deadWall[i] = new Tile(Value.None);
         }
@@ -85,7 +90,7 @@ internal sealed class Mountain
     internal void FlipDora()
     {
         int kanCount = DoraList.Values.Sum();
-        int index = 5 + (kanCount * 2);
+        int index = DORA_FIRST + (kanCount * 2);
 
         Value dora = _deadWall[index].DoraValue();
         Value uraDora = _deadWall[index - 1].DoraValue();
@@ -95,7 +100,7 @@ internal sealed class Mountain
 
         if (kanCount > 0)
         {
-            _deadWall[13 + kanCount] = _wall.First();
+            _deadWall[DEAD_WALL_LAST + kanCount] = _wall.First();
             _wall.RemoveFirst();
         }
     }

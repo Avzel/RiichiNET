@@ -82,7 +82,7 @@ internal struct Tile : IComparable<Tile>
     {
         int val = (int)value;
 
-        return val % 10 == 1 || val % 10 == 9;
+        return val % 10 is 1 or 9;
     }
 
     internal bool IsHonor()
@@ -99,12 +99,12 @@ internal struct Tile : IComparable<Tile>
     {
         int val = (int)value;
 
-        return (val >= 42 && val <= 44) || val == 46 || val == 48 || val == 82;
+        return val is 46 or 48 or 82 or (>= 42 and <= 44);
     }
 
     internal bool IsFive()
     {
-        return value == Value.M5 || value == Value.P5 || value == Value.S5;
+        return value is Value.M5 or Value.P5 or Value.S5;
     }
 
     internal bool CanStartShuntsu()
@@ -116,7 +116,7 @@ internal struct Tile : IComparable<Tile>
     {
         int val = (int)value;
 
-        return val % 10 >= 3 && val % 10 <= 5;
+        return val % 10 is >= 3 and <= 5;
     }
 
     internal Value DoraValue()

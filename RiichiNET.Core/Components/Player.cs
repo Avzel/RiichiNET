@@ -141,7 +141,7 @@ internal sealed class Player
         {
             Value value = tile.value;
 
-            if (Hand[tile] == 2 || Hand[tile] == 3)
+            if (Hand[tile] is 2 or 3)
             {
                 _callableValues[Naki.Pon]?.Add(value);
             }
@@ -307,6 +307,6 @@ internal sealed class Player
         }
         // TODO: take combinations of 1 pair and 4 triples, look for 7 pairs, or look for 14 singles
 
-
+        
     }
 }
