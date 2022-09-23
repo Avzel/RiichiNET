@@ -255,11 +255,6 @@ internal sealed class Player
 
     // Shanten Calculation:
 
-    internal bool CanShuntsuAkadora(Tile tile)
-    {
-        return tile.akadora || Hand.ContainsKey(~(tile + 1)) || Hand.ContainsKey(~(tile + 2));
-    }
-
     private int HandCount(Value value)
     {
         Tile normal = (Tile)value;
@@ -286,6 +281,11 @@ internal sealed class Player
         else return 0;
     }
 
+        private bool GetShuntsuAkadora(Tile tile)
+    {
+        return tile.akadora || Hand.ContainsKey(~(tile + 1)) || Hand.ContainsKey(~(tile + 2));
+    }
+
     private void CalculateShanten()
     {
         List<Group> pairs = new List<Group>();
@@ -302,7 +302,7 @@ internal sealed class Player
 
             for (int i = 0; i < ShuntsuCount(tile); i++)
             {
-                triples.Add(new AnJun(value, i == 0 ? CanShuntsuAkadora(tile) : false));
+                triples.Add(new AnJun(value, i == 0 ? GetShuntsuAkadora(tile) : false));
             }
         }
         // TODO: take combinations of 1 pair and 4 triples, look for 7 pairs, or look for 14 singles
