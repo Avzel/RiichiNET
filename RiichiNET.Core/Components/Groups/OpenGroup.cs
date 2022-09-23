@@ -27,6 +27,15 @@ internal abstract class OpenGroup: Group
         return OrderedTiles[0].IsGreen();
     }
 
+    internal override bool Contains(Value value)
+    {
+        foreach (Tile tile in OrderedTiles)
+        {
+            if (tile.value == value) return true;
+        }
+        return false;
+    }
+
     private protected void SetShuntsuAkadora(bool akadora)
     {
         if ((Akadora = akadora) == true)

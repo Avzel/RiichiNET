@@ -28,4 +28,9 @@ internal abstract class ClosedGroup: Group
     {
         return ((Tile)_value).IsGreen();
     }
+
+    internal override bool Contains(Value value)
+    {
+        return _value == value;
+    }
 }

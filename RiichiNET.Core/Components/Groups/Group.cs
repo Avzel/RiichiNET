@@ -14,4 +14,5 @@ internal abstract class Group
     internal abstract bool HasYaoChuu();
     internal abstract bool OnlyHonors();
     internal abstract bool OnlyGreens();
+    internal abstract bool Contains(Value value);
 }

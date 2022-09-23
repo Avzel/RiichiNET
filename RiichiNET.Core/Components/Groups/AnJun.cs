@@ -35,4 +35,9 @@ internal sealed class AnJun: ClosedGroup
     {
         return false;
     }
+
+    internal override bool Contains(Value value)
+    {
+        return _value - value is <= 0 and >= -2;
+    }
 }
