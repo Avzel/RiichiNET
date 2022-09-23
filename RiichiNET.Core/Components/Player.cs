@@ -168,6 +168,18 @@ internal sealed class Player
         }
     }
 
+    private void DetermineFuriten()
+    {
+        HashSet<Value>? winningTiles = _callableValues.GetValueOrDefault(Naki.Agari);
+
+        if (winningTiles != null) foreach (Value value in winningTiles)
+        {
+            if (GraveyardContents.Contains(value)) Furiten = true; return;
+        }
+
+        Furiten = false; return;
+    }
+
     internal void Discard(Tile tile)
     {
         if (!(Hand.ContainsKey(tile) || Hand.ContainsKey(~tile))) return;
@@ -223,18 +235,6 @@ internal sealed class Player
         _riichiTile = Graveyard.Count - 1;
     }
 
-    internal void DetermineFuriten()
-    {
-        HashSet<Value>? winningTiles = _callableValues.GetValueOrDefault(Naki.Agari);
-
-        if (winningTiles != null) foreach (Value value in winningTiles)
-        {
-            if (GraveyardContents.Contains(value)) Furiten = true; return;
-        }
-
-        Furiten = false; return;
-    }
-
     internal void NextRound()
     {
         Wind = Wind.Next<Wind>();
@@ -253,6 +253,13 @@ internal sealed class Player
         foreach (List<Group> list in WinningHand.Values) list.Clear();
     }
 
+    // Shanten Calculation:
+
+    internal bool CanShuntsuAkadora(Tile tile)
+    {
+        return tile.akadora || Hand.ContainsKey(~(tile + 1)) || Hand.ContainsKey(~(tile + 2));
+    }
+
     private int HandCount(Value value)
     {
         Tile normal = (Tile)value;
@@ -263,14 +270,14 @@ internal sealed class Player
         else return 0;
     }
 
-    private int SequenceCount(Tile tile)
+    private int ShuntsuCount(Tile tile)
     {
         int firstCount = HandCount(tile.value);
         int secondCount = HandCount(tile.value.Next());
         int thirdCount = HandCount(tile.value.Next().Next());
 
         if (!tile.IsHonor() && 
-            tile.CanStartSequence() && 
+            tile.CanStartShuntsu() && 
             secondCount > 0 && 
             thirdCount > 0)
         {
@@ -279,7 +286,7 @@ internal sealed class Player
         else return 0;
     }
 
-    internal void CalculateShanten()
+    private void CalculateShanten()
     {
         List<Group> pairs = new List<Group>();
         List<Group> triples = new List<Group>();
@@ -289,17 +296,17 @@ internal sealed class Player
             Value value = tile.value;
             bool akadora = tile.akadora;
 
-            if (Hand[tile] >= 2) pairs.Add(new AnJan(value));
-            if (Hand[tile] >= 3) triples.Add(new AnKou(value));
+            if (Hand[tile] >= 2) pairs.Add(new AnJan(value, akadora));
+            if (Hand[tile] >= 3) triples.Add(new AnKou(value, akadora));
             if (Hand[tile] == 4) pairs.Add(new AnJan(value));
 
-            for (int i = 0; i < SequenceCount(tile); i++)
+            for (int i = 0; i < ShuntsuCount(tile); i++)
             {
-                triples.Add(new AnJun(value));
+                triples.Add(new AnJun(value, i == 0 ? CanShuntsuAkadora(tile) : false));
             }
         }
+        // TODO: take combinations of 1 pair and 4 triples, look for 7 pairs, or look for 14 singles
 
-        // TODO: take combinations of 1 pair and 4 triples, 7 pairs, or 14 singles
-        // TODO: handle akadora
+
     }
 }
