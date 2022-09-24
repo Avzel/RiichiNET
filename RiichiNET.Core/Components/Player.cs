@@ -104,7 +104,7 @@ internal sealed class Player
 
     private void DetermineCallOnDraw()
     {
-        CalculateShanten();
+        // CalculateShanten();
 
         foreach (Tile tile in Hand.Keys)
         {
@@ -135,7 +135,7 @@ internal sealed class Player
 
     private void DetermineCallOnDiscard()
     {
-        CalculateShanten();
+        // CalculateShanten();
 
         foreach (Tile tile in Hand.Keys)
         {
@@ -170,14 +170,7 @@ internal sealed class Player
 
     private void DetermineFuriten()
     {
-        HashSet<Value>? winningTiles = _callableValues.GetValueOrDefault(Naki.Agari);
-
-        if (winningTiles != null) foreach (Value value in winningTiles)
-        {
-            if (GraveyardContents.Contains(value)) Furiten = true; return;
-        }
-
-        Furiten = false; return;
+        // TODO
     }
 
     internal void Discard(Tile tile)
@@ -255,7 +248,7 @@ internal sealed class Player
 
     // Shanten Calculation:
 
-    private int HandCount(Value value)
+        private int HandCount(Value value)
     {
         Tile normal = (Tile)value;
         Tile special = ~((Tile)value);
@@ -286,9 +279,22 @@ internal sealed class Player
         return tile.akadora || Hand.ContainsKey(~(tile + 1)) || Hand.ContainsKey(~(tile + 2));
     }
 
-    private void CalculateShanten()
+    private Value GetMissingKokushiTile(List<Value> values)
     {
-        List<Group> singles = new List<Group>();
+        HashSet<Value> yaoChuuPai = new HashSet<Value>()
+        {
+            Value.M1, Value.M9, Value.P1, Value.P9, Value.S1, Value.S9, 
+            Value.WE, Value.WN, Value.WS, Value.WW,
+            Value.DG, Value.DR, Value.DW
+        };
+        foreach (Value value in values) yaoChuuPai.Remove(value);
+        return yaoChuuPai.First();
+    }
+
+    internal void CalculateShanten(List<Group> melds)
+    {
+        List<Tile> singles = new List<Tile>();
+        List<Tile> yaoChuuPai = new List<Tile>();
         List<Group> pairs = new List<Group>();
         List<Group> triples = new List<Group>();
 
@@ -297,7 +303,8 @@ internal sealed class Player
             Value value = tile.value;
             bool akadora = tile.akadora;
 
-            if (Hand[tile] == 1 && tile.IsYaoChuu()) singles.Add(new AnPai(value, akadora));
+            if (Hand[tile] == 1) singles.Add(tile);
+            if (Hand[tile] == 1 && tile.IsYaoChuu()) yaoChuuPai.Add(tile);
             if (Hand[tile] >= 2) pairs.Add(new AnJan(value, akadora));
             if (Hand[tile] >= 3) triples.Add(new AnKou(value, akadora));
             if (Hand[tile] == 4) pairs.Add(new AnJan(value));
@@ -307,8 +314,31 @@ internal sealed class Player
                 triples.Add(new AnJun(value, i == 0 ? GetShuntsuAkadora(tile) : false));
             }
         }
-        // TODO: take combinations of 1 pair and 4 triples, look for 7 pairs, or look for 14 singles
 
-        
+        if (pairs.Count() == 6)
+        {
+            Tenpai = true;
+            _callableValues[Naki.Agari]?.Add(singles[0].value);
+            return;
+        }
+        else if (yaoChuuPai.Count() == 13)
+        {
+            Tenpai = true;
+            foreach (Tile tile in yaoChuuPai) _callableValues[Naki.Agari]?.Add(tile.value);
+            return;
+        }
+        else if (yaoChuuPai.Count() == 11 && pairs[0].HasYaoChuu())
+        {
+            List<Value> kokushiValues = new List<Value>();
+            foreach (Tile tile in yaoChuuPai) kokushiValues.Add(tile.value);
+            kokushiValues.Add(pairs[0].GetSortedTiles()[0].value);
+            _callableValues[Naki.Agari]?.Add(GetMissingKokushiTile(kokushiValues));
+        }
+        else
+        {
+            // TODO: take combinations of 1 pair and 4 triples
+
+            
+        }
     }
 }
