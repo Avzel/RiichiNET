@@ -281,13 +281,14 @@ internal sealed class Player
         else return 0;
     }
 
-        private bool GetShuntsuAkadora(Tile tile)
+    private bool GetShuntsuAkadora(Tile tile)
     {
         return tile.akadora || Hand.ContainsKey(~(tile + 1)) || Hand.ContainsKey(~(tile + 2));
     }
 
     private void CalculateShanten()
     {
+        List<Group> singles = new List<Group>();
         List<Group> pairs = new List<Group>();
         List<Group> triples = new List<Group>();
 
@@ -296,6 +297,7 @@ internal sealed class Player
             Value value = tile.value;
             bool akadora = tile.akadora;
 
+            if (Hand[tile] == 1 && tile.IsYaoChuu()) singles.Add(new AnPai(value, akadora));
             if (Hand[tile] >= 2) pairs.Add(new AnJan(value, akadora));
             if (Hand[tile] >= 3) triples.Add(new AnKou(value, akadora));
             if (Hand[tile] == 4) pairs.Add(new AnJan(value));
