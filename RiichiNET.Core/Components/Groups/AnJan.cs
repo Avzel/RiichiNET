@@ -12,6 +12,6 @@ internal sealed class AnJan: ClosedGroup
 
     internal override List<Tile> GetSortedTiles()
     {
-        return new List<Tile>() {new Tile(_value, true), (Tile)_value};
+        return new List<Tile>() {new Tile(_value, Akadora), (Tile)_value};
     }
 }

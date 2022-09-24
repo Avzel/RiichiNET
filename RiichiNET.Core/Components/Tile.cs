@@ -92,7 +92,7 @@ internal struct Tile : IComparable<Tile>
 
     internal bool IsYaoChuu()
     {
-        return IsHonor() && IsTerminal();
+        return IsHonor() || IsTerminal();
     }
 
     internal bool IsGreen()
