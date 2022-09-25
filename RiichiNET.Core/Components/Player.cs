@@ -6,7 +6,8 @@ using System.Collections.Generic;
 
 using RiichiNET.Util.Extensions;
 using RiichiNET.Core.Enums;
-using RiichiNET.Core.Components.Groups;
+using RiichiNET.Core.Components.Collections;
+using RiichiNET.Core.Components.Collections.Melds;
 
 internal sealed class Player
 {
@@ -15,8 +16,8 @@ internal sealed class Player
     internal int Score { get; private set; } = 25000;
     internal int ScoreChange { get; set; } = 0;
 
-    internal SortedDictionary<Tile, int> Hand { get; } = new SortedDictionary<Tile, int>();
-    internal List<Group> Melds { get; } = new List<Group>();
+    internal ClosedHand Hand { get; } = new ClosedHand();
+    internal List<Meld> Melds { get; } = new List<Meld>();
     internal List<Tile> Graveyard { get; } = new List<Tile>();
     internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
     private int? _riichiTile = null;
@@ -37,12 +38,12 @@ internal sealed class Player
 
     internal bool Tenpai { get; private set; } = false;
     internal bool Furiten { get; set; } = false;
-    internal Dictionary<Mentsu, List<Group>> WinningHand = new Dictionary<Mentsu, List<Group>>()
+    internal Dictionary<Mentsu, List<Meld>> WinningHand = new Dictionary<Mentsu, List<Meld>>()
     {
-        {Mentsu.Jantou, new List<Group>()},
-        {Mentsu.Shuntsu, new List<Group>()},
-        {Mentsu.Koutsu, new List<Group>()},
-        {Mentsu.Kantsu, new List<Group>()}
+        {Mentsu.Jantou, new List<Meld>()},
+        {Mentsu.Shuntsu, new List<Meld>()},
+        {Mentsu.Koutsu, new List<Meld>()},
+        {Mentsu.Kantsu, new List<Meld>()}
     };
 
     internal Player(Seat seat)
@@ -53,14 +54,14 @@ internal sealed class Player
 
     internal int HandLength()
     {
-        return Hand.Values.Sum() + (3 * Melds.Count);
+        return Hand.Length() + (3 * Melds.Count);
     }
 
     internal bool IsOpen()
     {
-        foreach (Group group in Melds)
+        foreach (Meld Meld in Melds)
         {
-            if (group.Open) return true;
+            if (Meld.Open) return true;
         }
 
         return false;
@@ -106,7 +107,7 @@ internal sealed class Player
     {
         // CalculateShanten();
 
-        foreach (Tile tile in Hand.Keys)
+        foreach (Tile tile in Hand.Tiles())
         {
             if (Hand[tile] == 4) _callableValues[Naki.AnKan]?.Add(tile.value);
         }
@@ -114,22 +115,7 @@ internal sealed class Player
 
     internal void Draw(Tile tile)
     {
-        if (Hand.ContainsKey(tile)) Hand[tile]++;
-
-        else if (Hand.ContainsKey(~tile) && tile.akadora)
-        {
-            int count = Hand[~tile] + 1;
-            Hand.Remove(~tile);
-            Hand[tile] = count;
-        }
-
-        else if (Hand.ContainsKey(~tile) && !tile.akadora)
-        {
-            Hand[~tile]++;
-        }
-
-        else Hand[tile] = 1;
-
+        Hand.Draw(tile);
         DetermineCallOnDraw();
     }
 
@@ -137,7 +123,7 @@ internal sealed class Player
     {
         // CalculateShanten();
 
-        foreach (Tile tile in Hand.Keys)
+        foreach (Tile tile in Hand.Tiles())
         {
             Value value = tile.value;
 
@@ -151,73 +137,52 @@ internal sealed class Player
                 _callableValues[Naki.DaiMinKan]?.Add(value);
             }
 
-            if (!tile.IsYaoChuu() && Hand.ContainsKey(tile + 1))
+            if (!tile.IsYaoChuu() && Hand.ContainsTile(tile + 1))
             {
                 _callableValues[Naki.ChiiShimo]?.Add((tile - 1).value);
             }
 
-            if (Hand.ContainsKey(tile + 2))
+            if (Hand.ContainsTile(tile + 2))
             {
                 _callableValues[Naki.ChiiNaka]?.Add((tile + 1).value);
             }
 
-            if (!tile.IsYaoChuu() && Hand.ContainsKey(tile - 1))
+            if (!tile.IsYaoChuu() && Hand.ContainsTile(tile - 1))
             {
                 _callableValues[Naki.ChiiKami]?.Add((tile + 1).value);
             }
         }
     }
 
-    private void DetermineFuriten()
-    {
-        // TODO
-    }
-
     internal void Discard(Tile tile)
     {
-        if (!(Hand.ContainsKey(tile) || Hand.ContainsKey(~tile))) return;
+        bool success = Hand.Discard(tile);
 
-        int count;
-        if (tile.akadora && Hand.ContainsKey(tile))
+        if (success)
         {
-            count = Hand[tile] - 1;
-            Hand.Remove(tile);
-            if (count > 0) Hand[~tile] = count;
+            Graveyard.Add(tile);
+            GraveyardContents.Add(tile.value);
         }
-        else if (!tile.akadora && Hand.ContainsKey(tile))
-        {
-            if (Hand[tile] == 1) Hand.Remove(tile);
-            else Hand[tile]--;
-        }
-        else if (!tile.akadora && Hand.ContainsKey(~tile))
-        {
-            if (Hand[tile] == 1) return;
-            else Hand[~tile]--;
-        }
-        else return;
-
-        Graveyard.Add(tile);
-        GraveyardContents.Add(tile.value);
 
         DetermineCallOnDiscard();
-        DetermineFuriten();
+        // DetermineFuriten();
     }
 
-    private void AddToWinningHand(Mentsu mentsu, Group group)
+    private void AddToWinningHand(Mentsu mentsu, Meld Meld)
     {
-        WinningHand.GetValueOrDefault(mentsu)?.Add(group);
+        WinningHand.GetValueOrDefault(mentsu)?.Add(Meld);
     }
 
-    internal void AddMeld(Group group)
+    internal void AddMeld(Meld Meld)
     {
-        Melds.Add(group);
-        AddToWinningHand(group.Mentsu, group);
+        Melds.Add(Meld);
+        AddToWinningHand(Meld.Mentsu, Meld);
 
-        Value value = group.GetSortedTiles()[0].value;
+        Value value = Meld[0].value;
 
         JustCalled = value;
 
-        if (group.Open && group.Mentsu == Mentsu.Koutsu)
+        if (Meld.Open && Meld.Mentsu == Mentsu.Koutsu)
         {
             _callableValues[Naki.ShouMinKan]?.Add(value);
         }
@@ -243,18 +208,18 @@ internal sealed class Player
         Furiten = false;
 
         foreach (HashSet<Value> set in _callableValues.Values) set.Clear();
-        foreach (List<Group> list in WinningHand.Values) list.Clear();
+        foreach (List<Meld> list in WinningHand.Values) list.Clear();
     }
 
     // Shanten Calculation:
 
-        private int HandCount(Value value)
+    private int HandCount(Value value)
     {
         Tile normal = (Tile)value;
         Tile special = ~((Tile)value);
 
-        if (Hand.ContainsKey(normal)) return Hand[normal];
-        else if (Hand.ContainsKey(special)) return Hand[special];
+        if (Hand.ContainsTile(normal)) return Hand[normal];
+        else if (Hand.ContainsTile(special)) return Hand[special];
         else return 0;
     }
 
@@ -264,81 +229,98 @@ internal sealed class Player
         int secondCount = HandCount(tile.value.Next());
         int thirdCount = HandCount(tile.value.Next().Next());
 
-        if (!tile.IsHonor() && 
+        if
+        (
+            !tile.IsHonor() && 
             tile.CanStartShuntsu() && 
             secondCount > 0 && 
-            thirdCount > 0)
+            thirdCount > 0
+        )
         {
             return (new int[] {firstCount, secondCount, thirdCount}).Min();
         }
         else return 0;
     }
 
-    private bool GetShuntsuAkadora(Tile tile)
+    private SortedDictionary<Tile, int> GetUpdatedCount(SortedDictionary<Tile, int> count, Meld meld)
     {
-        return tile.akadora || Hand.ContainsKey(~(tile + 1)) || Hand.ContainsKey(~(tile + 2));
-    }
-
-    private Value GetMissingKokushiTile(List<Value> values)
-    {
-        HashSet<Value> yaoChuuPai = new HashSet<Value>()
+        SortedDictionary<Tile, int> updatedCount = new SortedDictionary<Tile, int>(count);
+        foreach (Tile tile in meld.GetSortedTiles())
         {
-            Value.M1, Value.M9, Value.P1, Value.P9, Value.S1, Value.S9, 
-            Value.WE, Value.WN, Value.WS, Value.WW,
-            Value.DG, Value.DR, Value.DW
-        };
-        foreach (Value value in values) yaoChuuPai.Remove(value);
-        return yaoChuuPai.First();
+            updatedCount[tile]--;
+            if (updatedCount[tile] == 0) updatedCount.Remove(tile);
+            else if (tile.akadora)
+            {
+                updatedCount[~tile] = updatedCount[tile];
+                updatedCount.Remove(tile);
+            }
+        }
+        return updatedCount;
     }
 
-    internal void CalculateShanten(List<Group> melds)
+    private List<Meld> GetUpdatedMelds(List<Meld> melds, Meld meld)
     {
-        List<Tile> singles = new List<Tile>();
-        List<Tile> yaoChuuPai = new List<Tile>();
-        List<Group> pairs = new List<Group>();
-        List<Group> triples = new List<Group>();
+        List<Meld> updatedMelds = new List<Meld>(melds);
+        updatedMelds.Add(meld);
+        return updatedMelds;
+    }
 
-        foreach (Tile tile in Hand.Keys)
+    private bool GetShuntsuAkadora(SortedDictionary<Tile, int> count, Tile tile)
+    {
+        return tile.akadora || count.ContainsKey(~(tile + 1)) || count.ContainsKey(~(tile + 2));
+    }
+
+    private void DetermineFuriten()
+    {
+        // TODO
+    }
+
+    private void TreeOfHands(SortedDictionary<Tile, int> count, List<Meld> melds)
+    {
+        foreach (Tile tile in count.Keys)
         {
             Value value = tile.value;
             bool akadora = tile.akadora;
 
-            if (Hand[tile] == 1) singles.Add(tile);
-            if (Hand[tile] == 1 && tile.IsYaoChuu()) yaoChuuPai.Add(tile);
-            if (Hand[tile] >= 2) pairs.Add(new AnJan(value, akadora));
-            if (Hand[tile] >= 3) triples.Add(new AnKou(value, akadora));
-            if (Hand[tile] == 4) pairs.Add(new AnJan(value));
+            if (count[tile] >= 2)
+            {
+                Meld anJan = new AnJan(value, akadora);
+                TreeOfHands
+                (
+                    GetUpdatedCount(count, anJan), 
+                    GetUpdatedMelds(melds, anJan)
+                );
+            }
+            if (count[tile] >= 3)
+            {
+                Meld anKou = new AnKou(value, akadora);
+                TreeOfHands
+                (
+                    GetUpdatedCount(count, anKou), 
+                    GetUpdatedMelds(melds, anKou)
+                );
+            }
 
+            SortedDictionary<Tile, int> updatedCount = new SortedDictionary<Tile, int>(count);
+            List<Meld> updatedMelds = new List<Meld>(melds);
             for (int i = 0; i < ShuntsuCount(tile); i++)
             {
-                triples.Add(new AnJun(value, i == 0 ? GetShuntsuAkadora(tile) : false));
+                Meld anJun = new AnJun(value, i == 0 ? GetShuntsuAkadora(count, tile) : false);
+                updatedCount = GetUpdatedCount(updatedCount, anJun);
+                updatedMelds = GetUpdatedMelds(updatedMelds, anJun);
             }
+            TreeOfHands(updatedCount, updatedMelds);
         }
 
-        if (pairs.Count() == 6)
-        {
-            Tenpai = true;
-            _callableValues[Naki.Agari]?.Add(singles[0].value);
-            return;
-        }
-        else if (yaoChuuPai.Count() == 13)
-        {
-            Tenpai = true;
-            foreach (Tile tile in yaoChuuPai) _callableValues[Naki.Agari]?.Add(tile.value);
-            return;
-        }
-        else if (yaoChuuPai.Count() == 11 && pairs[0].HasYaoChuu())
-        {
-            List<Value> kokushiValues = new List<Value>();
-            foreach (Tile tile in yaoChuuPai) kokushiValues.Add(tile.value);
-            kokushiValues.Add(pairs[0].GetSortedTiles()[0].value);
-            _callableValues[Naki.Agari]?.Add(GetMissingKokushiTile(kokushiValues));
-        }
-        else
-        {
-            // TODO: take combinations of 1 pair and 4 triples
+        // Evaluate hands here:
 
-            
-        }
+        // 22 44 66 888 99 WWW
+        // 4444 55 666 8 9 WW
+        // 111 1 22 33 4 5 6 777
+
+        // if ()
+        // {
+
+        // }
     }
 }

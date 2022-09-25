@@ -1,10 +1,10 @@
-namespace RiichiNET.Core.Components.Groups;
+namespace RiichiNET.Core.Components.Collections.Melds;
 
 using System.Collections.Generic;
 
 using RiichiNET.Core.Enums;
 
-internal sealed class MinKou: OpenGroup
+internal sealed class MinKou: OpenMeld
 {
     internal override Mentsu Mentsu { get => Mentsu.Koutsu; }
     internal override Naki Naki { get => Naki.Pon; }

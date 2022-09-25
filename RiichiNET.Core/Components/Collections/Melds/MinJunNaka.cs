@@ -1,10 +1,10 @@
-namespace RiichiNET.Core.Components.Groups;
+namespace RiichiNET.Core.Components.Collections.Melds;
 
 using System.Collections.Generic;
 
 using RiichiNET.Core.Enums;
 
-internal class MinJunNaka: OpenGroup
+internal class MinJunNaka: OpenMeld
 {
     internal override Mentsu Mentsu { get => Mentsu.Shuntsu; }
     internal override Naki Naki { get => Naki.ChiiNaka; }

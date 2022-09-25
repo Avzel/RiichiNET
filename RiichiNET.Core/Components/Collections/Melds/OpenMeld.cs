@@ -1,10 +1,10 @@
-namespace RiichiNET.Core.Components.Groups;
+namespace RiichiNET.Core.Components.Collections.Melds;
 
 using System.Collections.Generic;
 
 using RiichiNET.Core.Enums;
 
-internal abstract class OpenGroup: Group
+internal abstract class OpenMeld: Meld
 {
     internal override bool Open { get => true; }
     internal abstract Naki Naki { get; }

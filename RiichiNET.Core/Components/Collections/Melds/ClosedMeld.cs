@@ -1,14 +1,14 @@
-namespace RiichiNET.Core.Components.Groups;
+namespace RiichiNET.Core.Components.Collections.Melds;
 
 using RiichiNET.Core.Enums;
 
-internal abstract class ClosedGroup: Group
+internal abstract class ClosedMeld: Meld
 {
     internal override bool Open { get => false; }
 
     private protected Value _value;
 
-    internal ClosedGroup(Value value, bool akadora=false)
+    internal ClosedMeld(Value value, bool akadora=false)
     {
         _value = value;
         Akadora = akadora;

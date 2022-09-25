@@ -1,10 +1,10 @@
-namespace RiichiNET.Core.Components.Groups;
+namespace RiichiNET.Core.Components.Collections.Melds;
 
 using System.Collections.Generic;
 
 using RiichiNET.Core.Enums;
 
-internal sealed class AnKou: ClosedGroup
+internal sealed class AnKou: ClosedMeld
 {
     internal override Mentsu Mentsu { get => Mentsu.Koutsu; }
 
