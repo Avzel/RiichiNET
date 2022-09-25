@@ -7,7 +7,7 @@ using RiichiNET.Core.Components.Collections.Melds;
 
 internal sealed class TileCount
 {
-    internal SortedDictionary<Tile, int> _hand;
+    internal SortedDictionary<Tile, int> _hand { get; }
 
     internal TileCount(TileCount? original = default)
     {
