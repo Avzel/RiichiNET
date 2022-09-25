@@ -16,7 +16,7 @@ internal sealed class Player
     internal int Score { get; private set; } = 25000;
     internal int ScoreChange { get; set; } = 0;
 
-    internal ClosedHand Hand { get; } = new ClosedHand();
+    internal TileCount Hand { get; } = new TileCount();
     internal List<Meld> Melds { get; } = new List<Meld>();
     internal List<Tile> Graveyard { get; } = new List<Tile>();
     internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
@@ -131,22 +131,18 @@ internal sealed class Player
             {
                 _callableValues[Naki.Pon]?.Add(value);
             }
-
             if (Hand[tile] == 3)
             {
                 _callableValues[Naki.DaiMinKan]?.Add(value);
             }
-
             if (!tile.IsYaoChuu() && Hand.ContainsTile(tile + 1))
             {
                 _callableValues[Naki.ChiiShimo]?.Add((tile - 1).value);
             }
-
             if (Hand.ContainsTile(tile + 2))
             {
                 _callableValues[Naki.ChiiNaka]?.Add((tile + 1).value);
             }
-
             if (!tile.IsYaoChuu() && Hand.ContainsTile(tile - 1))
             {
                 _callableValues[Naki.ChiiKami]?.Add((tile + 1).value);
@@ -213,21 +209,18 @@ internal sealed class Player
 
     // Shanten Calculation:
 
-    private int HandCount(Value value)
+    private int AgnosticCount(Value value)
     {
         Tile normal = (Tile)value;
         Tile special = ~((Tile)value);
-
-        if (Hand.ContainsTile(normal)) return Hand[normal];
-        else if (Hand.ContainsTile(special)) return Hand[special];
-        else return 0;
+        return (new int[] {Hand[normal], Hand[special]}).Max();
     }
 
     private int ShuntsuCount(Tile tile)
     {
-        int firstCount = HandCount(tile.value);
-        int secondCount = HandCount(tile.value.Next());
-        int thirdCount = HandCount(tile.value.Next().Next());
+        int firstCount = AgnosticCount(tile.value);
+        int secondCount = AgnosticCount(tile.value.Next());
+        int thirdCount = AgnosticCount(tile.value.Next().Next());
 
         if
         (
@@ -242,19 +235,15 @@ internal sealed class Player
         else return 0;
     }
 
-    private SortedDictionary<Tile, int> GetUpdatedCount(SortedDictionary<Tile, int> count, Meld meld)
+    private bool GetShuntsuAkadora(TileCount count, Tile tile)
     {
-        SortedDictionary<Tile, int> updatedCount = new SortedDictionary<Tile, int>(count);
-        foreach (Tile tile in meld.GetSortedTiles())
-        {
-            updatedCount[tile]--;
-            if (updatedCount[tile] == 0) updatedCount.Remove(tile);
-            else if (tile.akadora)
-            {
-                updatedCount[~tile] = updatedCount[tile];
-                updatedCount.Remove(tile);
-            }
-        }
+        return tile.akadora || count.ContainsTile(~(tile + 1)) || count.ContainsTile(~(tile + 2));
+    }
+
+    private TileCount GetUpdatedCount(TileCount count, Meld meld)
+    {
+        TileCount updatedCount = new TileCount(count);
+        updatedCount.Discard(meld);
         return updatedCount;
     }
 
@@ -265,19 +254,14 @@ internal sealed class Player
         return updatedMelds;
     }
 
-    private bool GetShuntsuAkadora(SortedDictionary<Tile, int> count, Tile tile)
-    {
-        return tile.akadora || count.ContainsKey(~(tile + 1)) || count.ContainsKey(~(tile + 2));
-    }
-
     private void DetermineFuriten()
     {
         // TODO
     }
 
-    private void TreeOfHands(SortedDictionary<Tile, int> count, List<Meld> melds)
+    private void TreeOfHands(TileCount count, List<Meld> melds)
     {
-        foreach (Tile tile in count.Keys)
+        foreach (Tile tile in count.Tiles())
         {
             Value value = tile.value;
             bool akadora = tile.akadora;
@@ -301,7 +285,7 @@ internal sealed class Player
                 );
             }
 
-            SortedDictionary<Tile, int> updatedCount = new SortedDictionary<Tile, int>(count);
+            TileCount updatedCount = new TileCount(count);
             List<Meld> updatedMelds = new List<Meld>(melds);
             for (int i = 0; i < ShuntsuCount(tile); i++)
             {

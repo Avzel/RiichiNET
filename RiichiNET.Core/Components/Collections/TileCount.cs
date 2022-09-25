@@ -5,13 +5,13 @@ using System.Linq;
 
 using RiichiNET.Core.Components.Collections.Melds;
 
-internal sealed class ClosedHand
+internal sealed class TileCount
 {
-    private SortedDictionary<Tile, int> _hand;
+    internal SortedDictionary<Tile, int> _hand;
 
-    internal ClosedHand(IDictionary<Tile, int>? original = default)
+    internal TileCount(TileCount? original = default)
     {
-        if (original != null) _hand = new SortedDictionary<Tile, int>(original);
+        if (original != null) _hand = new SortedDictionary<Tile, int>(original._hand);
         else _hand = new SortedDictionary<Tile, int>();
     }
 
