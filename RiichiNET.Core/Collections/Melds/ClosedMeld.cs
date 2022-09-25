@@ -1,5 +1,6 @@
-namespace RiichiNET.Core.Components.Collections.Melds;
+namespace RiichiNET.Core.Collections.Melds;
 
+using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
 internal abstract class ClosedMeld: Meld

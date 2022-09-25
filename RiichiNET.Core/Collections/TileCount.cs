@@ -1,9 +1,10 @@
-namespace RiichiNET.Core.Components.Collections;
+namespace RiichiNET.Core.Collections;
 
 using System.Collections.Generic;
 using System.Linq;
 
-using RiichiNET.Core.Components.Collections.Melds;
+using RiichiNET.Core.Collections.Melds;
+using RiichiNET.Core.Components;
 
 internal sealed class TileCount
 {

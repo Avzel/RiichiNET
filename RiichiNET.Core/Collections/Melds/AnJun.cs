@@ -1,7 +1,8 @@
-namespace RiichiNET.Core.Components.Collections.Melds;
+namespace RiichiNET.Core.Collections.Melds;
 
 using System.Collections.Generic;
 
+using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
 internal sealed class AnJun: ClosedMeld

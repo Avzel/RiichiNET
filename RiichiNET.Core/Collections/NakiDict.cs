@@ -1,4 +1,4 @@
-namespace RiichiNET.Core.Components.Collections;
+namespace RiichiNET.Core.Collections;
 
 using System.Collections.Generic;
 using System.Linq;

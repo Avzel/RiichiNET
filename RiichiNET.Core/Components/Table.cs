@@ -2,6 +2,7 @@ namespace RiichiNET.Core.Components;
 
 using System.Collections.Generic;
 
+using RiichiNET.Core.Collections;
 using RiichiNET.Core.Enums;
 
 using Call = System.ValueTuple<int, Enums.Seat, Enums.Naki>;

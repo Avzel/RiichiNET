@@ -1,11 +1,12 @@
-namespace RiichiNET.Core.Components;
+namespace RiichiNET.Core.Collections;
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
-using RiichiNET.Util.Extensions;
+using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
+using RiichiNET.Util.Extensions;
 
 internal sealed class Mountain
 {

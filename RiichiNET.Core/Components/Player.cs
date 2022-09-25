@@ -1,13 +1,13 @@
 namespace RiichiNET.Core.Components;
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
-using RiichiNET.Util.Extensions;
+using RiichiNET.Core.Collections;
+using RiichiNET.Core.Collections.Melds;
 using RiichiNET.Core.Enums;
-using RiichiNET.Core.Components.Collections;
-using RiichiNET.Core.Components.Collections.Melds;
+using RiichiNET.Util.Extensions;
 
 internal sealed class Player
 {
