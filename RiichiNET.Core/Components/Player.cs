@@ -179,18 +179,11 @@ internal sealed class Player
 
     // Shanten Calculation:
 
-    private int AgnosticCount(Value value)
+    private int ShuntsuCount(TileCount count, Tile tile)
     {
-        Tile normal = (Tile)value;
-        Tile special = ~((Tile)value);
-        return (new int[] {Hand[normal], Hand[special]}).Max();
-    }
-
-    private int ShuntsuCount(Tile tile)
-    {
-        int firstCount = AgnosticCount(tile.value);
-        int secondCount = AgnosticCount(tile.value.Next());
-        int thirdCount = AgnosticCount(tile.value.Next().Next());
+        int firstCount = count.AgnosticCount(tile.value);
+        int secondCount = count.AgnosticCount(tile.value.Next());
+        int thirdCount = count.AgnosticCount(tile.value.Next().Next());
 
         if
         (
@@ -203,6 +196,48 @@ internal sealed class Player
             return (new int[] {firstCount, secondCount, thirdCount}).Min();
         }
         else return 0;
+    }
+
+    private int TaatsuCount(TileCount count)
+    {
+        if (count.Count() <= 1) return 0;
+        else foreach (Tile tile in count.Tiles())
+        {
+            if
+            (
+                count.AgnosticCount(tile.value.Next()) > 0 ||
+                count.AgnosticCount(tile.value.Next().Next()) > 0
+            )
+            {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    private int JantouCount(WinningHand hand)
+    {
+        int jantou = hand.Doubles();
+        return jantou > 2 ? 2 : jantou;
+    }
+
+    private int UniqueTerminals(TileCount count)
+    {
+        int uniqueTerminals = 0;
+        foreach (Tile tile in count.Tiles())
+        {
+            if (tile.IsYaoChuu()) uniqueTerminals++;
+        }
+        return uniqueTerminals;
+    }
+
+    private int TerminalPairs(WinningHand hand)
+    {
+        foreach (Meld jantou in hand.GetMelds(Mentsu.Jantou))
+        {
+            if (jantou.HasYaoChuu()) return 1;
+        }
+        return 0;
     }
 
     private bool GetShuntsuAkadora(TileCount count, Tile tile)
@@ -224,26 +259,26 @@ internal sealed class Player
         return updatedHand;
     }
 
-    internal void BranchJantou(Tile tile, TileCount count, WinningHand hand)
+    private void BranchJantou(Tile tile, TileCount count, WinningHand hand)
     {
         if (count[tile] >= 2)
         {
             Meld anJan = new AnJan(tile.value, tile.akadora);
-            TreeOfHands(UpdatedCount(count, anJan), UpdatedHand(hand, anJan));
+            EvaluateHand(UpdatedCount(count, anJan), UpdatedHand(hand, anJan));
         }
     }
-    internal void BranchKoutsu(Tile tile, TileCount count, WinningHand hand)
+    private void BranchKoutsu(Tile tile, TileCount count, WinningHand hand)
     {
         if (count[tile] >= 3)
         {
             Meld anKou = new AnKou(tile.value, tile.akadora);
-            TreeOfHands(UpdatedCount(count, anKou), UpdatedHand(hand, anKou));
+            EvaluateHand(UpdatedCount(count, anKou), UpdatedHand(hand, anKou));
         }
     }
 
-    internal void BranchShuntsu(Tile tile, TileCount count, WinningHand hand)
+    private void BranchShuntsu(Tile tile, TileCount count, WinningHand hand)
     {
-        int shuntsuCount = ShuntsuCount(tile);
+        int shuntsuCount = ShuntsuCount(count, tile);
         if ((shuntsuCount) > 0)
         {
             TileCount updatedCount = new TileCount(count);
@@ -254,8 +289,20 @@ internal sealed class Player
                 updatedCount = UpdatedCount(updatedCount, anJun);
                 updatedHand = UpdatedHand(updatedHand, anJun);
             }
-            TreeOfHands(updatedCount, updatedHand);
+            EvaluateHand(updatedCount, updatedHand);
         }
+    }
+    private int CalculateShanten(TileCount count, WinningHand hand)
+    {
+        return
+        (
+            new int[]
+            {
+                8 - (2*hand.Triples()) - JantouCount(hand) + TaatsuCount(count),
+                6 - hand.Doubles(),
+                13 - UniqueTerminals(count) - TerminalPairs(hand)
+            }
+        ).Min();
     }
 
     private void DetermineFuriten()
@@ -263,7 +310,7 @@ internal sealed class Player
         // TODO
     }
 
-    private void TreeOfHands(TileCount count, WinningHand hand)
+    private void EvaluateHand(TileCount count, WinningHand hand)
     {
         foreach (Tile tile in count.Tiles())
         {
@@ -271,16 +318,8 @@ internal sealed class Player
             BranchKoutsu(tile, count, hand);
             BranchShuntsu(tile, count, hand);
         }
+        int shanten = CalculateShanten(count, hand);
 
-        // Evaluate hands here:
-
-        // 22 44 66 888 99 WWW
-        // 4444 55 666 8 9 WW
-        // 111 1 22 33 4 5 6 777
-
-        if ()
-        {
-
-        }
+        
     }
 }

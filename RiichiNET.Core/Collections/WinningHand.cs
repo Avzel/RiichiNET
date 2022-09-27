@@ -46,6 +46,16 @@ internal sealed class WinningHand
         foreach (List<Meld> list in _hand.Values) list.Clear();
     }
 
+    internal int Doubles()
+    {
+        return this[Mentsu.Jantou];
+    }
+
+    internal int Triples()
+    {
+        return this[Mentsu.Shuntsu] + this[Mentsu.Koutsu];
+    }
+
     internal int this[Mentsu mentsu]
     {
         get

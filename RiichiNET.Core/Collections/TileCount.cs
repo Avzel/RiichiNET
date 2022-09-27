@@ -5,6 +5,7 @@ using System.Linq;
 
 using RiichiNET.Core.Collections.Melds;
 using RiichiNET.Core.Components;
+using RiichiNET.Core.Enums;
 
 internal sealed class TileCount
 {
@@ -84,9 +85,21 @@ internal sealed class TileCount
         return _hand.Values.Sum();
     }
 
+    internal int Count()
+    {
+        return Tiles().Count();
+    }
+
     internal IEnumerable<Tile> Tiles()
     {
         return _hand.Keys;
+    }
+
+    internal int AgnosticCount(Value value)
+    {
+        Tile normal = (Tile)value;
+        Tile special = ~((Tile)value);
+        return (new int[] {this[normal], this[special]}).Max();
     }
 
     internal int this[Tile tile]
