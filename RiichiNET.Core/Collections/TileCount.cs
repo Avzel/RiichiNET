@@ -36,29 +36,27 @@ internal sealed class TileCount
 
     internal bool Discard(Tile tile)
     {
-        if (!(_hand.ContainsKey(tile) || _hand.ContainsKey(~tile))) return false;
-
-        int count;
-        if (tile.akadora && _hand.ContainsKey(tile))
+        if (this.ContainsTile(tile))
         {
-            count = _hand[tile] - 1;
-            _hand.Remove(tile);
-            if (count > 0) _hand[~tile] = count;
-            return true;
+            _hand[tile]--;
         }
-        else if (!tile.akadora && _hand.ContainsKey(tile))
+        else if (!tile.akadora && this.ContainsTile(~tile))
         {
-            if (_hand[tile] == 1) _hand.Remove(tile);
-            else _hand[tile]--;
-            return true;
-        }
-        else if (!tile.akadora && _hand.ContainsKey(~tile))
-        {
-            if (_hand[~tile] == 1) return false;
-            else _hand[~tile]--;
-            return true;
+            _hand[~tile]--;
         }
         else return false;
+
+        if (tile.akadora)
+        {
+            _hand[~tile] = _hand[tile];
+            _hand.Remove(tile);
+            tile = ~tile;
+        }
+        if (_hand[tile] == 0)
+        {
+            _hand.Remove(tile);
+        }
+        return true;
     }
 
     internal bool Discard(Meld meld)

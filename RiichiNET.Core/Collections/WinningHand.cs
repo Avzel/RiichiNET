@@ -8,7 +8,7 @@ using RiichiNET.Core.Enums;
 
 internal sealed class WinningHand
 {
-    private Dictionary<Mentsu, List<Meld>> _hand = new Dictionary<Mentsu, List<Meld>>()
+    internal Dictionary<Mentsu, List<Meld>> _hand = new Dictionary<Mentsu, List<Meld>>()
     {
         {Mentsu.Jantou, new List<Meld>()},
         {Mentsu.Shuntsu, new List<Meld>()},
@@ -16,9 +16,19 @@ internal sealed class WinningHand
         {Mentsu.Kantsu, new List<Meld>()}
     };
 
-    internal void Add(Mentsu mentsu, Meld meld)
+    internal WinningHand(List<Meld>? melds=default)
     {
-        _hand[mentsu].Add(meld);
+        if (melds != null) foreach (Meld meld in melds) Add(meld);
+    }
+
+    internal WinningHand(WinningHand original)
+    {
+        _hand = original._hand;
+    }
+
+    internal void Add(Meld meld)
+    {
+        _hand[meld.Mentsu].Add(meld);
     }
     
     internal bool Contains(Mentsu mentsu)
@@ -34,5 +44,14 @@ internal sealed class WinningHand
     internal void Clear()
     {
         foreach (List<Meld> list in _hand.Values) list.Clear();
+    }
+
+    internal int this[Mentsu mentsu]
+    {
+        get
+        {
+            if (_hand.ContainsKey(mentsu)) return _hand[mentsu].Count();
+            else return 0;
+        }
     }
 }

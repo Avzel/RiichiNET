@@ -27,7 +27,7 @@ internal sealed class Player
 
     internal bool Tenpai { get; private set; } = false;
     internal bool Furiten { get; set; } = false;
-    internal Dictionary<Value, WinningHand> WinningHands = new Dictionary<Value, WinningHand>();
+    internal List<WinningHand> WinningHands = new List<WinningHand>();
 
     internal Player(Seat seat)
     {
@@ -210,18 +210,52 @@ internal sealed class Player
         return tile.akadora || count.ContainsTile(~(tile + 1)) || count.ContainsTile(~(tile + 2));
     }
 
-    private TileCount GetUpdatedCount(TileCount count, Meld meld)
+    private TileCount UpdatedCount(TileCount count, Meld meld)
     {
         TileCount updatedCount = new TileCount(count);
         updatedCount.Discard(meld);
         return updatedCount;
     }
 
-    private List<Meld> GetUpdatedMelds(List<Meld> melds, Meld meld)
+    private WinningHand UpdatedHand(WinningHand hand, Meld meld)
     {
-        List<Meld> updatedMelds = new List<Meld>(melds);
-        updatedMelds.Add(meld);
-        return updatedMelds;
+        WinningHand updatedHand = new WinningHand(hand);
+        updatedHand.Add(meld);
+        return updatedHand;
+    }
+
+    internal void BranchJantou(Tile tile, TileCount count, WinningHand hand)
+    {
+        if (count[tile] >= 2)
+        {
+            Meld anJan = new AnJan(tile.value, tile.akadora);
+            TreeOfHands(UpdatedCount(count, anJan), UpdatedHand(hand, anJan));
+        }
+    }
+    internal void BranchKoutsu(Tile tile, TileCount count, WinningHand hand)
+    {
+        if (count[tile] >= 3)
+        {
+            Meld anKou = new AnKou(tile.value, tile.akadora);
+            TreeOfHands(UpdatedCount(count, anKou), UpdatedHand(hand, anKou));
+        }
+    }
+
+    internal void BranchShuntsu(Tile tile, TileCount count, WinningHand hand)
+    {
+        int shuntsuCount = ShuntsuCount(tile);
+        if ((shuntsuCount) > 0)
+        {
+            TileCount updatedCount = new TileCount(count);
+            WinningHand updatedHand = new WinningHand(hand);
+            for (int i = 0; i < shuntsuCount; i++)
+            {
+                Meld anJun = new AnJun(tile.value, i == 0 ? GetShuntsuAkadora(count, tile) : false);
+                updatedCount = UpdatedCount(updatedCount, anJun);
+                updatedHand = UpdatedHand(updatedHand, anJun);
+            }
+            TreeOfHands(updatedCount, updatedHand);
+        }
     }
 
     private void DetermineFuriten()
@@ -229,41 +263,13 @@ internal sealed class Player
         // TODO
     }
 
-    private void TreeOfHands(TileCount count, List<Meld> melds)
+    private void TreeOfHands(TileCount count, WinningHand hand)
     {
         foreach (Tile tile in count.Tiles())
         {
-            Value value = tile.value;
-            bool akadora = tile.akadora;
-
-            if (count[tile] >= 2)
-            {
-                Meld anJan = new AnJan(value, akadora);
-                TreeOfHands
-                (
-                    GetUpdatedCount(count, anJan), 
-                    GetUpdatedMelds(melds, anJan)
-                );
-            }
-            if (count[tile] >= 3)
-            {
-                Meld anKou = new AnKou(value, akadora);
-                TreeOfHands
-                (
-                    GetUpdatedCount(count, anKou), 
-                    GetUpdatedMelds(melds, anKou)
-                );
-            }
-
-            TileCount updatedCount = new TileCount(count);
-            List<Meld> updatedMelds = new List<Meld>(melds);
-            for (int i = 0; i < ShuntsuCount(tile); i++)
-            {
-                Meld anJun = new AnJun(value, i == 0 ? GetShuntsuAkadora(count, tile) : false);
-                updatedCount = GetUpdatedCount(updatedCount, anJun);
-                updatedMelds = GetUpdatedMelds(updatedMelds, anJun);
-            }
-            TreeOfHands(updatedCount, updatedMelds);
+            BranchJantou(tile, count, hand);
+            BranchKoutsu(tile, count, hand);
+            BranchShuntsu(tile, count, hand);
         }
 
         // Evaluate hands here:
@@ -272,9 +278,9 @@ internal sealed class Player
         // 4444 55 666 8 9 WW
         // 111 1 22 33 4 5 6 777
 
-        // if ()
-        // {
+        if ()
+        {
 
-        // }
+        }
     }
 }
