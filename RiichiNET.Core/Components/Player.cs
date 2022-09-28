@@ -2,6 +2,7 @@ namespace RiichiNET.Core.Components;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using RiichiNET.Core.Collections;
 using RiichiNET.Core.Collections.Melds;
@@ -26,7 +27,7 @@ internal sealed class Player
     internal Value JustCalled { get; private set; } = Value.None;
 
     internal int Shanten { get; private set; } = ShantenCalculator.MAX_SHANTEN;
-    internal bool Furiten { get; set; }
+    internal bool IchijiFuriten { get; set; }
     internal HashSet<WinningHand> WinningHands = new HashSet<WinningHand>();
 
     internal Player(Seat seat)
@@ -54,6 +55,15 @@ internal sealed class Player
         return Shanten == 0;
     }
 
+    internal bool IsFuriten()
+    {
+        foreach (Value value in CallableValues[Naki.Agari])
+        {
+            if (GraveyardContents.Contains(value)) return true;
+        }
+        return false || IchijiFuriten;
+    }
+
     internal bool IsRiichi()
     {
         return _riichiTile != null;
@@ -67,42 +77,60 @@ internal sealed class Player
     internal bool CanCallOnDraw()
     {
         return
-            CallableValues.CanCall(Naki.ShouMinKan)
-            || CallableValues.CanCall(Naki.AnKan)
+            ((CallableValues.CanCall(Naki.ShouMinKan) || CallableValues.CanCall(Naki.AnKan))
+                && CanKanDuringRiichi())
             || CallableValues.CanCall(Naki.Riichi)
-            || CallableValues.CanCall(Naki.Agari);
+            || WinningHands.Any();
     }
 
     internal bool CanCallOnDiscard(Value value)
     {
         return
-            CallableValues.CanCall(Naki.ChiiShimo, value)
-            || CallableValues.CanCall(Naki.ChiiNaka, value)
-            || CallableValues.CanCall(Naki.ChiiKami, value)
-            || CallableValues.CanCall(Naki.Pon, value)
-            || CallableValues.CanCall(Naki.DaiMinKan, value)
-            || CallableValues.CanCall(Naki.Agari, value);
+            (!IsRiichi() && 
+                (CallableValues.CanCall(Naki.ChiiShimo, value)
+                || CallableValues.CanCall(Naki.ChiiNaka, value)
+                || CallableValues.CanCall(Naki.ChiiKami, value)
+                || CallableValues.CanCall(Naki.Pon, value)
+                ))
+            ||
+            (CallableValues.CanCall(Naki.DaiMinKan, value) && CanKanDuringRiichi(value))
+            ||
+            CallableValues.CanCall(Naki.Agari, value);
+    }
+
+    private bool CanKanDuringRiichi(Value value=Value.None)
+    {
+        // TODO
     }
 
     private void DetermineCallOnDraw()
     {
-        EvaluateHand();
+        EvaluateHand(true);
 
         foreach (Tile tile in Hand.Tiles())
         {
             if (Hand[tile] == 4) CallableValues.Add(Naki.AnKan, tile);
         }
+
+        foreach (Meld meld in Melds)
+        {
+            if (meld.Mentsu == Mentsu.Koutsu && Hand.ContainsValue(meld[0]))
+            {
+                CallableValues.Add(Naki.ShouMinKan, meld[0].value);
+            }
+        }
     }
 
     internal void Draw(Tile tile)
     {
+        if (IchijiFuriten && !IsRiichi()) IchijiFuriten = false;
         Hand.Draw(tile);
         DetermineCallOnDraw();
     }
 
     private void DetermineCallOnDiscard()
     {
-        EvaluateHand();
+        EvaluateHand(false);
 
         foreach (Tile tile in Hand.Tiles())
         {
@@ -142,11 +170,6 @@ internal sealed class Player
         }
 
         DetermineCallOnDiscard();
-
-        if (!Furiten && CallableValues[Naki.Agari].Contains(tile.value))
-        {
-            Furiten = true;
-        }
     }
 
     internal void AddMeld(Meld Meld)
@@ -156,16 +179,36 @@ internal sealed class Player
         Value value = Meld[0].value;
 
         JustCalled = value;
-
-        if (Meld.Open && Meld.Mentsu == Mentsu.Koutsu)
-        {
-            CallableValues.Add(Naki.ShouMinKan, value);
-        }
     }
 
     internal void DeclareRiichi(Tile tile)
     {
         _riichiTile = Graveyard.Count - 1;
+    }
+
+    private void EvaluateHand(bool draw)
+    {
+        CallableValues.Clear();
+        WinningHands.Clear();
+
+        ShantenCalculator sc = new ShantenCalculator(Hand, new WinningHand(Melds), draw);
+
+        int calculated = sc.MinimumShanten;
+
+        if (draw && calculated == 0)
+        {
+            CallableValues.Add(Naki.Riichi, sc.Tiles);
+        }
+        else if (draw && calculated == -1)
+        {
+            WinningHands = new HashSet<WinningHand>(sc.WinningHands);
+        }
+        else if (calculated == 0)
+        {
+            CallableValues.Add(Naki.Agari, sc.Tiles);
+        }
+
+        if (calculated < Shanten) Shanten = calculated;
     }
 
     internal void NextRound()
@@ -181,15 +224,7 @@ internal sealed class Player
         CallableValues.Clear();
         JustCalled = Value.None;
         Shanten = ShantenCalculator.MAX_SHANTEN;
-        Furiten = false;
+        IchijiFuriten = false;
         WinningHands.Clear();
-    }
-
-    internal void EvaluateHand()
-    {
-        ShantenCalculator sc = new ShantenCalculator(Hand, new WinningHand(Melds));
-
-        // Need to handle furiten
-        // Evaluate on discards only or draws too? How to get riichi tiles and winninghands otherwise?
     }
 }

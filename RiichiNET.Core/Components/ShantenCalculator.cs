@@ -11,13 +11,14 @@ using RiichiNET.Core.Enums;
 internal sealed class ShantenCalculator
 {
     internal static int MAX_SHANTEN = 6;
+    private bool draw;
     internal int MinimumShanten { get; private set; } = MAX_SHANTEN;
-    internal HashSet<Value> WinningTiles { get; private set; } = new HashSet<Value>();
+    internal HashSet<Value> Tiles { get; private set; } = new HashSet<Value>();
     internal HashSet<WinningHand> WinningHands { get; private set; } = new HashSet<WinningHand>();
-    internal HashSet<Value> RiichiTiles { get; private set; } = new HashSet<Value>();
 
-    internal ShantenCalculator(TileCount count, WinningHand hand)
+    internal ShantenCalculator(TileCount count, WinningHand hand, bool draw)
     {
+        this.draw = draw;
         EvaluateHand(count, hand);
     }
 
@@ -151,34 +152,34 @@ internal sealed class ShantenCalculator
         return shanten;
     }
 
-    // Need to be able to handle riichi tiles
     private void GetWinningTiles(TileCount count, WinningHand hand)
     {
-        if (count.Count() == 0)
+        int singles = count.Count();
+        if (singles == 0)
         {
             foreach (Meld meld in hand.GetMelds(Mentsu.Jantou))
             {
-                WinningTiles.Add(meld[0].value);
+                Tiles.Add(meld[0].value);
             }
         }
-        else if (count.Count() is 1 or 13)
+        else if (singles is 1 or 13)
         {
             foreach (Tile tile in count.Tiles())
             {
-                WinningTiles.Add(tile.value);
+                Tiles.Add(tile.value);
             }
         }
-        else if (count.Count() == 2)
+        else if (singles == 2)
         {
             Tile tile = count.First();
             if (count.ContainsValue(tile+1))
             {
-                if (!tile.IsYaoChuu()) WinningTiles.Add((tile-1).value);
-                if (!(tile+1).IsYaoChuu()) WinningTiles.Add((tile+2).value);
+                if (!tile.IsYaoChuu()) Tiles.Add((tile-1).value);
+                if (!(tile+1).IsYaoChuu()) Tiles.Add((tile+2).value);
             }
-            else WinningTiles.Add((tile+1).value);
+            else Tiles.Add((tile+1).value);
         }
-        else if (count.Count() == 11)
+        else if (singles == 11)
         {
             foreach (Value value in Enum.GetValues(typeof(Value)))
             {
@@ -190,7 +191,39 @@ internal sealed class ShantenCalculator
                     value != hand.GetMelds(Mentsu.Jantou)[0][0].value
                 )
                 {
-                    WinningTiles.Add(value);
+                    Tiles.Add(value);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void GetRiichiTiles(TileCount count, WinningHand hand)
+    {
+        int singles = count.Count();
+        if (singles is 1 or 2)
+        {
+            foreach (Tile tile in count.Tiles()) Tiles.Add(tile.value);
+        }
+        else if (singles == 3)
+        {
+            int taatsu;
+            TileCount tester = new TileCount(count);
+            foreach (Tile tile in count.Tiles())
+            {
+                tester.Discard(tile);
+                if ((taatsu = TaatsuCount(tester)) == 1) Tiles.Add(tile.value);
+                tester.Draw(tile);
+            }
+        }
+        else if (singles >= 13)
+        {
+            foreach (Tile tile in count.Tiles())
+            {
+                if (!tile.IsYaoChuu())
+                {
+                    Tiles.Add(tile.value);
+                    break;
                 }
             }
         }
@@ -204,10 +237,15 @@ internal sealed class ShantenCalculator
             BranchKoutsu(tile, count, hand);
             BranchShuntsu(tile, count, hand);
         }
+
         int shanten = CalculateShanten(count, hand);
 
         if (shanten == -1) WinningHands.Add(hand);
 
-        else if (shanten == 0) GetWinningTiles(count, hand);
+        else if (shanten == 0)
+        {
+            if (draw) GetRiichiTiles(count, hand);
+            else GetWinningTiles(count, hand);
+        }
     }
 }
