@@ -101,6 +101,7 @@ internal sealed class Player
     private bool CanKanDuringRiichi(Value value=Value.None)
     {
         // TODO
+        return false;
     }
 
     private void DetermineCallOnDraw()

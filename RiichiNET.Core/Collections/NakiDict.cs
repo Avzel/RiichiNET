@@ -30,7 +30,7 @@ internal sealed class NakiDict
     internal void Add(Naki naki, IEnumerable<Value> values)
     {
         if (naki == Naki.None) return;
-        else _values[naki] = new HashSet<Value>(values);
+        else foreach (Value value in values) _values[naki].Add(value);
     }
 
         internal void Add(Naki naki, Tile tile)

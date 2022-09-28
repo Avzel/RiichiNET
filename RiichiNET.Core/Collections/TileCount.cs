@@ -5,16 +5,18 @@ using System.Linq;
 
 using RiichiNET.Core.Collections.Melds;
 using RiichiNET.Core.Components;
-using RiichiNET.Core.Enums;
 
 internal sealed class TileCount
 {
-    internal SortedDictionary<Tile, int> _hand { get; }
+    private SortedDictionary<Tile, int> _hand { get; }
 
     internal TileCount(TileCount? original = default)
     {
-        if (original != null) _hand = new SortedDictionary<Tile, int>(original._hand);
-        else _hand = new SortedDictionary<Tile, int>();
+        _hand = new SortedDictionary<Tile, int>();
+        if (original != null) foreach (Tile tile in original.Tiles())
+        {
+            _hand.Add(tile, original[tile]);
+        }
     }
 
     internal void Draw(Tile tile)
