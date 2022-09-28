@@ -41,27 +41,22 @@ internal sealed class WinningHand
         return _hand[mentsu].AsReadOnly();
     }
 
-    internal void Clear()
+    internal int Count(Mentsu mentsu)
     {
-        foreach (List<Meld> list in _hand.Values) list.Clear();
+        if (_hand.ContainsKey(mentsu)) return _hand[mentsu].Count();
+        else return 0;
     }
 
     internal int Doubles()
     {
-        return this[Mentsu.Jantou];
+        return this.Count(Mentsu.Jantou);
     }
 
     internal int Triples()
     {
-        return this[Mentsu.Shuntsu] + this[Mentsu.Koutsu];
-    }
-
-    internal int this[Mentsu mentsu]
-    {
-        get
-        {
-            if (_hand.ContainsKey(mentsu)) return _hand[mentsu].Count();
-            else return 0;
-        }
+        return 
+            this.Count(Mentsu.Shuntsu) + 
+            this.Count(Mentsu.Koutsu) + 
+            this.Count(Mentsu.Kantsu);
     }
 }

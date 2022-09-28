@@ -3,6 +3,7 @@ namespace RiichiNET.Core.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
 internal sealed class NakiDict
@@ -26,6 +27,12 @@ internal sealed class NakiDict
         else _values[naki].Add(value);
     }
 
+        internal void Add(Naki naki, Tile tile)
+    {
+        if (naki == Naki.None) return;
+        else _values[naki].Add(tile.value);
+    }
+
     internal bool Contains(Naki naki, Value value)
     {
         if (naki == Naki.None) return false;
@@ -39,8 +46,17 @@ internal sealed class NakiDict
         else return _values[naki].Any();
     }
 
-    internal void Clear()
+    internal void Clear(Naki naki=Naki.None)
     {
-        foreach (HashSet<Value> set in _values.Values) set.Clear();
+        if (naki == Naki.None)
+        {
+            foreach (HashSet<Value> set in _values.Values) set.Clear();
+        }
+        else _values[naki].Clear();
+    }
+
+    internal HashSet<Value> this[Naki naki]
+    {
+        get {return _values[naki];}
     }
 }

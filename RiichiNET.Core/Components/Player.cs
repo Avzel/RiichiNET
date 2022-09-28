@@ -2,18 +2,18 @@ namespace RiichiNET.Core.Components;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using RiichiNET.Core.Collections;
 using RiichiNET.Core.Collections.Melds;
 using RiichiNET.Core.Enums;
+using RiichiNET.Core.Scoring;
 using RiichiNET.Util.Extensions;
 
 internal sealed class Player
 {
     internal Seat Seat { get; }
     internal Wind Wind { get; set; }
-    internal int Score { get; private set; } = 25000;
+    internal int Score { get; private set; } = Tabulation.STARTING_SCORE;
     internal int ScoreChange { get; set; } = 0;
 
     internal TileCount Hand { get; } = new TileCount();
@@ -25,9 +25,9 @@ internal sealed class Player
     internal NakiDict CallableValues { get; } = new NakiDict();
     internal Value JustCalled { get; private set; } = Value.None;
 
-    internal bool Tenpai { get; private set; } = false;
-    internal bool Furiten { get; set; } = false;
-    internal List<WinningHand> WinningHands = new List<WinningHand>();
+    internal int Shanten { get; private set; } = ShantenCalculator.MAX_SHANTEN;
+    internal bool Furiten { get; set; }
+    internal HashSet<WinningHand> WinningHands = new HashSet<WinningHand>();
 
     internal Player(Seat seat)
     {
@@ -46,8 +46,12 @@ internal sealed class Player
         {
             if (Meld.Open) return true;
         }
-
         return false;
+    }
+
+    internal bool IsTenpai()
+    {
+        return Shanten == 0;
     }
 
     internal bool IsRiichi()
@@ -82,11 +86,11 @@ internal sealed class Player
 
     private void DetermineCallOnDraw()
     {
-        // CalculateShanten();
+        EvaluateHand();
 
         foreach (Tile tile in Hand.Tiles())
         {
-            if (Hand[tile] == 4) CallableValues.Add(Naki.AnKan, tile.value);
+            if (Hand[tile] == 4) CallableValues.Add(Naki.AnKan, tile);
         }
     }
 
@@ -98,7 +102,7 @@ internal sealed class Player
 
     private void DetermineCallOnDiscard()
     {
-        // CalculateShanten();
+        EvaluateHand();
 
         foreach (Tile tile in Hand.Tiles())
         {
@@ -114,15 +118,15 @@ internal sealed class Player
             }
             if (!tile.IsYaoChuu() && Hand.ContainsTile(tile + 1))
             {
-                CallableValues.Add(Naki.ChiiShimo, (tile-1).value);
+                CallableValues.Add(Naki.ChiiShimo, tile-1);
             }
             if (Hand.ContainsTile(tile + 2))
             {
-                CallableValues.Add(Naki.ChiiNaka, (tile+1).value);
+                CallableValues.Add(Naki.ChiiNaka, tile+1);
             }
             if (!tile.IsYaoChuu() && Hand.ContainsTile(tile - 1))
             {
-                CallableValues.Add(Naki.ChiiKami, (tile+1).value);
+                CallableValues.Add(Naki.ChiiKami, tile+1);
             }
         }
     }
@@ -138,7 +142,11 @@ internal sealed class Player
         }
 
         DetermineCallOnDiscard();
-        // DetermineFuriten();
+
+        if (!Furiten && CallableValues[Naki.Agari].Contains(tile.value))
+        {
+            Furiten = true;
+        }
     }
 
     internal void AddMeld(Meld Meld)
@@ -172,154 +180,16 @@ internal sealed class Player
         _riichiTile = null;
         CallableValues.Clear();
         JustCalled = Value.None;
-        Tenpai = false;
+        Shanten = ShantenCalculator.MAX_SHANTEN;
         Furiten = false;
         WinningHands.Clear();
     }
 
-    // Shanten Calculation:
-
-    private int ShuntsuCount(TileCount count, Tile tile)
+    internal void EvaluateHand()
     {
-        int firstCount = count.AgnosticCount(tile.value);
-        int secondCount = count.AgnosticCount(tile.value.Next());
-        int thirdCount = count.AgnosticCount(tile.value.Next().Next());
+        ShantenCalculator sc = new ShantenCalculator(Hand, new WinningHand(Melds));
 
-        if
-        (
-            !tile.IsHonor() && 
-            tile.CanStartShuntsu() && 
-            secondCount > 0 && 
-            thirdCount > 0
-        )
-        {
-            return (new int[] {firstCount, secondCount, thirdCount}).Min();
-        }
-        else return 0;
-    }
-
-    private int TaatsuCount(TileCount count)
-    {
-        if (count.Count() <= 1) return 0;
-        else foreach (Tile tile in count.Tiles())
-        {
-            if
-            (
-                count.AgnosticCount(tile.value.Next()) > 0 ||
-                count.AgnosticCount(tile.value.Next().Next()) > 0
-            )
-            {
-                return 1;
-            }
-        }
-        return 0;
-    }
-
-    private int JantouCount(WinningHand hand)
-    {
-        int jantou = hand.Doubles();
-        return jantou > 2 ? 2 : jantou;
-    }
-
-    private int UniqueTerminals(TileCount count)
-    {
-        int uniqueTerminals = 0;
-        foreach (Tile tile in count.Tiles())
-        {
-            if (tile.IsYaoChuu()) uniqueTerminals++;
-        }
-        return uniqueTerminals;
-    }
-
-    private int TerminalPairs(WinningHand hand)
-    {
-        foreach (Meld jantou in hand.GetMelds(Mentsu.Jantou))
-        {
-            if (jantou.HasYaoChuu()) return 1;
-        }
-        return 0;
-    }
-
-    private bool GetShuntsuAkadora(TileCount count, Tile tile)
-    {
-        return tile.akadora || count.ContainsTile(~(tile + 1)) || count.ContainsTile(~(tile + 2));
-    }
-
-    private TileCount UpdatedCount(TileCount count, Meld meld)
-    {
-        TileCount updatedCount = new TileCount(count);
-        updatedCount.Discard(meld);
-        return updatedCount;
-    }
-
-    private WinningHand UpdatedHand(WinningHand hand, Meld meld)
-    {
-        WinningHand updatedHand = new WinningHand(hand);
-        updatedHand.Add(meld);
-        return updatedHand;
-    }
-
-    private void BranchJantou(Tile tile, TileCount count, WinningHand hand)
-    {
-        if (count[tile] >= 2)
-        {
-            Meld anJan = new AnJan(tile.value, tile.akadora);
-            EvaluateHand(UpdatedCount(count, anJan), UpdatedHand(hand, anJan));
-        }
-    }
-    private void BranchKoutsu(Tile tile, TileCount count, WinningHand hand)
-    {
-        if (count[tile] >= 3)
-        {
-            Meld anKou = new AnKou(tile.value, tile.akadora);
-            EvaluateHand(UpdatedCount(count, anKou), UpdatedHand(hand, anKou));
-        }
-    }
-
-    private void BranchShuntsu(Tile tile, TileCount count, WinningHand hand)
-    {
-        int shuntsuCount = ShuntsuCount(count, tile);
-        if ((shuntsuCount) > 0)
-        {
-            TileCount updatedCount = new TileCount(count);
-            WinningHand updatedHand = new WinningHand(hand);
-            for (int i = 0; i < shuntsuCount; i++)
-            {
-                Meld anJun = new AnJun(tile.value, i == 0 ? GetShuntsuAkadora(count, tile) : false);
-                updatedCount = UpdatedCount(updatedCount, anJun);
-                updatedHand = UpdatedHand(updatedHand, anJun);
-            }
-            EvaluateHand(updatedCount, updatedHand);
-        }
-    }
-    private int CalculateShanten(TileCount count, WinningHand hand)
-    {
-        return
-        (
-            new int[]
-            {
-                8 - (2*hand.Triples()) - JantouCount(hand) + TaatsuCount(count),
-                6 - hand.Doubles(),
-                13 - UniqueTerminals(count) - TerminalPairs(hand)
-            }
-        ).Min();
-    }
-
-    private void DetermineFuriten()
-    {
-        // TODO
-    }
-
-    private void EvaluateHand(TileCount count, WinningHand hand)
-    {
-        foreach (Tile tile in count.Tiles())
-        {
-            BranchJantou(tile, count, hand);
-            BranchKoutsu(tile, count, hand);
-            BranchShuntsu(tile, count, hand);
-        }
-        int shanten = CalculateShanten(count, hand);
-
-        
+        // Need to handle furiten
+        // Evaluate on discards only or draws too? How to get riichi tiles and winninghands otherwise?
     }
 }

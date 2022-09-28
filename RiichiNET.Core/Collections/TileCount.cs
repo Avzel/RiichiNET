@@ -80,6 +80,20 @@ internal sealed class TileCount
         return _hand.ContainsKey(tile);
     }
 
+    internal bool ContainsValue(Tile tile)
+    {
+        return
+            this.ContainsTile(tile) ||
+            this.ContainsTile(~tile);
+    }
+
+    internal int AgnosticCount(Tile tile)
+    {
+        Tile original = tile;
+        Tile other = ~tile;
+        return (new int[] {this[original], this[other]}).Max();
+    }
+
     internal int Length()
     {
         return _hand.Values.Sum();
@@ -90,16 +104,14 @@ internal sealed class TileCount
         return Tiles().Count();
     }
 
+    internal Tile First()
+    {
+        return _hand.Keys.First();
+    }
+
     internal IEnumerable<Tile> Tiles()
     {
         return _hand.Keys;
-    }
-
-    internal int AgnosticCount(Value value)
-    {
-        Tile normal = (Tile)value;
-        Tile special = ~((Tile)value);
-        return (new int[] {this[normal], this[special]}).Max();
     }
 
     internal int this[Tile tile]
