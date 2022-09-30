@@ -1,5 +1,7 @@
 namespace RiichiNET.Core.Collections.Melds;
 
+using System.Collections.Generic;
+
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
@@ -33,5 +35,15 @@ internal abstract class ClosedMeld: Meld
     internal override bool Contains(Value value)
     {
         return _value == value;
+    }
+
+    internal override Tile this[int i]
+    {
+        get
+        {
+            List<Tile> tiles = GetSortedTiles();
+            if (tiles.Count > i) return GetSortedTiles()[i];
+            else return (Tile)Value.None;
+        }
     }
 }

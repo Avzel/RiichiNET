@@ -20,11 +20,12 @@ internal sealed class Player
     internal TileCount Hand { get; } = new TileCount();
     internal List<Meld> Melds { get; } = new List<Meld>();
     internal List<Tile> Graveyard { get; } = new List<Tile>();
-    internal HashSet<Value> GraveyardContents { get; } = new HashSet<Value>();
+    internal TileCount GraveyardContents { get; } = new TileCount();
     private int? _riichiTile = null;
 
     internal NakiDict CallableValues { get; } = new NakiDict();
     internal Value JustCalled { get; private set; } = Value.None;
+    internal Tile JustDrawn { get; private set; } = (Tile)Value.None;
 
     internal int Shanten { get; private set; } = ShantenCalculator.MAX_SHANTEN;
     internal bool IchijiFuriten { get; set; }
@@ -59,7 +60,7 @@ internal sealed class Player
     {
         foreach (Value value in CallableValues[Naki.Agari])
         {
-            if (GraveyardContents.Contains(value)) return true;
+            if (GraveyardContents.ContainsTile(value)) return true;
         }
         return false || IchijiFuriten;
     }
@@ -74,34 +75,41 @@ internal sealed class Player
         return Score <= 0;
     }
 
-    internal bool CanCallOnDraw()
+    private void CallAbilityCancelation(bool draw)
     {
-        return
-            ((CallableValues.CanCall(Naki.ShouMinKan) || CallableValues.CanCall(Naki.AnKan))
-                && CanKanDuringRiichi())
-            || CallableValues.CanCall(Naki.Riichi)
-            || WinningHands.Any();
+        if (draw)
+        {
+            CallableValues.Clear(Naki.ChiiKami);
+            CallableValues.Clear(Naki.ChiiNaka);
+            CallableValues.Clear(Naki.ChiiShimo);
+            CallableValues.Clear(Naki.Pon);
+            CallableValues.Clear(Naki.DaiMinKan);
+        }
+        else
+        {
+            CallableValues.Clear(Naki.Riichi);
+            CallableValues.Clear(Naki.Agari);
+            CallableValues.Clear(Naki.AnKan);
+            CallableValues.Clear(Naki.ShouMinKan);
+            WinningHands.Clear();
+        }
     }
 
-    internal bool CanCallOnDiscard(Value value)
+    private bool CanKanDuringRiichi(Naki naki, Value value)
     {
-        return
-            (!IsRiichi() && 
-                (CallableValues.CanCall(Naki.ChiiShimo, value)
-                || CallableValues.CanCall(Naki.ChiiNaka, value)
-                || CallableValues.CanCall(Naki.ChiiKami, value)
-                || CallableValues.CanCall(Naki.Pon, value)
-                ))
-            ||
-            (CallableValues.CanCall(Naki.DaiMinKan, value) && CanKanDuringRiichi(value))
-            ||
-            CallableValues.CanCall(Naki.Agari, value);
-    }
-
-    private bool CanKanDuringRiichi(Value value=Value.None)
-    {
-        // TODO
-        return false;
+        if (naki == Naki.AnKan)
+        {
+            // TODO
+        }
+        else if (naki == Naki.ShouMinKan)
+        {
+            // TODO
+        }
+        else if (naki == Naki.DaiMinKan)
+        {
+            // TODO
+        }
+        else return false;
     }
 
     private void DetermineCallOnDraw()
@@ -126,6 +134,7 @@ internal sealed class Player
     {
         if (IchijiFuriten && !IsRiichi()) IchijiFuriten = false;
         Hand.Draw(tile);
+        JustDrawn = tile;
         DetermineCallOnDraw();
     }
 
@@ -163,23 +172,43 @@ internal sealed class Player
     internal void Discard(Tile tile)
     {
         bool success = Hand.Discard(tile);
-
         if (success)
         {
             Graveyard.Add(tile);
-            GraveyardContents.Add(tile.value);
+            GraveyardContents.Draw(tile.value);
         }
-
         DetermineCallOnDiscard();
     }
 
-    internal void AddMeld(Meld Meld)
+    internal Tile PopFromGraveyard()
     {
-        Melds.Add(Meld);
+        Tile popped = Graveyard.Last();
+        Graveyard.RemoveAt(Graveyard.Count() - 1);
+        GraveyardContents.Discard(popped.value);
+        return popped;
+    }
 
-        Value value = Meld[0].value;
-
-        JustCalled = value;
+    internal void AddMeld(Meld meld)
+    {
+        if (meld.Open && ((OpenMeld)meld).Naki != Naki.ShouMinKan)
+        {
+            Tile called = ((OpenMeld)meld).GetCalledTile();
+            JustCalled = called.value;
+            Draw(called);
+            Hand.Discard(meld);
+        }
+        else
+        {
+            JustCalled = meld[0].value;
+            if (meld.Open)
+            {
+                Discard(JustDrawn);
+                Melds.RemoveAll(it => 
+                    it.Mentsu == Mentsu.Koutsu && it.Contains(JustCalled));
+            }
+            else Hand.Discard(meld);
+        }
+        Melds.Add(meld);
     }
 
     internal void DeclareRiichi(Tile tile)
@@ -189,11 +218,9 @@ internal sealed class Player
 
     private void EvaluateHand(bool draw)
     {
-        CallableValues.Clear();
-        WinningHands.Clear();
+        CallAbilityCancelation(draw);
 
         ShantenCalculator sc = new ShantenCalculator(Hand, new WinningHand(Melds), draw);
-
         int calculated = sc.MinimumShanten;
 
         if (draw && calculated == 0)
@@ -208,7 +235,6 @@ internal sealed class Player
         {
             CallableValues.Add(Naki.Agari, sc.Tiles);
         }
-
         if (calculated < Shanten) Shanten = calculated;
     }
 

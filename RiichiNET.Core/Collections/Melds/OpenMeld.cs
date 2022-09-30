@@ -1,6 +1,7 @@
 namespace RiichiNET.Core.Collections.Melds;
 
 using System.Collections.Generic;
+using System.Linq;
 
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
@@ -12,6 +13,11 @@ internal abstract class OpenMeld: Meld
 
     internal List<Tile> OrderedTiles { get; private protected set; } = new List<Tile>();
     internal int CalledIndex { get; private protected set; }
+
+    internal Tile GetCalledTile()
+    {
+        return OrderedTiles[CalledIndex];
+    }
 
     internal override bool HasYaoChuu()
     {
@@ -35,6 +41,15 @@ internal abstract class OpenMeld: Meld
             if (tile.value == value) return true;
         }
         return false;
+    }
+
+    internal override Tile this[int i]
+    {
+        get
+        {
+            if (i < OrderedTiles.Count() - 1) return OrderedTiles[i];
+            else return (Tile)Value.None;
+        }
     }
 
     private protected void SetShuntsuAkadora(bool akadora)

@@ -17,13 +17,5 @@ internal abstract class Meld
     internal abstract bool OnlyGreens();
     internal abstract bool Contains(Value value);
 
-    internal Tile this[int i]
-    {
-        get
-        {
-            List<Tile> tiles = GetSortedTiles();
-            if (tiles.Count > i) return GetSortedTiles()[i];
-            else return (Tile)Value.None;
-        }
-    }
+    internal abstract Tile this[int i] { get; }
 }
