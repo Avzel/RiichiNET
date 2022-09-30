@@ -95,7 +95,7 @@ internal sealed class Player
         }
     }
 
-    private bool CanKanDuringRiichi(Naki naki, Value value)
+    private bool CanKanDuringRiichi(Naki naki, Value value)  // Use a ShantenCalculator and confirm winning tiles don't change
     {
         if (naki == Naki.AnKan)
         {
@@ -118,14 +118,14 @@ internal sealed class Player
 
         foreach (Tile tile in Hand.Tiles())
         {
-            if (Hand[tile] == 4) CallableValues.Add(Naki.AnKan, tile);
+            if (Hand[tile] == 4) CallableValues.Add(Naki.AnKan, tile);  // Call CanKanDuringRiichi() here and only add doable values
         }
 
         foreach (Meld meld in Melds)
         {
             if (meld.Mentsu == Mentsu.Koutsu && Hand.ContainsValue(meld[0]))
             {
-                CallableValues.Add(Naki.ShouMinKan, meld[0].value);
+                CallableValues.Add(Naki.ShouMinKan, meld[0].value);  // Call CanKanDuringRiichi() here and only add doable values
             }
         }
     }
@@ -152,7 +152,7 @@ internal sealed class Player
             }
             if (Hand[tile] == 3)
             {
-                CallableValues.Add(Naki.DaiMinKan, value);
+                CallableValues.Add(Naki.DaiMinKan, value);  // Call CanKanDuringRiichi() here and only add doable values
             }
             if (!tile.IsYaoChuu() && Hand.ContainsTile(tile + 1))
             {
