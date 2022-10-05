@@ -31,9 +31,14 @@ internal sealed class WinningHand
         _hand[meld.Mentsu].Add(meld);
     }
     
-    internal bool Contains(Mentsu mentsu)
+    internal bool Contains(Mentsu mentsu, Value value=Value.None)
     {
-        return _hand[mentsu].Any();
+        if (value == Value.None) return _hand[mentsu].Any();
+        else foreach (Meld meld in _hand[mentsu])
+        {
+            if (meld.Contains(value)) return true;
+        }
+        return false;
     }
 
     internal IList<Meld> GetMelds(Mentsu mentsu)

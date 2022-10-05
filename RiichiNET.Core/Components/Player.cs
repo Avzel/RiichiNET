@@ -95,21 +95,25 @@ internal sealed class Player
         }
     }
 
-    private bool CanKanDuringRiichi(Naki naki, Value value)  // Use a ShantenCalculator and confirm winning tiles don't change
+    private bool CanKanDuringRiichi(Naki naki, Value value)
     {
-        if (naki == Naki.AnKan)
+        if (!IsRiichi()) return true;
+
+        TileCount testHand = new TileCount(Hand);
+        WinningHand testMelds = new WinningHand(Melds);
+        ShantenCalculator sc;
+
+        foreach (Value winner in CallableValues[Naki.Agari])
         {
-            // TODO
+            testHand.Draw(winner);
+            sc = new ShantenCalculator(testHand, testMelds, true);
+            foreach (WinningHand winners in sc.WinningHands)
+            {
+                if (!winners.Contains(Mentsu.Koutsu, value)) return false;
+            }
+            testHand.Discard(winner);
         }
-        else if (naki == Naki.ShouMinKan)
-        {
-            // TODO
-        }
-        else if (naki == Naki.DaiMinKan)
-        {
-            // TODO
-        }
-        else return false;
+        return true;
     }
 
     private void DetermineCallOnDraw()
@@ -118,14 +122,19 @@ internal sealed class Player
 
         foreach (Tile tile in Hand.Tiles())
         {
-            if (Hand[tile] == 4) CallableValues.Add(Naki.AnKan, tile);  // Call CanKanDuringRiichi() here and only add doable values
+            if (Hand[tile] == 4 && CanKanDuringRiichi(Naki.AnKan, tile.value))
+            {
+                CallableValues.Add(Naki.AnKan, tile);
+            }
         }
 
         foreach (Meld meld in Melds)
         {
-            if (meld.Mentsu == Mentsu.Koutsu && Hand.ContainsValue(meld[0]))
+            if (meld.Mentsu == Mentsu.Koutsu &&
+                Hand.ContainsValue(meld[0]) && 
+                CanKanDuringRiichi(Naki.ShouMinKan, meld[0].value))
             {
-                CallableValues.Add(Naki.ShouMinKan, meld[0].value);  // Call CanKanDuringRiichi() here and only add doable values
+                CallableValues.Add(Naki.ShouMinKan, meld[0].value);
             }
         }
     }
@@ -150,9 +159,9 @@ internal sealed class Player
             {
                 CallableValues.Add(Naki.Pon, value);
             }
-            if (Hand[tile] == 3)
+            if (Hand[tile] == 3 && CanKanDuringRiichi(Naki.DaiMinKan, value))
             {
-                CallableValues.Add(Naki.DaiMinKan, value);  // Call CanKanDuringRiichi() here and only add doable values
+                CallableValues.Add(Naki.DaiMinKan, value);
             }
             if (!tile.IsYaoChuu() && Hand.ContainsTile(tile + 1))
             {
@@ -223,7 +232,7 @@ internal sealed class Player
         ShantenCalculator sc = new ShantenCalculator(Hand, new WinningHand(Melds), draw);
         int calculated = sc.MinimumShanten;
 
-        if (draw && calculated == 0)
+        if (!IsRiichi() && draw && calculated == 0)
         {
             CallableValues.Add(Naki.Riichi, sc.Tiles);
         }
