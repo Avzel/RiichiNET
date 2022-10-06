@@ -53,7 +53,7 @@ namespace RiichiNET.Core.Scoring;
 // SuuAnkouSingleWait=200,
 // DaiSuuShii=200
 
-internal class Yaku
+internal sealed class YakuCalculator
 {
     // TODO
 }

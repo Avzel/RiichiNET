@@ -1,4 +1,4 @@
-namespace RiichiNET.Core.Components;
+namespace RiichiNET.Core.Scoring;
 
 using System;
 using System.Collections.Generic;
@@ -6,6 +6,7 @@ using System.Linq;
 
 using RiichiNET.Core.Collections;
 using RiichiNET.Core.Collections.Melds;
+using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
 internal sealed class ShantenCalculator

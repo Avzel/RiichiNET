@@ -30,6 +30,7 @@ internal sealed class Player
     internal int Shanten { get; private set; } = ShantenCalculator.MAX_SHANTEN;
     internal bool IchijiFuriten { get; set; }
     internal HashSet<WinningHand> WinningHands = new HashSet<WinningHand>();
+    internal (int han, int fu) points { get; private set; }
 
     internal Player(Seat seat)
     {
