@@ -31,6 +31,7 @@ internal sealed class Player
     internal bool IchijiFuriten { get; set; }
     internal HashSet<WinningHand> WinningHands = new HashSet<WinningHand>();
     internal (int han, int fu) points { get; private set; }
+    internal HashSet<Yaku> Yaku { get; } = new HashSet<Yaku>();
 
     internal Player(Seat seat)
     {
@@ -252,16 +253,18 @@ internal sealed class Player
     {
         Wind = Wind.Next<Wind>();
         Score += ScoreChange;
-        ScoreChange = 0;
+        ScoreChange = default;
         Hand.Clear();
         Melds.Clear();
         Graveyard.Clear();
         GraveyardContents.Clear();
-        _riichiTile = null;
+        _riichiTile = default;
         CallableValues.Clear();
-        JustCalled = Value.None;
+        JustCalled = default;
         Shanten = ShantenCalculator.MAX_SHANTEN;
-        IchijiFuriten = false;
+        IchijiFuriten = default;
         WinningHands.Clear();
+        points = default;
+        Yaku.Clear();
     }
 }
