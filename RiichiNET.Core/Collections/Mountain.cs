@@ -25,7 +25,7 @@ internal sealed class Mountain
 
     internal Mountain()
     {
-        SetMountain();
+        Reset();
     }
 
     internal bool IsEmpty()
@@ -33,7 +33,7 @@ internal sealed class Mountain
         return !_wall.Any();
     }
 
-    internal void SetMountain()
+    internal void Reset()
     {
         CreateTiles();
         SplitDeadWall();
