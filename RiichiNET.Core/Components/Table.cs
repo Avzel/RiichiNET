@@ -76,7 +76,8 @@ internal sealed class Table
 
     internal void Rinshan()
     {
-        // TODO
+        Tile tile = _mountain.Rinshan();
+        _players[(int)_turn].Draw(tile);
     }
 
     internal void NextTurn()
@@ -91,8 +92,7 @@ internal sealed class Table
 
     private bool RoundIsOver()
     {
-        // TODO
-        return false;
+        return _mountain.IsEmpty();
     }
 
     private void Ryuukyoku()
@@ -105,6 +105,12 @@ internal sealed class Table
         // TODO
     }
 
+    private Seat DetermineNextDealer()
+    {
+        int seat =_round > 3 ? _round - 4 : _round;
+        return (Seat) Enum.ToObject(typeof(Seat), seat);
+    }
+
     internal void NextRound()
     {
         // TODO (Ryuukyoku or Agari)
@@ -112,7 +118,7 @@ internal sealed class Table
         _state = default;
         _wind = _wind.Next<Wind>();
         _round++;
-        _turn = default;
+        _turn = DetermineNextDealer();
         _mountain.Reset();
         foreach (Player player in _players) player.NextRound();
         _calls.Clear();

@@ -81,7 +81,7 @@ internal sealed class Mountain
 
         for (int i = EXTRA_TILES_FIRST; i < EXTRA_TILES_LAST; i++)
         {
-            _deadWall[i] = new Tile(Value.None);
+            _deadWall[i] = (Tile)Value.None;
         }
 
         if (DoraList.Any()) DoraList.Clear();
@@ -114,7 +114,7 @@ internal sealed class Mountain
             _wall.RemoveLast();
             return tile;
         }
-        else return new Tile(Value.None);
+        else return (Tile)Value.None;
     }
 
     internal Tile Rinshan()
@@ -124,7 +124,7 @@ internal sealed class Mountain
 
         if (tile.value != Value.None)
         {
-            _deadWall[index] = new Tile(Value.None);
+            _deadWall[index] = (Tile)Value.None;
         }
 
         return tile;
