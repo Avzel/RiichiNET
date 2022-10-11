@@ -1,5 +1,6 @@
 namespace RiichiNET.Core.Components;
 
+using System;
 using System.Collections.Generic;
 
 using RiichiNET.Core.Collections;
@@ -34,19 +35,33 @@ internal sealed class Table
         InitialDraw();
     }
 
-    internal void Draw()
+    internal bool Draw(Seat? turn=null)
     {
-        // TODO
+        Tile tile = _mountain.Draw();
+        if (tile.value != Value.None)
+        {
+            if (turn == null) _players[(int)_turn].Draw(tile);
+            else _players[(int)turn].Draw(tile);
+            return true;
+        }
+        else return false;
     }
 
-    internal void Discard()
+    internal void Discard(Tile tile)
     {
-        // TODO
+        _players[(int)_turn].Discard(tile);
     }
 
     internal void InitialDraw()
     {
-        // TODO
+        int count;
+        foreach (Seat seat in Enum.GetValues(typeof(Seat)))
+        {
+            if (seat == _turn) count = 14;
+            else count = 13;
+
+            for (; count > 0; count--) Draw(seat);
+        }
     }
 
     internal void HandleCallsDraw()
@@ -66,7 +81,12 @@ internal sealed class Table
 
     internal void NextTurn()
     {
-        // TODO
+        _turn = _turn.Next<Seat>();
+    }
+
+    internal void ChangeTurn(Seat seat)
+    {
+        _turn = seat;
     }
 
     private bool RoundIsOver()
