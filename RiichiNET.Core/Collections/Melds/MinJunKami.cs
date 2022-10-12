@@ -10,7 +10,7 @@ internal class MinJunKami: OpenMeld
     internal override Mentsu Mentsu { get => Mentsu.Shuntsu; }
     internal override Naki Naki { get => Naki.ChiiKami; }
 
-    internal MinJunKami(Value value, Direction called, bool akadora=false)
+    internal MinJunKami(Value value, bool akadora=false)
     {
         CalledIndex = 0;
         OrderedTiles[0] = (Tile)value;

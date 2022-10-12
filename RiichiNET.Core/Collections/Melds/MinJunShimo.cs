@@ -10,7 +10,7 @@ internal class MinJunShimo: OpenMeld
     internal override Mentsu Mentsu { get => Mentsu.Shuntsu; }
     internal override Naki Naki { get => Naki.ChiiShimo; }
 
-    internal MinJunShimo(Value value, Direction called, bool akadora=false)
+    internal MinJunShimo(Value value, bool akadora=false)
     {
         CalledIndex = 0;
         OrderedTiles[0] = (Tile)value;
