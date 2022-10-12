@@ -79,9 +79,9 @@ internal sealed class Table
     /// </summary>
     /// <param name="naki"></param>
     /// <param name="tile"></param>
-    internal void HandleCallsDraw(Naki naki, Tile? tile=default)
+    internal void HandleCallsDraw(Naki naki, List<Tile>? tiles=null)
     {
-        
+        // TODO
     }
 
     internal void HandleCallsDiscard()
