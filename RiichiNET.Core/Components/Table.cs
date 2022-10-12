@@ -9,6 +9,9 @@ using RiichiNET.Util.Extensions;
 
 using Call = System.ValueTuple<int, Enums.Seat, Enums.Naki>;
 
+/// <summary>
+/// Will be field of Server
+/// </summary>
 internal sealed class Table
 {
     // Can be used to determine agari type
@@ -17,6 +20,7 @@ internal sealed class Table
     private int _round = 0;
     private Seat _turn = 0;
     private int _pool = 0;
+    private Tile _justDiscarded;
 
     private Mountain _mountain = new Mountain();
     private Player[] _players = new Player[4]
@@ -35,12 +39,17 @@ internal sealed class Table
         InitialDraw();
     }
 
+    internal Player GetCurrentPlayer()
+    {
+        return _players[(int)_turn];
+    }
+
     internal bool Draw(Seat? turn=null)
     {
         Tile tile = _mountain.Draw();
         if (tile.value != Value.None)
         {
-            if (turn == null) _players[(int)_turn].Draw(tile);
+            if (turn == null) GetCurrentPlayer().Draw(tile);
             else _players[(int)turn].Draw(tile);
             return true;
         }
@@ -49,7 +58,8 @@ internal sealed class Table
 
     internal void Discard(Tile tile)
     {
-        _players[(int)_turn].Discard(tile);
+        GetCurrentPlayer().Discard(tile);
+        _justDiscarded = tile;
     }
 
     internal void InitialDraw()
@@ -64,9 +74,14 @@ internal sealed class Table
         }
     }
 
-    internal void HandleCallsDraw()
+    /// <summary>
+    /// Client will send call request to server, which then calls this method
+    /// </summary>
+    /// <param name="naki"></param>
+    /// <param name="tile"></param>
+    internal void HandleCallsDraw(Naki naki, Tile? tile=default)
     {
-        // TODO
+        
     }
 
     internal void HandleCallsDiscard()
@@ -77,7 +92,7 @@ internal sealed class Table
     internal void Rinshan()
     {
         Tile tile = _mountain.Rinshan();
-        _players[(int)_turn].Draw(tile);
+        GetCurrentPlayer().Draw(tile);
     }
 
     internal void NextTurn()
@@ -90,7 +105,7 @@ internal sealed class Table
         _turn = seat;
     }
 
-    private bool RoundIsOver()
+    internal bool RoundIsOver()
     {
         return _mountain.IsEmpty();
     }

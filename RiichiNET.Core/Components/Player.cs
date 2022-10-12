@@ -187,8 +187,8 @@ internal sealed class Player
         {
             Graveyard.Add(tile);
             GraveyardContents.Draw(tile.value);
+            DetermineCallOnDiscard();
         }
-        DetermineCallOnDiscard();
     }
 
     internal Tile PopFromGraveyard()
