@@ -213,13 +213,29 @@ internal sealed class Player
             JustCalled = meld[0].value;
             if (meld.Open)
             {
-                Discard(JustDrawn);
-                Melds.RemoveAll(it => 
-                    it.Mentsu == Mentsu.Koutsu && it.Contains(JustCalled));
+                Meld? pon = GetPon(JustCalled);
+                if (pon != null)
+                {
+                    Discard(JustDrawn);
+                    Melds.Remove(pon);
+                }
+                else return;
             }
             else Hand.Discard(meld);
         }
         Melds.Add(meld);
+    }
+
+    internal Meld? GetPon(Value value)
+    {
+        foreach (Meld meld in Melds)
+        {
+            if (meld.Mentsu == Mentsu.Koutsu && meld.Contains(JustCalled))
+            {
+                return meld;
+            }
+        }
+        return null;
     }
 
     internal void DeclareRiichi(Tile tile)

@@ -65,7 +65,13 @@ internal abstract class OpenMeld: Meld
         }
     }
 
-    private protected void SetKouKanTiles(bool kantsu, Value value, Direction called, (bool exists, bool taken) akadora=default)
+    private protected void SetKouKanTiles
+    (
+        bool kantsu, 
+        Value value, 
+        Direction called, 
+        (bool exists, bool taken) akadora=default
+    )
     {
         OrderedTiles[0] = OrderedTiles[1] = OrderedTiles[2] = (Tile)value;
         if (akadora.exists) Akadora = true;
