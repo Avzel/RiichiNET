@@ -6,15 +6,15 @@ using System.Linq;
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
-internal abstract class OpenMeld: Meld
+public abstract class OpenMeld: Meld
 {
-    internal override bool Open { get => true; }
-    internal abstract Naki Naki { get; }
+    public override bool Open { get => true; }
+    public abstract Naki Naki { get; }
 
-    internal List<Tile> OrderedTiles { get; private protected set; } = new List<Tile>();
+    public List<Tile> OrderedTiles { get; private protected set; } = new List<Tile>();
     internal int CalledIndex { get; private protected set; }
 
-    internal Tile GetCalledTile()
+    public Tile GetCalledTile()
     {
         return OrderedTiles[CalledIndex];
     }
@@ -34,7 +34,7 @@ internal abstract class OpenMeld: Meld
         return OrderedTiles[0].IsGreen();
     }
 
-    internal override bool Contains(Value value)
+    public override bool Contains(Value value)
     {
         foreach (Tile tile in OrderedTiles)
         {

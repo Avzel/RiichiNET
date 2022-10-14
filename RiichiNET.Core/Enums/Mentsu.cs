@@ -1,6 +1,6 @@
 namespace RiichiNET.Core.Enums;
 
-internal enum Mentsu
+public enum Mentsu
 {
     Jantou,
     Shuntsu,

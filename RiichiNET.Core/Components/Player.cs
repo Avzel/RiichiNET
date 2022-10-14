@@ -10,22 +10,22 @@ using RiichiNET.Core.Enums;
 using RiichiNET.Core.Scoring;
 using RiichiNET.Util.Extensions;
 
-internal sealed class Player
+public sealed class Player
 {
     internal Seat Seat { get; }
-    internal Wind Wind { get; set; }
-    internal int Score { get; private set; } = Tabulation.STARTING_SCORE;
+    public Wind Wind { get; set; }
+    public int Score { get; private set; } = Tabulation.STARTING_SCORE;
     internal int ScoreChange { get; set; } = 0;
 
-    internal TileCount Hand { get; } = new TileCount();
-    internal List<Meld> Melds { get; } = new List<Meld>();
-    internal List<Tile> Graveyard { get; } = new List<Tile>();
+    public TileCount Hand { get; } = new TileCount();
+    public List<Meld> Melds { get; } = new List<Meld>();
+    public List<Tile> Graveyard { get; } = new List<Tile>();
     internal TileCount GraveyardContents { get; } = new TileCount();
     private int? _riichiTile = null;
 
     internal NakiDict CallableValues { get; } = new NakiDict();
     internal Value JustCalled { get; private set; } = Value.None;
-    internal Tile JustDrawn { get; private set; } = (Tile)Value.None;
+    public Tile JustDrawn { get; private set; } = (Tile)Value.None;
 
     internal int Shanten { get; private set; } = ShantenCalculator.MAX_SHANTEN;
     internal bool IchijiFuriten { get; set; }
@@ -39,7 +39,7 @@ internal sealed class Player
         this.Wind = (Wind) Enum.ToObject(typeof(Wind), (int)seat);
     }
 
-    internal int HandLength()
+    public int HandLength()
     {
         return Hand.Length() + (3 * Melds.Count);
     }

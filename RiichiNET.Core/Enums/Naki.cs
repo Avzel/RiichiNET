@@ -1,6 +1,6 @@
 namespace RiichiNET.Core.Enums;
 
-internal enum Naki
+public enum Naki
 {
     None=0,
     ChiiShimo,

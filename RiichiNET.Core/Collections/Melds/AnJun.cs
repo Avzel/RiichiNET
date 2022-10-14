@@ -11,7 +11,7 @@ internal sealed class AnJun: ClosedMeld
 
     internal AnJun(Value value, bool akadora=false): base(value, akadora) {}
 
-    internal override List<Tile> GetSortedTiles()
+    public override List<Tile> GetSortedTiles()
     {
         Tile first = _value;
         Tile second = _value + 1;
@@ -37,7 +37,7 @@ internal sealed class AnJun: ClosedMeld
         return false;
     }
 
-    internal override bool Contains(Value value)
+    public override bool Contains(Value value)
     {
         return _value - value is <= 0 and >= -2;
     }

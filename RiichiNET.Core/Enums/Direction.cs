@@ -1,6 +1,6 @@
 namespace RiichiNET.Core.Enums;
 
-internal enum Direction
+public enum Direction
 {
     Right,
     Up,

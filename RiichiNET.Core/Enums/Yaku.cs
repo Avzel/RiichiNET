@@ -1,6 +1,6 @@
 namespace RiichiNET.Core.Enums;
 
-internal enum Yaku
+public enum Yaku
 {
     Riichi=1,
     RyanRiichi=1,

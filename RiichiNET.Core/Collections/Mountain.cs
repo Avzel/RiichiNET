@@ -8,7 +8,7 @@ using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 using RiichiNET.Util.Extensions;
 
-internal sealed class Mountain
+public sealed class Mountain
 {
     static readonly int DORA_FIRST = 5;
     static readonly int DEAD_WALL_LAST = 13;
@@ -28,9 +28,19 @@ internal sealed class Mountain
         Reset();
     }
 
-    internal bool IsEmpty()
+    public bool IsEmpty()
     {
         return !_wall.Any();
+    }
+
+    public int Count()
+    {
+        return _wall.Count();
+    }
+
+    public int DoraCount()
+    {
+        return DoraList.Values.Sum();
     }
 
     internal void Reset()
@@ -90,7 +100,7 @@ internal sealed class Mountain
 
     internal void FlipDora()
     {
-        int kanCount = DoraList.Values.Sum();
+        int kanCount = DoraCount();
         int index = DORA_FIRST + (kanCount * 2);
 
         Value dora = _deadWall[index].DoraValue();
@@ -119,7 +129,7 @@ internal sealed class Mountain
 
     internal Tile Rinshan()
     {
-        int index = DoraList.Values.Sum();
+        int index = DoraCount();
         Tile tile = _deadWall[index];
 
         if (tile.value != Value.None)
@@ -128,5 +138,19 @@ internal sealed class Mountain
         }
 
         return tile;
+    }
+
+    public List<Tile> GetOrderedDora(bool ura=false)
+    {
+        List<Tile> orderedDora = new List<Tile>();
+
+        int index = ura ? DORA_FIRST-1 : DORA_FIRST;
+        int count = DoraCount();
+        for (; count > 0; count--)
+        {
+            orderedDora.Add(_deadWall[index]);
+            index += 2;
+        }
+        return orderedDora;
     }
 }

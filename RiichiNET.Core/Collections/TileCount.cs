@@ -6,7 +6,7 @@ using System.Linq;
 using RiichiNET.Core.Collections.Melds;
 using RiichiNET.Core.Components;
 
-internal sealed class TileCount
+public sealed class TileCount
 {
     private SortedDictionary<Tile, int> _hand { get; }
 
@@ -77,12 +77,12 @@ internal sealed class TileCount
         _hand.Clear();
     }
 
-    internal bool ContainsTile(Tile tile)
+    public bool ContainsTile(Tile tile)
     {
         return _hand.ContainsKey(tile);
     }
 
-    internal bool ContainsValue(Tile tile)
+    public bool ContainsValue(Tile tile)
     {
         return
             this.ContainsTile(tile) ||
@@ -96,7 +96,7 @@ internal sealed class TileCount
         return (new int[] {this[original], this[other]}).Max();
     }
 
-    internal int Length()
+    public int Length()
     {
         return _hand.Values.Sum();
     }
@@ -111,12 +111,12 @@ internal sealed class TileCount
         return _hand.Keys.First();
     }
 
-    internal IEnumerable<Tile> Tiles()
+    public IEnumerable<Tile> Tiles()
     {
         return _hand.Keys;
     }
 
-    internal int this[Tile tile]
+    public int this[Tile tile]
     {
         get
         {

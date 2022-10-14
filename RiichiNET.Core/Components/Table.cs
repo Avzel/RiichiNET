@@ -15,11 +15,11 @@ using Call = System.ValueTuple<int, Enums.Seat, Enums.Naki>;
 internal sealed class Table
 {
     // Can be used to determine agari type
-    private State _state = State.None;
-    private Wind _wind = Wind.East;
+    public State State = State.None;
+    public Wind Wind = Wind.East;
+    public int Pool = 0;
     private int _round = 0;
     private Seat _turn = 0;
-    private int _pool = 0;
     private Tile _justDiscarded;
 
     private Mountain _mountain = new Mountain();
@@ -79,7 +79,7 @@ internal sealed class Table
     /// </summary>
     /// <param name="naki"></param>
     /// <param name="tile"></param>
-    internal void HandleCallsDraw(Naki naki, Value value=default)
+    internal void HandleCallsDraw(Naki naki, List<Tile>? tiles=null)
     {
         // TODO
     }
@@ -130,8 +130,8 @@ internal sealed class Table
     {
         // TODO (Ryuukyoku or Agari)
 
-        _state = default;
-        _wind = _wind.Next<Wind>();
+        State = default;
+        Wind = Wind.Next<Wind>();
         _round++;
         _turn = DetermineNextDealer();
         _mountain.Reset();

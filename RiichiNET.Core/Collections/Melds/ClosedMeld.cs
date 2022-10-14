@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
-internal abstract class ClosedMeld: Meld
+public abstract class ClosedMeld: Meld
 {
-    internal override bool Open { get => false; }
+    public override bool Open { get => false; }
 
     private protected Value _value;
 
@@ -32,7 +32,7 @@ internal abstract class ClosedMeld: Meld
         return ((Tile)_value).IsGreen();
     }
 
-    internal override bool Contains(Value value)
+    public override bool Contains(Value value)
     {
         return _value == value;
     }

@@ -8,7 +8,7 @@ using RiichiNET.Core.Enums;
 internal class MinJunKami: OpenMeld
 {
     internal override Mentsu Mentsu { get => Mentsu.Shuntsu; }
-    internal override Naki Naki { get => Naki.ChiiKami; }
+    public override Naki Naki { get => Naki.ChiiKami; }
 
     internal MinJunKami(Value value, bool akadora=false)
     {
@@ -19,7 +19,7 @@ internal class MinJunKami: OpenMeld
         SetShuntsuAkadora(akadora);
     }
 
-    internal override List<Tile> GetSortedTiles()
+    public override List<Tile> GetSortedTiles()
     {
         return new List<Tile>()
         {

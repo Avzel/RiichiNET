@@ -1,6 +1,6 @@
 namespace RiichiNET.Core.Enums;
 
-internal enum Value
+public enum Value
 {
     None=0,
     M1=1, M2, M3, M4, M5, M6, M7, M8, M9,

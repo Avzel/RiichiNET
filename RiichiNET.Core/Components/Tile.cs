@@ -4,12 +4,12 @@ using System;
 
 using RiichiNET.Core.Enums;
 
-internal struct Tile : IComparable<Tile>
+public struct Tile : IComparable<Tile>
 {
-    internal Value value;
-    internal bool akadora;
+    public Value value;
+    public bool akadora;
 
-    internal Tile(Value value, bool akadora=false)
+    public Tile(Value value, bool akadora=false)
     {
         this.value = value;
         this.akadora = akadora;

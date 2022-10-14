@@ -1,6 +1,6 @@
 namespace RiichiNET.Core.Enums;
 
-internal enum State
+public enum State
 {
     None=0,
     Draw,

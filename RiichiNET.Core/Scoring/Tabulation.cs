@@ -1,6 +1,6 @@
 namespace RiichiNET.Core.Scoring;
 
-internal static class Tabulation
+public static class Tabulation
 {
-    internal static int STARTING_SCORE = 25000;
+    public static int STARTING_SCORE = 25000;
 }
