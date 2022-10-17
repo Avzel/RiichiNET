@@ -74,12 +74,37 @@ internal sealed class Table
         }
     }
 
+    internal void PerformMelds(Meld meld)
+    {
+        GetCurrentPlayer().AddMeld(meld);
+        _calls.AddLast((Call)(_elapsed, _turn, meld.Naki));
+    }
+
     internal void PerformMeldsDraw(Meld meld)
     {
         if (meld.Naki is not Naki.AnKan or Naki.ShouMinKan) return;
 
-        GetCurrentPlayer().AddMeld(meld);
-        _calls.AddLast((Call)(_elapsed, _turn, meld.Naki));
+        PerformMelds(meld);
+    }
+
+    internal void PerformMeldsDiscard(Seat caller, Meld meld)
+    {
+        if (meld.Naki is not 
+            Naki.ChiiKami or 
+            Naki.ChiiNaka or 
+            Naki.ChiiShimo or 
+            Naki.Pon or 
+            Naki.DaiMinKan
+        ) return;
+
+        ChangeTurn(caller);
+        PerformMelds(meld);
+    }
+
+    internal void Rinshan()
+    {
+        Tile tile = _mountain.Rinshan();
+        GetCurrentPlayer().Draw(tile);
     }
 
     internal void StartRiichi(Tile tile)
@@ -94,17 +119,6 @@ internal sealed class Table
         Pool += Tabulation.RIICHI_COST;
     }
 
-    internal void PerformMeldsDiscard(Seat caller, Naki naki, Meld? meld=default)
-    {
-        // TODO
-    }
-
-    internal void Rinshan()
-    {
-        Tile tile = _mountain.Rinshan();
-        GetCurrentPlayer().Draw(tile);
-    }
-
     internal void NextTurn()
     {
         _turn = _turn.Next<Seat>();
@@ -114,6 +128,7 @@ internal sealed class Table
     internal void ChangeTurn(Seat seat)
     {
         _turn = seat;
+        _elapsed++;
     }
 
     internal bool RoundIsOver()
@@ -123,12 +138,12 @@ internal sealed class Table
 
     private void Ryuukyoku()
     {
-        // TODO
+        // TODO: call NextRound()
     }
 
     private void Agari(params Seat[] winners)
     {
-        // TODO
+        // TODO: call NextRound()
     }
 
     private Seat DetermineNextDealer()
@@ -137,18 +152,20 @@ internal sealed class Table
         return (Seat) Enum.ToObject(typeof(Seat), seat);
     }
 
-    internal void NextRound()
+    internal void NextRound(bool overthrow)
     {
-        // TODO (Ryuukyoku or Agari)
-
         State = default;
-        Wind = Wind.Next<Wind>();
-        _round++;
-        _turn = DetermineNextDealer();
         _elapsed = default;
         _mountain.Reset();
-        foreach (Player player in _players) player.NextRound();
         _calls.Clear();
+
+        if (overthrow)
+        {
+            Wind = Wind.Next<Wind>();
+            _round++;
+            _turn = DetermineNextDealer();
+        }
+        foreach (Player player in _players) player.NextRound(overthrow);
 
         InitialDraw();
     }

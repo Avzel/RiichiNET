@@ -270,9 +270,9 @@ public sealed class Player
         if (calculated < Shanten) Shanten = calculated;
     }
 
-    internal void NextRound()
+    internal void NextRound(bool overthrow)
     {
-        Wind = Wind.Next<Wind>();
+        if (overthrow) Wind = Wind.Next<Wind>();
         Score += ScoreChange;
         ScoreChange = default;
         Hand.Clear();
