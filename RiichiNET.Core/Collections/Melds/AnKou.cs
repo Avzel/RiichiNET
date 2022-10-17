@@ -8,6 +8,7 @@ using RiichiNET.Core.Enums;
 internal sealed class AnKou: ClosedMeld
 {
     internal override Mentsu Mentsu { get => Mentsu.Koutsu; }
+    public override Naki Naki { get => Naki.None; }
 
     internal AnKou(Value value, bool akadora=false): base(value, akadora) {}
 

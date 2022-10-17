@@ -77,6 +77,11 @@ public sealed class Player
         return Score <= 0;
     }
 
+    internal bool IsWinner()
+    {
+        return WinningHands.Any();
+    }
+
     private void CallAbilityCancelation(bool draw)
     {
         if (draw)
@@ -226,7 +231,7 @@ public sealed class Player
         Melds.Add(meld);
     }
 
-    internal Meld? GetPon(Value value)
+    private Meld? GetPon(Value value)
     {
         foreach (Meld meld in Melds)
         {

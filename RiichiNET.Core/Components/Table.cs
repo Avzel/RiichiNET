@@ -4,22 +4,22 @@ using System;
 using System.Collections.Generic;
 
 using RiichiNET.Core.Collections;
+using RiichiNET.Core.Collections.Melds;
 using RiichiNET.Core.Enums;
+using RiichiNET.Core.Scoring;
 using RiichiNET.Util.Extensions;
 
 using Call = System.ValueTuple<int, Enums.Seat, Enums.Naki>;
 
-/// <summary>
-/// Will be field of Server
-/// </summary>
 internal sealed class Table
 {
-    // Can be used to determine agari type
+    // TODO: Can be used to determine agari type
     public State State = State.None;
     public Wind Wind = Wind.East;
-    public int Pool = 0;
+    public int Pool { get; private set; } = 0;
     private int _round = 0;
     private Seat _turn = 0;
+    private int _elapsed = 0;
     private Tile _justDiscarded;
 
     private Mountain _mountain = new Mountain();
@@ -74,17 +74,27 @@ internal sealed class Table
         }
     }
 
-    /// <summary>
-    /// Client will send call request to server, which then calls this method
-    /// </summary>
-    /// <param name="naki"></param>
-    /// <param name="tile"></param>
-    internal void HandleCallsDraw(Naki naki, List<Tile>? tiles=null)
+    internal void PerformMeldsDraw(Meld meld)
     {
-        // TODO
+        if (meld.Naki is not Naki.AnKan or Naki.ShouMinKan) return;
+
+        GetCurrentPlayer().AddMeld(meld);
+        _calls.AddLast((Call)(_elapsed, _turn, meld.Naki));
     }
 
-    internal void HandleCallsDiscard(Naki naki, Seat caller, List<Tile>? tiles=default)
+    internal void StartRiichi(Tile tile)
+    {
+        if (!GetCurrentPlayer().Hand.ContainsTile(tile)) return;
+        GetCurrentPlayer().DeclareRiichi(tile);
+    }
+
+    internal void EndRiichi()
+    {
+        GetCurrentPlayer().ScoreChange -= Tabulation.RIICHI_COST;
+        Pool += Tabulation.RIICHI_COST;
+    }
+
+    internal void PerformMeldsDiscard(Seat caller, Naki naki, Meld? meld=default)
     {
         // TODO
     }
@@ -98,6 +108,7 @@ internal sealed class Table
     internal void NextTurn()
     {
         _turn = _turn.Next<Seat>();
+        _elapsed++;
     }
 
     internal void ChangeTurn(Seat seat)
@@ -115,7 +126,7 @@ internal sealed class Table
         // TODO
     }
 
-    private void Agari()
+    private void Agari(params Seat[] winners)
     {
         // TODO
     }
@@ -134,6 +145,7 @@ internal sealed class Table
         Wind = Wind.Next<Wind>();
         _round++;
         _turn = DetermineNextDealer();
+        _elapsed = default;
         _mountain.Reset();
         foreach (Player player in _players) player.NextRound();
         _calls.Clear();

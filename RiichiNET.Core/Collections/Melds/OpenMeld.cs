@@ -9,7 +9,6 @@ using RiichiNET.Core.Enums;
 public abstract class OpenMeld: Meld
 {
     public override bool Open { get => true; }
-    public abstract Naki Naki { get; }
 
     public List<Tile> OrderedTiles { get; private protected set; } = new List<Tile>();
     internal int CalledIndex { get; private protected set; }
