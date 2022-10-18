@@ -13,9 +13,9 @@ using Call = System.ValueTuple<int, Enums.Seat, Enums.Naki>;
 
 internal sealed class Table
 {
-    // TODO: Can be used to determine agari type
-    public State State = State.None;
-    public Wind Wind = Wind.East;
+    // Can be used to determine agari type
+    public State State { get; private set; } = State.None;
+    public Wind Wind { get; private set; } = Wind.East;
     public int Pool { get; private set; } = 0;
     private int _round = 0;
     private Seat _turn = 0;
@@ -76,7 +76,7 @@ internal sealed class Table
         }
     }
 
-    internal void PerformMelds(Meld meld)
+    private void PerformMelds(Meld meld)
     {
         GetCurrentPlayer().AddMeld(meld);
         _calls.AddLast((Call)(_elapsed, _turn, meld.Naki));
@@ -131,7 +131,7 @@ internal sealed class Table
         _elapsed++;
     }
 
-    internal void ChangeTurn(Seat seat)
+    private void ChangeTurn(Seat seat)
     {
         _turn = seat;
         _elapsed++;
