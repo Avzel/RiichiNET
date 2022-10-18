@@ -46,6 +46,7 @@ internal sealed class Table
 
     internal bool Draw(Seat? turn=null)
     {
+        State = State.Draw;
         Tile tile = _mountain.Draw();
         if (tile.value != Value.None)
         {
@@ -58,6 +59,7 @@ internal sealed class Table
 
     internal void Discard(Tile tile)
     {
+        State = State.Discard;
         GetCurrentPlayer().Discard(tile);
         _justDiscarded = tile;
     }
@@ -84,6 +86,7 @@ internal sealed class Table
     {
         if (meld.Naki is not Naki.AnKan or Naki.ShouMinKan) return;
 
+        State = State.Call;
         PerformMelds(meld);
     }
 
@@ -97,12 +100,14 @@ internal sealed class Table
             Naki.DaiMinKan
         ) return;
 
+        State = State.Call;
         ChangeTurn(caller);
         PerformMelds(meld);
     }
 
     internal void Rinshan()
     {
+        State = State.Draw;
         Tile tile = _mountain.Rinshan();
         GetCurrentPlayer().Draw(tile);
     }
@@ -111,6 +116,7 @@ internal sealed class Table
     {
         if (!GetCurrentPlayer().Hand.ContainsTile(tile)) return;
         GetCurrentPlayer().DeclareRiichi(tile);
+        Discard(tile);
     }
 
     internal void EndRiichi()
@@ -138,11 +144,13 @@ internal sealed class Table
 
     private void Ryuukyoku()
     {
+        State = State.RyuuKyoku;
         // TODO: call NextRound()
     }
 
     private void Agari(params Seat[] winners)
     {
+        State = State.Agari;
         // TODO: call NextRound()
     }
 
