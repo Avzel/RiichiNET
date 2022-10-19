@@ -44,6 +44,12 @@ internal sealed class Table
         return _players[(int)_turn];
     }
 
+    internal Player GetCurrentDealer()
+    {
+        int seat =_round > 3 ? _round - 4 : _round;
+        return _players[seat];
+    }
+
     internal bool Draw(Seat? turn=null)
     {
         State = State.Draw;
@@ -145,22 +151,39 @@ internal sealed class Table
     private void Ryuukyoku()
     {
         State = State.RyuuKyoku;
-        // TODO: call NextRound()
+
+        // TODO: Point distribution based on Tenpai
+
+        if (GetCurrentDealer().IsTenpai()) NextRound(false);
+        else NextRound(true);
     }
 
     private void Agari(params Seat[] winners)
     {
+        if (State == State.Draw)
+        {
+            // TODO:
+        }
+        else if (State == State.Discard)
+        {
+            // TODO:
+        }
         State = State.Agari;
+
+        foreach (Seat seat in winners)
+        {
+            // TODO:
+        }
+
         // TODO: call NextRound()
     }
 
     private Seat DetermineNextDealer()
     {
-        int seat =_round > 3 ? _round - 4 : _round;
-        return (Seat) Enum.ToObject(typeof(Seat), seat);
+        return GetCurrentDealer().Seat.Next<Seat>();
     }
 
-    internal void NextRound(bool overthrow)
+    private void NextRound(bool overthrow)
     {
         State = default;
         _elapsed = default;
