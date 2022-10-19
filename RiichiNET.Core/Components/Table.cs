@@ -13,7 +13,6 @@ using Call = System.ValueTuple<int, Enums.Seat, Enums.Naki>;
 
 internal sealed class Table
 {
-    // Can be used to determine agari type
     public State State { get; private set; } = State.None;
     public Wind Wind { get; private set; } = Wind.East;
     public int Pool { get; private set; } = 0;
@@ -148,6 +147,11 @@ internal sealed class Table
         return _mountain.IsEmpty();
     }
 
+    private void Tabulate(Player player)
+    {
+        // TODO:
+    }
+
     private void Ryuukyoku()
     {
         State = State.RyuuKyoku;
@@ -170,12 +174,12 @@ internal sealed class Table
         }
         State = State.Agari;
 
+        bool overthrow = false;
         foreach (Seat seat in winners)
         {
-            // TODO:
+            if (seat == GetCurrentDealer().Seat) overthrow = true;
         }
-
-        // TODO: call NextRound()
+        NextRound(overthrow);
     }
 
     private Seat DetermineNextDealer()
