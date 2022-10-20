@@ -38,18 +38,18 @@ internal sealed class Table
         InitialDraw();
     }
 
-    internal Player GetCurrentPlayer()
+    public Player GetCurrentPlayer()
     {
         return _players[(int)_turn];
     }
 
-    internal Player GetCurrentDealer()
+    public Player GetCurrentDealer()
     {
         int seat =_round > 3 ? _round - 4 : _round;
         return _players[seat];
     }
 
-    internal bool Draw(Seat? turn=null)
+    public bool Draw(Seat? turn=null)
     {
         State = State.Draw;
         Tile tile = _mountain.Draw();
@@ -62,52 +62,45 @@ internal sealed class Table
         else return false;
     }
 
-    internal void Discard(Tile tile)
+    public void Discard(Tile tile)
     {
         State = State.Discard;
         GetCurrentPlayer().Discard(tile);
         _justDiscarded = tile;
     }
 
-    internal void InitialDraw()
+    void InitialDraw()
     {
-        int count;
         foreach (Seat seat in Enum.GetValues(typeof(Seat)))
         {
-            if (seat == _turn) count = 14;
-            else count = 13;
-
-            for (; count > 0; count--) Draw(seat);
+            for (int i = seat == _turn ? 14 : 13; i > 0; i--) Draw(seat);
         }
     }
 
-    private void PerformMelds(Meld meld)
+    public List<Player> CanCall()
     {
+        List<Player> canCall = new List<Player>();
+
+        foreach (Player player in _players)
+        {
+            if (player == GetCurrentPlayer()) continue;
+
+            if (player.CallableValues.CanCall(value: _justDiscarded.value))
+            {
+                canCall.Add(player);
+            }
+        }
+        return canCall;
+    }
+
+    private void PerformMelds(Meld meld, Seat caller)
+    {
+        if (meld.Naki is Naki.Riichi or Naki.Agari or Naki.None) return;
+        State = State.Call;
+
         GetCurrentPlayer().AddMeld(meld);
         _calls.AddLast((Call)(_elapsed, _turn, meld.Naki));
-    }
-
-    internal void PerformMeldsDraw(Meld meld)
-    {
-        if (meld.Naki is not Naki.AnKan or Naki.ShouMinKan) return;
-
-        State = State.Call;
-        PerformMelds(meld);
-    }
-
-    internal void PerformMeldsDiscard(Seat caller, Meld meld)
-    {
-        if (meld.Naki is not 
-            Naki.ChiiKami or 
-            Naki.ChiiNaka or 
-            Naki.ChiiShimo or 
-            Naki.Pon or 
-            Naki.DaiMinKan
-        ) return;
-
-        State = State.Call;
-        ChangeTurn(caller);
-        PerformMelds(meld);
+        if (caller != _turn) ChangeTurn(caller);
     }
 
     internal void Rinshan()
@@ -152,17 +145,16 @@ internal sealed class Table
         // TODO:
     }
 
-    private void Ryuukyoku()
+    internal bool Ryuukyoku()
     {
         State = State.RyuuKyoku;
 
         // TODO: Point distribution based on Tenpai
 
-        if (GetCurrentDealer().IsTenpai()) NextRound(false);
-        else NextRound(true);
+        return GetCurrentDealer().IsTenpai() ? false : true;
     }
 
-    private void Agari(params Seat[] winners)
+    internal bool Agari()
     {
         if (State == State.Draw)
         {
@@ -174,12 +166,7 @@ internal sealed class Table
         }
         State = State.Agari;
 
-        bool overthrow = false;
-        foreach (Seat seat in winners)
-        {
-            if (seat == GetCurrentDealer().Seat) overthrow = true;
-        }
-        NextRound(overthrow);
+        return GetCurrentDealer().IsWinner() ? false : true;
     }
 
     private Seat DetermineNextDealer()
@@ -187,7 +174,7 @@ internal sealed class Table
         return GetCurrentDealer().Seat.Next<Seat>();
     }
 
-    private void NextRound(bool overthrow)
+    internal void NextRound(bool overthrow)
     {
         State = default;
         _elapsed = default;

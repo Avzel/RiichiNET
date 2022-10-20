@@ -39,17 +39,18 @@ internal sealed class NakiDict
         else _values[naki].Add(tile.value);
     }
 
-    internal bool Contains(Naki naki, Value value)
+    internal bool CanCall(Value value=Value.None, Naki naki=Naki.None)
     {
-        if (naki == Naki.None) return false;
-        else return _values[naki].Contains(value);
-    }
-
-    internal bool CanCall(Naki naki, Value value=Value.None)
-    {
-        if (naki == Naki.None) return false;
-        if (value != Value.None) return _values[naki].Contains(value);
-        else return _values[naki].Any();
+        if (naki == Naki.None && value == Value.None) return false;
+        else if (value == Value.None)
+        {
+            return _values[naki].Any();
+        }
+        else if (naki == Naki.None) foreach (HashSet<Value> values in _values.Values)
+        {
+            if (values.Contains(value)) return true;
+        }
+        return false;
     }
 
     internal void Clear(Naki naki=Naki.None)
