@@ -81,6 +81,8 @@ internal sealed class Table
     {
         List<Player> canCall = new List<Player>();
 
+        if (!(State is State.Draw or State.Discard)) return canCall;
+
         foreach (Player player in _players)
         {
             if (player == GetCurrentPlayer()) continue;
