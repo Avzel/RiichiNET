@@ -67,14 +67,14 @@ public sealed class Player
         return false || IchijiFuriten;
     }
 
-    internal bool IsRiichi()
-    {
-        return _riichiTile != null;
-    }
-
     internal bool PendingRiichi()
     {
         return _riichiTile == Graveyard.Count();
+    }
+
+    internal bool IsRiichi()
+    {
+        return _riichiTile != null && !PendingRiichi();
     }
 
     internal bool IsDefeated()
@@ -82,9 +82,19 @@ public sealed class Player
         return Score <= 0;
     }
 
+    internal bool IsComplete()
+    {
+        return Shanten == -1;
+    }
+
+    internal bool CanWin()
+    {
+        return Yaku.Any();
+    }
+
     internal bool IsWinner()
     {
-        return WinningHands.Any();
+        return points.CompareTo((0, 0)) > 0;
     }
 
     private void CallAbilityCancelation(bool draw)

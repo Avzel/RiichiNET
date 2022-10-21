@@ -44,6 +44,11 @@ public sealed class Mountain
         return DoraList.Values.Sum();
     }
 
+    public bool CanKan()
+    {
+        return DoraCount() < 4;
+    }
+
     internal void Reset()
     {
         CreateTiles();

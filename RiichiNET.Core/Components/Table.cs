@@ -83,7 +83,7 @@ internal sealed class Table
     {
         List<Player> canCall = new List<Player>();
 
-        if (!(State is State.Draw or State.Discard)) return canCall; // Kokushi Musou on a call
+        if (!(State is State.Draw or State.Discard)) return canCall; // Chankan && Kokushi Musou on a call
 
         foreach (Player player in _players)
         {
@@ -91,7 +91,7 @@ internal sealed class Table
 
             if (player.CallableValues.CanCall(value: _justDiscarded.value))
             {
-                canCall.Add(player);
+                canCall.Add(player); // Cannot call Kan if the wall is empty || kanCount == 4
             }
         }
         return canCall;
@@ -109,7 +109,6 @@ internal sealed class Table
 
     internal void Rinshan()
     {
-        State = State.Draw;
         Tile tile = _mountain.Rinshan();
         GetCurrentPlayer().Draw(tile);
     }
@@ -149,11 +148,9 @@ internal sealed class Table
         // TODO:
     }
 
-    internal bool Ryuukyoku() // Nagashi Mangan check
+    internal bool Ryuukyoku()
     {
-        State = State.RyuuKyoku;
-
-        // TODO: Point distribution based on Tenpai
+        // TODO: Point distribution based on Tenpai || Nagashi Mangan
 
         return GetCurrentDealer().IsTenpai() ? false : true;
     }
@@ -168,7 +165,6 @@ internal sealed class Table
         {
             // TODO:
         }
-        State = State.Agari;
 
         return GetCurrentDealer().IsWinner() ? false : true;
     }
