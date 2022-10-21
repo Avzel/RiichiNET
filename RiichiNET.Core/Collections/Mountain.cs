@@ -29,7 +29,7 @@ public sealed class Mountain
         Reset();
     }
 
-    public bool IsEmpty()
+    internal bool IsEmpty()
     {
         return !_wall.Any();
     }
@@ -39,12 +39,12 @@ public sealed class Mountain
         return _wall.Count();
     }
 
-    public int DoraCount()
+    private int DoraCount()
     {
         return DoraList.Values.Sum();
     }
 
-    public bool CanKan()
+    internal bool CanKan()
     {
         return DoraCount() < 4;
     }
