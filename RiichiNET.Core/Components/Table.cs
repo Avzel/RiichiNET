@@ -10,8 +10,6 @@ using RiichiNET.Core.Enums;
 using RiichiNET.Core.Scoring;
 using RiichiNET.Util.Extensions;
 
-using Call = System.ValueTuple<int, Enums.Seat, Enums.Naki>;
-
 public sealed class Table
 {
     public State State { get; private set; } = State.None;
@@ -19,7 +17,9 @@ public sealed class Table
     public int Pool { get; private set; } = 0;
     private int _round = 0;
     private Seat _turn = 0;
+
     private int _elapsed = 0;
+    private bool _called = false;
     private Tile _justDiscarded;
 
     private Mountain _mountain = new Mountain();
@@ -30,9 +30,6 @@ public sealed class Table
         new Player(Seat.Third), 
         new Player(Seat.Fourth)
     };
-
-    // List of calls in order (for determining Ippatsu, Daburu, etc.)
-    private LinkedList<Call> _calls = new LinkedList<Call>();
 
     public Table()
     {
@@ -55,6 +52,11 @@ public sealed class Table
         HashSet<Player> others = new HashSet<Player>(_players);
         others.Remove(GetCurrentPlayer());
         return others;
+    }
+
+    internal bool UninterruptedFirstRound()
+    {
+        return !_called && _elapsed < 4;
     }
 
     private bool CanKan()
@@ -129,8 +131,11 @@ public sealed class Table
     private HashSet<Player> PerformMelds(Meld meld, Seat caller)
     {
         State = State.Call;
+        _called = true;
+
+        foreach (Player player in _players) player.ClearIppatsu();
+
         GetCurrentPlayer().AddMeld(meld);
-        _calls.AddLast((Call)(_elapsed, _turn, meld.Naki));
         if (caller != _turn) ChangeTurn(caller);
 
         HashSet<Player> able = new HashSet<Player>();
@@ -141,7 +146,7 @@ public sealed class Table
                 player.CallableValues.CanCall(meld[0].value, Naki.Agari) && 
                 (
                     meld.Naki == Naki.ShouMinKan || 
-                    player.Yaku.Contains(Yaku.KokushiMusou)
+                    player.YakuList.Contains(Yaku.KokushiMusou)
                 )
             )
             { able.Add(player); }
@@ -160,14 +165,20 @@ public sealed class Table
     internal bool StartRiichi(Tile tile)
     {
         Discard(tile, riichi: true);
+
+        GetCurrentPlayer().YakuList.Add(Yaku.Ippatsu);
+
         if (!CanCallOnDiscard().Any()) return true;
         else return false;
     }
 
     internal void EndRiichi()
     {
-        GetCurrentPlayer().ScoreChange -= Tabulation.RIICHI_COST;
+        Player player = GetCurrentPlayer();
+        player.ScoreChange -= Tabulation.RIICHI_COST;
         Pool += Tabulation.RIICHI_COST;
+
+        if (UninterruptedFirstRound()) player.YakuList.Add(Yaku.RyanRiichi);
     }
 
     internal void NextTurn()
@@ -216,6 +227,10 @@ public sealed class Table
         {
             // TODO:
         }
+        else if (State == State.Call)
+        {
+            // TODO:
+        }
 
         return GetCurrentDealer().IsWinner() ? false : true;
     }
@@ -230,7 +245,7 @@ public sealed class Table
         State = default;
         _elapsed = default;
         _mountain.Reset();
-        _calls.Clear();
+        _called = default;
 
         if (overthrow)
         {
@@ -243,3 +258,32 @@ public sealed class Table
         InitialDraw();
     }
 }
+
+/*
+Special Yaku:
+
+MenzenchinTsumohou
+	!Player.IsOpen() && Table.State == State.Draw
+
+Chankan
+	Table.State == State.Call && _turn != Player.Seat
+
+RinshanKaihou
+	Table.State == State.Call && _turn == Player.Seat
+
+HaiteiRaoyue
+	Table.State == State.Draw && Table.RoundIsOver()
+	
+HouteiYaoyui
+	Table.State == State.Discard && Table.RoundIsOver()
+
+TenHou
+	Table.State == State.Draw && Table.UninterruptedFirstRound() Player == Table.GetCurrentDealer()
+
+RenHou
+	Table.State == State.Discard && Table.UninterruptedFirstRound() && Player.Graveyard.IsEmpty()
+
+ChiiHou
+	Table.State == State.Draw && Table.UninterruptedFirstRound() && Player != Table.GetCurrentDealer()
+
+*/

@@ -31,7 +31,7 @@ public sealed class Player
     internal bool IchijiFuriten { get; set; }
     internal HashSet<WinningHand> WinningHands = new HashSet<WinningHand>();
     public (int han, int fu) points { get; private set; }
-    public HashSet<Yaku> Yaku { get; } = new HashSet<Yaku>();
+    public HashSet<Yaku> YakuList { get; } = new HashSet<Yaku>();
 
     internal Player(Seat seat)
     {
@@ -89,7 +89,7 @@ public sealed class Player
 
     internal bool CanWin()
     {
-        return !IsFuriten() && Yaku.Any();
+        return !IsFuriten() && YakuList.Any();
     }
 
     internal bool IsWinner()
@@ -115,6 +115,11 @@ public sealed class Player
             CallableValues.Clear(Naki.ShouMinKan);
             WinningHands.Clear();
         }
+    }
+
+    internal void ClearIppatsu()
+    {
+        YakuList.Remove(Yaku.Ippatsu);
     }
 
     private bool CanKanDuringRiichi(Naki naki, Value value)
@@ -209,6 +214,7 @@ public sealed class Player
             GraveyardContents.Draw(tile.value);
             DetermineCallOnDiscard();
         }
+        ClearIppatsu();
     }
 
     internal Tile PopFromGraveyard()
@@ -302,6 +308,6 @@ public sealed class Player
         IchijiFuriten = default;
         WinningHands.Clear();
         points = default;
-        Yaku.Clear();
+        YakuList.Clear();
     }
 }
