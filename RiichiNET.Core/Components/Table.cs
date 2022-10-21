@@ -12,7 +12,7 @@ using RiichiNET.Util.Extensions;
 
 using Call = System.ValueTuple<int, Enums.Seat, Enums.Naki>;
 
-internal sealed class Table
+public sealed class Table
 {
     public State State { get; private set; } = State.None;
     public Wind Wind { get; private set; } = Wind.East;
@@ -34,7 +34,7 @@ internal sealed class Table
     // List of calls in order (for determining Ippatsu, Daburu, etc.)
     private LinkedList<Call> _calls = new LinkedList<Call>();
 
-    internal Table()
+    public Table()
     {
         InitialDraw();
     }
@@ -71,7 +71,7 @@ internal sealed class Table
         _justDiscarded = tile;
     }
 
-    void InitialDraw()
+    private void InitialDraw()
     {
         foreach (Seat seat in Enum.GetValues(typeof(Seat)))
         {
