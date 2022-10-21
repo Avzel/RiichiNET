@@ -72,6 +72,11 @@ public sealed class Player
         return _riichiTile != null;
     }
 
+    internal bool PendingRiichi()
+    {
+        return _riichiTile == Graveyard.Count();
+    }
+
     internal bool IsDefeated()
     {
         return Score <= 0;
@@ -245,7 +250,8 @@ public sealed class Player
 
     internal void DeclareRiichi(Tile tile)
     {
-        _riichiTile = Graveyard.Count - 1;
+        Discard(tile);
+        _riichiTile = Graveyard.Count() - 1;
     }
 
     private void EvaluateHand(bool draw)

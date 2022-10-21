@@ -2,6 +2,7 @@ namespace RiichiNET.Core.Components;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using RiichiNET.Core.Collections;
 using RiichiNET.Core.Collections.Melds;
@@ -62,10 +63,11 @@ internal sealed class Table
         else return false;
     }
 
-    public void Discard(Tile tile)
+    public void Discard(Tile tile, bool riichi=false)
     {
         State = State.Discard;
-        GetCurrentPlayer().Discard(tile);
+        if (riichi) GetCurrentPlayer().DeclareRiichi(tile);
+        else GetCurrentPlayer().Discard(tile);
         _justDiscarded = tile;
     }
 
@@ -77,11 +79,11 @@ internal sealed class Table
         }
     }
 
-    public List<Player> CanCall()
+    public List<Player> CanCall() // Need to check for yaku in order to agaru
     {
         List<Player> canCall = new List<Player>();
 
-        if (!(State is State.Draw or State.Discard)) return canCall;
+        if (!(State is State.Draw or State.Discard)) return canCall; // Kokushi Musou on a call
 
         foreach (Player player in _players)
         {
@@ -112,11 +114,11 @@ internal sealed class Table
         GetCurrentPlayer().Draw(tile);
     }
 
-    internal void StartRiichi(Tile tile)
+    internal bool StartRiichi(Tile tile)
     {
-        if (!GetCurrentPlayer().Hand.ContainsTile(tile)) return;
-        GetCurrentPlayer().DeclareRiichi(tile);
-        Discard(tile);
+        Discard(tile, riichi: true);
+        if (!CanCall().Any()) return true;
+        else return false;
     }
 
     internal void EndRiichi()
@@ -147,7 +149,7 @@ internal sealed class Table
         // TODO:
     }
 
-    internal bool Ryuukyoku()
+    internal bool Ryuukyoku() // Nagashi Mangan check
     {
         State = State.RyuuKyoku;
 
