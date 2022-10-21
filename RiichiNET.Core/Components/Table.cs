@@ -50,25 +50,72 @@ public sealed class Table
         return _players[seat];
     }
 
+    public HashSet<Player> GetOtherPlayers()
+    {
+        HashSet<Player> others = new HashSet<Player>(_players);
+        others.Remove(GetCurrentPlayer());
+        return others;
+    }
+
+    private bool CanKan()
+    {
+        return _mountain.DoraCount() < 5 && !_mountain.IsEmpty();
+    }
+
+    private void RectifyCallables(Player player)
+    {
+        if (!CanKan())
+        {
+            player.CallableValues.Clear(Naki.AnKan);
+            player.CallableValues.Clear(Naki.ShouMinKan);
+            player.CallableValues.Clear(Naki.DaiMinKan);
+        }
+
+        DetermineYaku(player);
+        if (!player.CanWin())
+        {
+            player.CallableValues.Clear(Naki.Agari);
+        }
+    }
+
+    public HashSet<Player> CanCallOnDiscard()
+    {
+        HashSet<Player> able = new HashSet<Player>();
+        if (State != State.Discard) return able;
+
+        foreach (Player player in GetOtherPlayers())
+        {
+            if (player.CallableValues.CanCall(_justDiscarded.value))
+            {
+                able.Add(player);
+            }
+        }
+        return able;
+    }
+
     public bool Draw(Seat? turn=null)
     {
         State = State.Draw;
         Tile tile = _mountain.Draw();
+        Player player = turn == null ? GetCurrentPlayer() : _players[(int)turn];
         if (tile.value != Value.None)
         {
-            if (turn == null) GetCurrentPlayer().Draw(tile);
-            else _players[(int)turn].Draw(tile);
+            player.Draw(tile);
+            RectifyCallables(player);
             return true;
         }
         else return false;
     }
 
-    public void Discard(Tile tile, bool riichi=false)
+    public HashSet<Player> Discard(Tile tile, bool riichi=false)
     {
         State = State.Discard;
-        if (riichi) GetCurrentPlayer().DeclareRiichi(tile);
-        else GetCurrentPlayer().Discard(tile);
+        Player player = GetCurrentPlayer();
+        if (riichi) player.DeclareRiichi(tile);
+        else player.Discard(tile);
         _justDiscarded = tile;
+        RectifyCallables(player);
+        return CanCallOnDiscard();
     }
 
     private void InitialDraw()
@@ -79,44 +126,41 @@ public sealed class Table
         }
     }
 
-    public List<Player> CanCall() // Need to check for yaku in order to agaru
+    private HashSet<Player> PerformMelds(Meld meld, Seat caller)
     {
-        List<Player> canCall = new List<Player>();
-
-        if (!(State is State.Draw or State.Discard)) return canCall; // Chankan && Kokushi Musou on a call
-
-        foreach (Player player in _players)
-        {
-            if (player == GetCurrentPlayer()) continue;
-
-            if (player.CallableValues.CanCall(value: _justDiscarded.value))
-            {
-                canCall.Add(player); // Cannot call Kan if the wall is empty || kanCount == 4
-            }
-        }
-        return canCall;
-    }
-
-    private void PerformMelds(Meld meld, Seat caller)
-    {
-        if (meld.Naki is Naki.Riichi or Naki.Agari or Naki.None) return;
         State = State.Call;
-
         GetCurrentPlayer().AddMeld(meld);
         _calls.AddLast((Call)(_elapsed, _turn, meld.Naki));
         if (caller != _turn) ChangeTurn(caller);
+
+        HashSet<Player> able = new HashSet<Player>();
+        if (meld.Naki is Naki.ShouMinKan or Naki.AnKan)
+        {
+            foreach (Player player in GetOtherPlayers())
+            if (
+                player.CallableValues.CanCall(meld[0].value, Naki.Agari) && 
+                (
+                    meld.Naki == Naki.ShouMinKan || 
+                    player.Yaku.Contains(Yaku.KokushiMusou)
+                )
+            )
+            { able.Add(player); }
+        }
+        return able;
     }
 
     internal void Rinshan()
     {
+        Player player = GetCurrentPlayer();
         Tile tile = _mountain.Rinshan();
-        GetCurrentPlayer().Draw(tile);
+        player.Draw(tile);
+        RectifyCallables(player);
     }
 
     internal bool StartRiichi(Tile tile)
     {
         Discard(tile, riichi: true);
-        if (!CanCall().Any()) return true;
+        if (!CanCallOnDiscard().Any()) return true;
         else return false;
     }
 
@@ -143,7 +187,14 @@ public sealed class Table
         return _mountain.IsEmpty();
     }
 
-    private void Tabulate(Player player)
+    private void DetermineYaku(Player player)
+    {
+        if (!player.IsComplete()) return;
+
+        //TODO:
+    }
+
+    private void Tabulate()
     {
         // TODO:
     }

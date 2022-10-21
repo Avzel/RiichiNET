@@ -39,14 +39,9 @@ public sealed class Mountain
         return _wall.Count();
     }
 
-    private int DoraCount()
+    internal int DoraCount()
     {
         return DoraList.Values.Sum();
-    }
-
-    internal bool CanKan()
-    {
-        return DoraCount() < 4;
     }
 
     internal void Reset()
@@ -104,7 +99,7 @@ public sealed class Mountain
         if (UraDoraList.Any()) UraDoraList.Clear();
     }
 
-    internal void FlipDora()
+    private void FlipDora()
     {
         int kanCount = DoraCount();
         int index = DORA_FIRST + (kanCount * 2);
@@ -135,6 +130,7 @@ public sealed class Mountain
 
     internal Tile Rinshan()
     {
+        FlipDora();
         int index = DoraCount();
         Tile tile = _deadWall[index];
 

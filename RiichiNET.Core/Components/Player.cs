@@ -30,8 +30,8 @@ public sealed class Player
     internal int Shanten { get; private set; } = ShantenCalculator.MAX_SHANTEN;
     internal bool IchijiFuriten { get; set; }
     internal HashSet<WinningHand> WinningHands = new HashSet<WinningHand>();
-    internal (int han, int fu) points { get; private set; }
-    internal HashSet<Yaku> Yaku { get; } = new HashSet<Yaku>();
+    public (int han, int fu) points { get; private set; }
+    public HashSet<Yaku> Yaku { get; } = new HashSet<Yaku>();
 
     internal Player(Seat seat)
     {
@@ -89,7 +89,7 @@ public sealed class Player
 
     internal bool CanWin()
     {
-        return Yaku.Any();
+        return !IsFuriten() && Yaku.Any();
     }
 
     internal bool IsWinner()

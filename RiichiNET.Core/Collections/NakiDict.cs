@@ -6,7 +6,7 @@ using System.Linq;
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
-internal sealed class NakiDict
+public sealed class NakiDict
 {
     private Dictionary<Naki, HashSet<Value>> _values = new Dictionary<Naki, HashSet<Value>>()
     {
@@ -39,7 +39,7 @@ internal sealed class NakiDict
         else _values[naki].Add(tile.value);
     }
 
-    internal bool CanCall(Value value=Value.None, Naki naki=Naki.None)
+    public bool CanCall(Value value=Value.None, Naki naki=Naki.None)
     {
         if (naki == Naki.None && value == Value.None) return false;
         else if (value == Value.None)
@@ -62,7 +62,7 @@ internal sealed class NakiDict
         else _values[naki].Clear();
     }
 
-    internal HashSet<Value> this[Naki naki]
+    public HashSet<Value> this[Naki naki]
     {
         get {return _values[naki];}
     }
