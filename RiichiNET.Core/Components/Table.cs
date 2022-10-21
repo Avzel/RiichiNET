@@ -242,9 +242,9 @@ public sealed class Table
 
     internal void NextRound(bool overthrow)
     {
+        _mountain.Reset();
         State = default;
         _elapsed = default;
-        _mountain.Reset();
         _called = default;
 
         if (overthrow)
