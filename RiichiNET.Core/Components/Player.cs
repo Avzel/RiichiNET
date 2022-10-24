@@ -12,6 +12,9 @@ using RiichiNET.Util.Extensions;
 
 public sealed class Player
 {
+    public static readonly int MAX_HAND_SIZE = 14;
+    public static readonly int MIN_HAND_SIZE = 13;
+
     internal Seat Seat { get; }
     public Wind Wind { get; set; }
     public int Score { get; private set; } = Tabulation.STARTING_SCORE;
@@ -42,6 +45,11 @@ public sealed class Player
     public int HandLength()
     {
         return Hand.Length() + (3 * Melds.Count);
+    }
+
+    internal bool HasDrawn()
+    {
+        return HandLength() == MAX_HAND_SIZE;
     }
 
     internal bool IsOpen()
@@ -115,11 +123,6 @@ public sealed class Player
             CallableValues.Clear(Naki.ShouMinKan);
             WinningHands.Clear();
         }
-    }
-
-    internal void ClearIppatsu()
-    {
-        YakuList.Remove(Yaku.Ippatsu);
     }
 
     private bool CanKanDuringRiichi(Naki naki, Value value)
@@ -214,7 +217,6 @@ public sealed class Player
             GraveyardContents.Draw(tile.value);
             DetermineCallOnDiscard();
         }
-        ClearIppatsu();
     }
 
     internal Tile PopFromGraveyard()
@@ -277,7 +279,7 @@ public sealed class Player
         ShantenCalculator sc = new ShantenCalculator(Hand, new WinningHand(Melds), draw);
         int calculated = sc.MinimumShanten;
 
-        if (!IsRiichi() && draw && calculated == 0)
+        if (!IsRiichi() && !IsOpen() && draw && calculated == 0)
         {
             CallableValues.Add(Naki.Riichi, sc.Tiles);
         }
@@ -296,18 +298,18 @@ public sealed class Player
     {
         if (overthrow) Wind = Wind.Next<Wind>();
         Score += ScoreChange;
-        ScoreChange = default;
+        ScoreChange = 0;
         Hand.Clear();
         Melds.Clear();
         Graveyard.Clear();
         GraveyardContents.Clear();
-        _riichiTile = default;
+        _riichiTile = null;
         CallableValues.Clear();
-        JustCalled = default;
+        JustCalled = Value.None;
         Shanten = ShantenCalculator.MAX_SHANTEN;
-        IchijiFuriten = default;
+        IchijiFuriten = false;
         WinningHands.Clear();
-        points = default;
+        points = (han: 0, fu: 0);
         YakuList.Clear();
     }
 }

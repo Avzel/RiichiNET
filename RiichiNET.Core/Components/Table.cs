@@ -12,22 +12,29 @@ using RiichiNET.Util.Extensions;
 
 public sealed class Table
 {
+    internal struct Call
+    {
+        internal int elapsed;
+        internal Seat caller;
+        internal Naki type;
+    }
+
     public State State { get; private set; } = State.None;
     public Wind Wind { get; private set; } = Wind.East;
     public int Pool { get; private set; } = 0;
     private int _round = 0;
     private Seat _turn = 0;
 
-    private int _elapsed = 0;
-    private bool _called = false;
+    internal int Elapsed { get; private set; } = 0;
+    internal LinkedList<Call> Calls { get; } = new LinkedList<Call>();
     private Tile _justDiscarded;
 
     private Mountain _mountain = new Mountain();
-    private Player[] _players = new Player[4]
+    internal Player[] Players { get; } = new Player[4]
     {
-        new Player(Seat.First), 
-        new Player(Seat.Second), 
-        new Player(Seat.Third), 
+        new Player(Seat.First),
+        new Player(Seat.Second),
+        new Player(Seat.Third),
         new Player(Seat.Fourth)
     };
 
@@ -36,27 +43,27 @@ public sealed class Table
         InitialDraw();
     }
 
-    public Player GetCurrentPlayer()
+    public Player GetPlayer(Seat? seat=null)
     {
-        return _players[(int)_turn];
+        return seat == null ? Players[(int)_turn] : Players[(int)seat];
     }
 
-    public Player GetCurrentDealer()
+    public Player GetDealer()
     {
-        int seat =_round > 3 ? _round - 4 : _round;
-        return _players[seat];
+        int seat = _round > 3 ? _round - 4 : _round;
+        return Players[seat];
     }
 
     public HashSet<Player> GetOtherPlayers()
     {
-        HashSet<Player> others = new HashSet<Player>(_players);
-        others.Remove(GetCurrentPlayer());
+        HashSet<Player> others = new HashSet<Player>(Players);
+        others.Remove(GetPlayer());
         return others;
     }
 
     internal bool UninterruptedFirstRound()
     {
-        return !_called && _elapsed < 4;
+        return !Calls.Any() && Elapsed < 4;
     }
 
     private bool CanKan()
@@ -64,8 +71,9 @@ public sealed class Table
         return _mountain.DoraCount() < 5 && !_mountain.IsEmpty();
     }
 
-    private void RectifyCallables(Player player)
+    private void RectifyCallables(Value value=Value.None)
     {
+        Player player = GetPlayer();
         if (!CanKan())
         {
             player.CallableValues.Clear(Naki.AnKan);
@@ -73,14 +81,18 @@ public sealed class Table
             player.CallableValues.Clear(Naki.DaiMinKan);
         }
 
-        DetermineYaku(player);
-        if (!player.CanWin())
+        HashSet<Player> players = player.HasDrawn() ? 
+            new HashSet<Player> { GetPlayer() } :
+            GetOtherPlayers();
+
+        foreach (Player relevant in players)
         {
-            player.CallableValues.Clear(Naki.Agari);
+            DetermineYaku(relevant, value);
+            if (!relevant.CanWin()) relevant.CallableValues.Clear(Naki.Agari);
         }
     }
 
-    public HashSet<Player> CanCallOnDiscard()
+    private HashSet<Player> CanCallOnDiscard()
     {
         HashSet<Player> able = new HashSet<Player>();
         if (State != State.Discard) return able;
@@ -95,28 +107,27 @@ public sealed class Table
         return able;
     }
 
-    public bool Draw(Seat? turn=null)
+    public bool Draw(Seat? turn = null)
     {
         State = State.Draw;
         Tile tile = _mountain.Draw();
-        Player player = turn == null ? GetCurrentPlayer() : _players[(int)turn];
         if (tile.value != Value.None)
         {
-            player.Draw(tile);
-            RectifyCallables(player);
+            GetPlayer(turn).Draw(tile);
+            RectifyCallables();
             return true;
         }
         else return false;
     }
 
-    public HashSet<Player> Discard(Tile tile, bool riichi=false)
+    public HashSet<Player> Discard(Tile tile, bool riichi = false)
     {
         State = State.Discard;
-        Player player = GetCurrentPlayer();
+        Player player = GetPlayer();
         if (riichi) player.DeclareRiichi(tile);
         else player.Discard(tile);
         _justDiscarded = tile;
-        RectifyCallables(player);
+        RectifyCallables(_justDiscarded.value);
         return CanCallOnDiscard();
     }
 
@@ -128,79 +139,82 @@ public sealed class Table
         }
     }
 
-    private HashSet<Player> PerformMelds(Meld meld, Seat caller)
+    public HashSet<Player> FormMeld(Meld meld, Seat caller)
     {
         State = State.Call;
-        _called = true;
+        Calls.AddLast(new Call 
+        {
+            elapsed = Elapsed, caller = caller, type = meld.Naki
+        });
 
-        foreach (Player player in _players) player.ClearIppatsu();
-
-        GetCurrentPlayer().AddMeld(meld);
+        GetPlayer(caller).AddMeld(meld);
         if (caller != _turn) ChangeTurn(caller);
 
         HashSet<Player> able = new HashSet<Player>();
         if (meld.Naki is Naki.ShouMinKan or Naki.AnKan)
-        {
             foreach (Player player in GetOtherPlayers())
-            if (
-                player.CallableValues.CanCall(meld[0].value, Naki.Agari) && 
-                (
-                    meld.Naki == Naki.ShouMinKan || 
-                    player.YakuList.Contains(Yaku.KokushiMusou)
+            {
+                RectifyCallables(meld[0].value);
+                if (
+                    player.CallableValues.CanCall(meld[0].value, Naki.Agari) &&
+                    (
+                        meld.Naki == Naki.ShouMinKan ||
+                        player.YakuList.Contains(Yaku.KokushiMusou)
+                    )
                 )
-            )
-            { able.Add(player); }
-        }
+                { able.Add(player); }
+            }
         return able;
     }
 
-    internal void Rinshan()
+    public void Rinshan()
     {
-        Player player = GetCurrentPlayer();
+        Player player = GetPlayer();
         Tile tile = _mountain.Rinshan();
         player.Draw(tile);
-        RectifyCallables(player);
+        RectifyCallables();
     }
 
-    internal bool StartRiichi(Tile tile)
+    public HashSet<Player> StartRiichi(Tile tile)
     {
         Discard(tile, riichi: true);
 
-        GetCurrentPlayer().YakuList.Add(Yaku.Ippatsu);
+        Calls.AddLast(new Call 
+        {
+            elapsed = Elapsed, caller = GetPlayer().Seat, type = Naki.Riichi 
+        });
 
-        if (!CanCallOnDiscard().Any()) return true;
-        else return false;
+        return CanCallOnDiscard();
     }
 
-    internal void EndRiichi()
+    public void EndRiichi()
     {
-        Player player = GetCurrentPlayer();
+        Player player = GetPlayer();
         player.ScoreChange -= Tabulation.RIICHI_COST;
         Pool += Tabulation.RIICHI_COST;
-
-        if (UninterruptedFirstRound()) player.YakuList.Add(Yaku.RyanRiichi);
     }
 
-    internal void NextTurn()
+    public void NextTurn()
     {
         _turn = _turn.Next<Seat>();
-        _elapsed++;
+        Elapsed++;
     }
 
     private void ChangeTurn(Seat seat)
     {
         _turn = seat;
-        _elapsed++;
+        Elapsed++;
     }
 
-    internal bool RoundIsOver()
+    public bool RoundIsOver()
     {
         return _mountain.IsEmpty();
     }
 
-    private void DetermineYaku(Player player)
+    private void DetermineYaku(Player player, Value value=Value.None)
     {
         if (!player.IsComplete()) return;
+        player.YakuList.Clear();
 
         //TODO:
     }
@@ -210,14 +224,14 @@ public sealed class Table
         // TODO:
     }
 
-    internal bool Ryuukyoku()
+    public bool Ryuukyoku()
     {
         // TODO: Point distribution based on Tenpai || Nagashi Mangan
 
-        return GetCurrentDealer().IsTenpai() ? false : true;
+        return GetDealer().IsTenpai() ? false : true;
     }
 
-    internal bool Agari()
+    public bool Agari()
     {
         if (State == State.Draw)
         {
@@ -232,20 +246,20 @@ public sealed class Table
             // TODO:
         }
 
-        return GetCurrentDealer().IsWinner() ? false : true;
+        return GetDealer().IsWinner() ? false : true;
     }
 
     private Seat DetermineNextDealer()
     {
-        return GetCurrentDealer().Seat.Next<Seat>();
+        return GetDealer().Seat.Next<Seat>();
     }
 
-    internal void NextRound(bool overthrow)
+    public void NextRound(bool overthrow)
     {
         _mountain.Reset();
-        State = default;
-        _elapsed = default;
-        _called = default;
+        State = State.None;
+        Elapsed = 0;
+        Calls.Clear();
 
         if (overthrow)
         {
@@ -253,7 +267,7 @@ public sealed class Table
             _round++;
             _turn = DetermineNextDealer();
         }
-        foreach (Player player in _players) player.NextRound(overthrow);
+        foreach (Player player in Players) player.NextRound(overthrow);
 
         InitialDraw();
     }
@@ -261,6 +275,12 @@ public sealed class Table
 
 /*
 Special Yaku:
+
+Ippatsu
+    Player.IsRiichi() && Calls.Last().type == Naki.Riichi && Calls.Last().caller == Player && Table.Elapsed - Calls.Last().elapsed < 5
+
+RyanRiichi
+    Player.IsRiichi() && Calls.First().type == Naki.Riichi && Calls.First().caller == Player && Calls.First().elapsed < 4
 
 MenzenchinTsumohou
 	!Player.IsOpen() && Table.State == State.Draw
@@ -278,12 +298,12 @@ HouteiYaoyui
 	Table.State == State.Discard && Table.RoundIsOver()
 
 TenHou
-	Table.State == State.Draw && Table.UninterruptedFirstRound() Player == Table.GetCurrentDealer()
+	Table.State == State.Draw && Table.UninterruptedFirstRound() Player == Table.GetDealer()
 
 RenHou
 	Table.State == State.Discard && Table.UninterruptedFirstRound() && Player.Graveyard.IsEmpty()
 
 ChiiHou
-	Table.State == State.Draw && Table.UninterruptedFirstRound() && Player != Table.GetCurrentDealer()
+	Table.State == State.Draw && Table.UninterruptedFirstRound() && Player != Table.GetDealer()
 
 */
