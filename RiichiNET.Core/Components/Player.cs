@@ -26,7 +26,7 @@ public sealed class Player
     internal TileCount GraveyardContents { get; } = new TileCount();
     private int? _riichiTile = null;
 
-    internal NakiDict CallableValues { get; } = new NakiDict();
+    internal NakiDict Callables { get; } = new NakiDict();
     internal Value JustCalled { get; private set; } = Value.None;
     public Tile JustDrawn { get; private set; } = (Tile)Value.None;
 
@@ -68,7 +68,7 @@ public sealed class Player
 
     internal bool IsFuriten()
     {
-        foreach (Value value in CallableValues[Naki.Agari])
+        foreach (Value value in Callables[Naki.Agari])
         {
             if (GraveyardContents.ContainsTile(value)) return true;
         }
@@ -109,18 +109,18 @@ public sealed class Player
     {
         if (draw)
         {
-            CallableValues.Clear(Naki.ChiiKami);
-            CallableValues.Clear(Naki.ChiiNaka);
-            CallableValues.Clear(Naki.ChiiShimo);
-            CallableValues.Clear(Naki.Pon);
-            CallableValues.Clear(Naki.DaiMinKan);
+            Callables.Clear(Naki.ChiiKami);
+            Callables.Clear(Naki.ChiiNaka);
+            Callables.Clear(Naki.ChiiShimo);
+            Callables.Clear(Naki.Pon);
+            Callables.Clear(Naki.DaiMinKan);
         }
         else
         {
-            CallableValues.Clear(Naki.Riichi);
-            CallableValues.Clear(Naki.Agari);
-            CallableValues.Clear(Naki.AnKan);
-            CallableValues.Clear(Naki.ShouMinKan);
+            Callables.Clear(Naki.Riichi);
+            Callables.Clear(Naki.Agari);
+            Callables.Clear(Naki.AnKan);
+            Callables.Clear(Naki.ShouMinKan);
             WinningHands.Clear();
         }
     }
@@ -133,7 +133,7 @@ public sealed class Player
         WinningHand testMelds = new WinningHand(Melds);
         ShantenCalculator sc;
 
-        foreach (Value winner in CallableValues[Naki.Agari])
+        foreach (Value winner in Callables[Naki.Agari])
         {
             testHand.Draw(winner);
             sc = new ShantenCalculator(testHand, testMelds, true);
@@ -154,7 +154,7 @@ public sealed class Player
         {
             if (Hand[tile] == 4 && CanKanDuringRiichi(Naki.AnKan, tile.value))
             {
-                CallableValues.Add(Naki.AnKan, tile);
+                Callables.Add(Naki.AnKan, tile);
             }
         }
 
@@ -164,7 +164,7 @@ public sealed class Player
                 Hand.ContainsValue(meld[0]) && 
                 CanKanDuringRiichi(Naki.ShouMinKan, meld[0].value))
             {
-                CallableValues.Add(Naki.ShouMinKan, meld[0].value);
+                Callables.Add(Naki.ShouMinKan, meld[0].value);
             }
         }
     }
@@ -187,23 +187,23 @@ public sealed class Player
 
             if (Hand[tile] is 2 or 3)
             {
-                CallableValues.Add(Naki.Pon, value);
+                Callables.Add(Naki.Pon, value);
             }
             if (Hand[tile] == 3 && CanKanDuringRiichi(Naki.DaiMinKan, value))
             {
-                CallableValues.Add(Naki.DaiMinKan, value);
+                Callables.Add(Naki.DaiMinKan, value);
             }
             if (!tile.IsYaoChuu() && Hand.ContainsTile(tile + 1))
             {
-                CallableValues.Add(Naki.ChiiShimo, tile-1);
+                Callables.Add(Naki.ChiiShimo, tile-1);
             }
             if (Hand.ContainsTile(tile + 2))
             {
-                CallableValues.Add(Naki.ChiiNaka, tile+1);
+                Callables.Add(Naki.ChiiNaka, tile+1);
             }
             if (!tile.IsYaoChuu() && Hand.ContainsTile(tile - 1))
             {
-                CallableValues.Add(Naki.ChiiKami, tile+1);
+                Callables.Add(Naki.ChiiKami, tile+1);
             }
         }
     }
@@ -281,7 +281,7 @@ public sealed class Player
 
         if (!IsRiichi() && !IsOpen() && draw && calculated == 0)
         {
-            CallableValues.Add(Naki.Riichi, sc.Tiles);
+            Callables.Add(Naki.Riichi, sc.Tiles);
         }
         else if (draw && calculated == -1)
         {
@@ -289,7 +289,7 @@ public sealed class Player
         }
         else if (calculated == 0)
         {
-            CallableValues.Add(Naki.Agari, sc.Tiles);
+            Callables.Add(Naki.Agari, sc.Tiles);
         }
         if (calculated < Shanten) Shanten = calculated;
     }
@@ -304,7 +304,7 @@ public sealed class Player
         Graveyard.Clear();
         GraveyardContents.Clear();
         _riichiTile = null;
-        CallableValues.Clear();
+        Callables.Clear();
         JustCalled = Value.None;
         Shanten = ShantenCalculator.MAX_SHANTEN;
         IchijiFuriten = false;

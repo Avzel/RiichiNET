@@ -39,7 +39,7 @@ public sealed class NakiDict
         else _values[naki].Add(tile.value);
     }
 
-    public bool CanCall(Value value=Value.None, Naki naki=Naki.None)
+    public bool Able(Value value=Value.None, Naki naki=Naki.None)
     {
         if (naki == Naki.None && value == Value.None) return false;
         else if (value == Value.None)
@@ -49,6 +49,10 @@ public sealed class NakiDict
         else if (naki == Naki.None) foreach (HashSet<Value> values in _values.Values)
         {
             if (values.Contains(value)) return true;
+        }
+        else
+        {
+            return _values[naki].Contains(value);
         }
         return false;
     }

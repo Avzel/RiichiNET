@@ -76,20 +76,16 @@ public sealed class Table
         Player player = GetPlayer();
         if (!CanKan())
         {
-            player.CallableValues.Clear(Naki.AnKan);
-            player.CallableValues.Clear(Naki.ShouMinKan);
-            player.CallableValues.Clear(Naki.DaiMinKan);
+            player.Callables.Clear(Naki.AnKan);
+            player.Callables.Clear(Naki.ShouMinKan);
+            player.Callables.Clear(Naki.DaiMinKan);
         }
 
         HashSet<Player> players = player.HasDrawn() ? 
             new HashSet<Player> { GetPlayer() } :
             GetOtherPlayers();
 
-        foreach (Player relevant in players)
-        {
-            DetermineYaku(relevant, value);
-            if (!relevant.CanWin()) relevant.CallableValues.Clear(Naki.Agari);
-        }
+        foreach (Player relevant in players) DetermineYaku(relevant, value);
     }
 
     private HashSet<Player> CanCallOnDiscard()
@@ -99,7 +95,7 @@ public sealed class Table
 
         foreach (Player player in GetOtherPlayers())
         {
-            if (player.CallableValues.CanCall(_justDiscarded.value))
+            if (player.Callables.Able(_justDiscarded.value))
             {
                 able.Add(player);
             }
@@ -155,13 +151,12 @@ public sealed class Table
             foreach (Player player in GetOtherPlayers())
             {
                 RectifyCallables(meld[0].value);
-                if (
-                    player.CallableValues.CanCall(meld[0].value, Naki.Agari) &&
-                    (
-                        meld.Naki == Naki.ShouMinKan ||
-                        player.YakuList.Contains(Yaku.KokushiMusou)
-                    )
-                )
+
+                if (player.Callables.Able(meld[0].value, Naki.Agari) &&
+                (
+                    meld.Naki == Naki.ShouMinKan ||
+                    player.YakuList.Contains(Yaku.KokushiMusou)
+                ))
                 { able.Add(player); }
             }
         return able;
@@ -213,8 +208,8 @@ public sealed class Table
 
     private void DetermineYaku(Player player, Value value=Value.None)
     {
-        if (!player.IsComplete()) return;
         player.YakuList.Clear();
+        if (!player.IsComplete() || !player.Callables.Able(value, Naki.Agari)) return;
 
         //TODO:
     }
