@@ -1,11 +1,24 @@
 namespace RiichiNET.Core.Scoring;
 
+using RiichiNET.Core.Collections;
+using RiichiNET.Core.Components;
+
 internal sealed class YakuCalculator
 {
     internal YakuCalculator()
     {
         // TODO:
     }
+
+	internal static bool KokushuMusou(TileCount hand)
+	{
+		if (hand.Length() is not 12 or 13) return false;
+        foreach (Tile tile in hand.Tiles())
+        {
+            if (!tile.IsYaoChuu()) return false;
+        }
+        return true;
+	}
 }
 
 /*

@@ -71,7 +71,7 @@ public sealed class Table
         return _mountain.DoraCount() < 5 && !_mountain.IsEmpty();
     }
 
-    private void RectifyCallables(Value value=Value.None)
+    private void RectifyCallables()
     {
         Player player = GetPlayer();
         if (!CanKan())
@@ -81,17 +81,15 @@ public sealed class Table
             player.Callables.Clear(Naki.DaiMinKan);
         }
 
-        HashSet<Player> players = player.HasDrawn() ? 
-            new HashSet<Player> { GetPlayer() } :
-            GetOtherPlayers();
-
-        foreach (Player relevant in players) DetermineYaku(relevant, value);
+        if (!player.IsFuriten()) foreach (Value value in player.WinningValues)
+        {
+            if (ValueGivesYaku(player, value)) player.Callables.Add(Naki.Agari, value);
+        }
     }
 
     private HashSet<Player> CanCallOnDiscard()
     {
         HashSet<Player> able = new HashSet<Player>();
-        if (State != State.Discard) return able;
 
         foreach (Player player in GetOtherPlayers())
         {
@@ -123,7 +121,7 @@ public sealed class Table
         if (riichi) player.DeclareRiichi(tile);
         else player.Discard(tile);
         _justDiscarded = tile;
-        RectifyCallables(_justDiscarded.value);
+        RectifyCallables();
         return CanCallOnDiscard();
     }
 
@@ -150,12 +148,10 @@ public sealed class Table
         if (meld.Naki is Naki.ShouMinKan or Naki.AnKan)
             foreach (Player player in GetOtherPlayers())
             {
-                RectifyCallables(meld[0].value);
-
                 if (player.Callables.Able(meld[0].value, Naki.Agari) &&
                 (
                     meld.Naki == Naki.ShouMinKan ||
-                    player.YakuList.Contains(Yaku.KokushiMusou)
+                    YakuCalculator.KokushuMusou(player.Hand)
                 ))
                 { able.Add(player); }
             }
@@ -206,12 +202,19 @@ public sealed class Table
         return _mountain.IsEmpty();
     }
 
-    private void DetermineYaku(Player player, Value value=Value.None)
+    public bool GameIsOver()
     {
-        player.YakuList.Clear();
-        if (!player.IsComplete() || !player.Callables.Able(value, Naki.Agari)) return;
+        foreach (Player player in Players)
+        {
+            if (player.IsDefeated()) return true;
+        }
+        return _round > 7 || false;
+    }
 
-        //TODO:
+    private bool ValueGivesYaku(Player player, Value value)
+    {
+        // TODO:
+        return false;
     }
 
     private void Tabulate()
