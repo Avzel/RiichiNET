@@ -279,15 +279,15 @@ public sealed class Player
         ShantenCalculator sc = new ShantenCalculator(Hand, new WinningHand(Melds), draw);
         int calculated = sc.MinimumShanten;
 
-        if (!IsRiichi() && !IsOpen() && draw && calculated == 0)
+        if (!IsRiichi() && !IsOpen() && draw && calculated is 0 or 1)
         {
             Callables.Add(Naki.Riichi, sc.Tiles);
         }
-        else if (draw && calculated == -1)
+        if (draw && calculated == -1)
         {
             WinningHands = new HashSet<WinningHand>(sc.WinningHands);
         }
-        else if (calculated == 0)
+        else if (!draw && calculated == 0)
         {
             Callables.Add(Naki.Agari, sc.Tiles);
         }
