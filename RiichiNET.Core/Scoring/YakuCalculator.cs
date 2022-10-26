@@ -9,7 +9,7 @@ using RiichiNET.Core.Enums;
 
 internal sealed class YakuCalculator
 {
-    private readonly List<Yaku> _best = new List<Yaku>();
+    private readonly HashSet<Yaku> _best = new HashSet<Yaku>();
 
 	internal static bool KokushuMusou(TileCount hand)
 	{
@@ -27,10 +27,12 @@ internal sealed class YakuCalculator
         return false;
     }
 
-	internal void DetermineYaku()
+	internal HashSet<Yaku> DetermineYaku()
 	{
+        HashSet<Yaku> yaku = new HashSet<Yaku>();
 		// TODO:
-	}
+        return yaku;
+    }
 }
 
 /*
