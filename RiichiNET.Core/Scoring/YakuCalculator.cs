@@ -1,14 +1,15 @@
 namespace RiichiNET.Core.Scoring;
 
+using System.Collections.Generic;
+using System.Linq;
+
 using RiichiNET.Core.Collections;
 using RiichiNET.Core.Components;
+using RiichiNET.Core.Enums;
 
 internal sealed class YakuCalculator
 {
-    internal YakuCalculator()
-    {
-        // TODO:
-    }
+    private readonly List<Yaku> _best = new List<Yaku>();
 
 	internal static bool KokushuMusou(TileCount hand)
 	{
@@ -18,6 +19,17 @@ internal sealed class YakuCalculator
             if (!tile.IsYaoChuu()) return false;
         }
         return true;
+	}
+
+	internal bool YakuExists()
+	{
+        // TODO:
+        return false;
+    }
+
+	internal void DetermineYaku()
+	{
+		// TODO:
 	}
 }
 
