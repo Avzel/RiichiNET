@@ -10,11 +10,10 @@ using RiichiNET.Util.Extensions;
 
 public sealed class Mountain
 {
-    static readonly int DORA_FIRST = 5;
-    static readonly int DEAD_WALL_LAST = 13;
-    static readonly int EXTRA_TILES_FIRST = 14;
-    static readonly int EXTRA_TILES_LAST = 18;
-    internal static readonly int MAX_TILES = 136;
+    private static readonly int DORA_FIRST = 5;
+    private static readonly int DEAD_WALL_LAST = 13;
+    private static readonly int EXTRA_TILES_FIRST = 14;
+    private static readonly int EXTRA_TILES_LAST = 18;
 
     static readonly Random Rand = new Random();
 

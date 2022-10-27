@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
-public abstract class ClosedMeld: Meld
+internal abstract class ClosedMeld: Meld
 {
     public override bool Open { get => false; }
 

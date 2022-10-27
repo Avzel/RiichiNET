@@ -12,8 +12,8 @@ using RiichiNET.Util.Extensions;
 
 public sealed class Player
 {
-    public static readonly int MAX_HAND_SIZE = 14;
-    public static readonly int MIN_HAND_SIZE = 13;
+    internal static readonly int MAX_HAND_SIZE = 14;
+    internal static readonly int MIN_HAND_SIZE = 13;
 
     internal Seat Seat { get; }
     public Wind Wind { get; set; }
@@ -43,7 +43,7 @@ public sealed class Player
         this.Wind = (Wind) Enum.ToObject(typeof(Wind), (int)seat);
     }
 
-    public int HandLength()
+    internal int HandLength()
     {
         return Hand.Length() + (3 * Melds.Count);
     }

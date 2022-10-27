@@ -77,12 +77,12 @@ public sealed class TileCount
         _hand.Clear();
     }
 
-    public bool ContainsTile(Tile tile)
+    internal bool ContainsTile(Tile tile)
     {
         return _hand.ContainsKey(tile);
     }
 
-    public bool ContainsValue(Tile tile)
+    internal bool ContainsValue(Tile tile)
     {
         return
             this.ContainsTile(tile) ||
@@ -96,7 +96,7 @@ public sealed class TileCount
         return (new int[] {this[original], this[other]}).Max();
     }
 
-    public int Length()
+    internal int Length()
     {
         return _hand.Values.Sum();
     }

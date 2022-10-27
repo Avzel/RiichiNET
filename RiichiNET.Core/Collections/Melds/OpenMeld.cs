@@ -6,7 +6,7 @@ using System.Linq;
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
-public abstract class OpenMeld: Meld
+internal abstract class OpenMeld: Meld
 {
     public override bool Open { get => true; }
 

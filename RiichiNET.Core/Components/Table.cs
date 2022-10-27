@@ -19,7 +19,7 @@ public sealed class Table
         internal Naki type;
     }
 
-    public State State { get; private set; } = State.None;
+    internal State State { get; private set; } = State.None;
     public Wind Wind { get; private set; } = Wind.East;
     public int Pool { get; private set; } = 0;
     private int _round = 0;
@@ -38,7 +38,7 @@ public sealed class Table
         new Player(Seat.Fourth)
     };
 
-    public Table()
+    internal Table()
     {
         InitialDraw();
     }
@@ -48,13 +48,13 @@ public sealed class Table
         return seat == null ? Players[(int)_turn] : Players[(int)seat];
     }
 
-    public Player GetDealer()
+    internal Player GetDealer()
     {
         int seat = _round > 3 ? _round - 4 : _round;
         return Players[seat];
     }
 
-    public HashSet<Player> GetOtherPlayers()
+    internal HashSet<Player> GetOtherPlayers()
     {
         HashSet<Player> others = new HashSet<Player>(Players);
         others.Remove(GetPlayer());
@@ -101,7 +101,7 @@ public sealed class Table
         return able;
     }
 
-    public bool Draw(Seat? turn = null)
+    internal bool Draw(Seat? turn = null)
     {
         State = State.Draw;
         Tile tile = _mountain.Draw();
@@ -114,7 +114,7 @@ public sealed class Table
         else return false;
     }
 
-    public HashSet<Player> Discard(Tile tile, bool riichi = false)
+    internal HashSet<Player> Discard(Tile tile, bool riichi = false)
     {
         State = State.Discard;
         Player player = GetPlayer();
@@ -133,7 +133,7 @@ public sealed class Table
         }
     }
 
-    public HashSet<Player> FormMeld(Meld meld, Seat caller)
+    internal HashSet<Player> FormMeld(Meld meld, Seat caller)
     {
         State = State.Call;
         Calls.AddLast(new Call 
@@ -158,7 +158,7 @@ public sealed class Table
         return able;
     }
 
-    public void Rinshan()
+    internal void Rinshan()
     {
         Player player = GetPlayer();
         Tile tile = _mountain.Rinshan();
@@ -166,7 +166,7 @@ public sealed class Table
         RectifyCallables();
     }
 
-    public HashSet<Player> StartRiichi(Tile tile)
+    internal HashSet<Player> StartRiichi(Tile tile)
     {
         Discard(tile, riichi: true);
 
@@ -178,14 +178,14 @@ public sealed class Table
         return CanCallOnDiscard();
     }
 
-    public void EndRiichi()
+    internal void EndRiichi()
     {
         Player player = GetPlayer();
         player.ScoreChange -= Tabulation.RIICHI_COST;
         Pool += Tabulation.RIICHI_COST;
     }
 
-    public void NextTurn()
+    internal void NextTurn()
     {
         _turn = _turn.Next<Seat>();
         Elapsed++;
@@ -197,12 +197,12 @@ public sealed class Table
         Elapsed++;
     }
 
-    public bool RoundIsOver()
+    internal bool RoundIsOver()
     {
         return _mountain.IsEmpty();
     }
 
-    public bool GameIsOver()
+    internal bool GameIsOver()
     {
         foreach (Player player in Players)
         {
@@ -222,14 +222,14 @@ public sealed class Table
         // TODO:
     }
 
-    public bool Ryuukyoku()
+    internal bool Ryuukyoku()
     {
         // TODO: Point distribution based on Tenpai || Nagashi Mangan
 
         return GetDealer().IsTenpai() ? false : true;
     }
 
-    public bool Agari()
+    internal bool Agari()
     {
         if (State == State.Draw)
         {
@@ -252,7 +252,7 @@ public sealed class Table
         return GetDealer().Seat.Next<Seat>();
     }
 
-    public void NextRound(bool overthrow)
+    internal void NextRound(bool overthrow)
     {
         _mountain.Reset();
         State = State.None;
