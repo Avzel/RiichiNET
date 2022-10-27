@@ -81,10 +81,11 @@ public sealed class Table
             player.Callables.Clear(Naki.DaiMinKan);
         }
 
-        if (!player.IsFuriten()) foreach (Value value in player.WinningValues)
+        foreach (Value value in player.WinningValues)
         {
-            if (ValueGivesYaku(player, value)) player.Callables.Add(Naki.Agari, value);
+            if (ValueGivesYaku(player, value)) player.Callables.Add(Naki.Ron, value);
         }
+        if (player.IsComplete()) Tabulate();
     }
 
     private HashSet<Player> CanCallOnDiscard()
@@ -148,7 +149,7 @@ public sealed class Table
         if (meld.Naki is Naki.ShouMinKan or Naki.AnKan)
             foreach (Player player in GetOtherPlayers())
             {
-                if (player.Callables.Able(meld[0].value, Naki.Agari) &&
+                if (player.Callables.Able(meld[0].value, Naki.Ron) &&
                 (
                     meld.Naki == Naki.ShouMinKan ||
                     YakuCalculator.KokushuMusou(player.Hand)
@@ -214,6 +215,8 @@ public sealed class Table
     private bool ValueGivesYaku(Player player, Value value)
     {
         // TODO:
+        if (player.IsRiichi()) return true;
+        if (player.IsFuriten()) return false;
         return false;
     }
 

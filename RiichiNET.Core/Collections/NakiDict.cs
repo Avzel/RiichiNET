@@ -18,7 +18,7 @@ internal sealed class NakiDict
         {Naki.DaiMinKan, new HashSet<Value>()},
         {Naki.AnKan, new HashSet<Value>()},
         {Naki.Riichi, new HashSet<Value>()},
-        {Naki.Agari, new HashSet<Value>()}
+        {Naki.Ron, new HashSet<Value>()}
     };
 
     internal void Add(Naki naki, Value value)

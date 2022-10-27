@@ -12,9 +12,6 @@ using RiichiNET.Util.Extensions;
 
 public sealed class Player
 {
-    internal static readonly int MAX_HAND_SIZE = 14;
-    internal static readonly int MIN_HAND_SIZE = 13;
-
     internal Seat Seat { get; }
     public Wind Wind { get; set; }
     public int Score { get; private set; } = Tabulation.STARTING_SCORE;
@@ -50,7 +47,7 @@ public sealed class Player
 
     internal bool HasDrawn()
     {
-        return HandLength() == MAX_HAND_SIZE;
+        return HandLength() == TileCount.MAX_HAND_SIZE;
     }
 
     internal bool IsOpen()
@@ -74,7 +71,7 @@ public sealed class Player
 
     internal bool IsFuriten()
     {
-        foreach (Value value in Callables[Naki.Agari])
+        foreach (Value value in Callables[Naki.Ron])
         {
             if (GraveyardContents.ContainsTile(value)) return true;
         }
@@ -109,7 +106,7 @@ public sealed class Player
         WinningHand testMelds = new WinningHand(Melds);
         ShantenCalculator sc;
 
-        foreach (Value winner in Callables[Naki.Agari])
+        foreach (Value winner in Callables[Naki.Ron])
         {
             testHand.Draw(winner);
             sc = new ShantenCalculator(testHand, testMelds, true);
@@ -124,7 +121,7 @@ public sealed class Player
 
     private void DetermineCallOnDraw()
     {
-        EvaluateHand(true);
+        EvaluateHand();
 
         foreach (Tile tile in Hand.Tiles())
         {
@@ -155,7 +152,7 @@ public sealed class Player
 
     private void DetermineCallOnDiscard()
     {
-        EvaluateHand(false);
+        EvaluateHand();
 
         foreach (Tile tile in Hand.Tiles())
         {
@@ -248,18 +245,20 @@ public sealed class Player
         _riichiTile = Graveyard.Count() - 1;
     }
 
-    private void EvaluateHand(bool draw)
+    private void EvaluateHand()
     {
+        if (IsRiichi()) return;
         Callables.Clear();
         WinningValues.Clear();
         WinningHands.Clear();
 
+        bool draw = HasDrawn();
         ShantenCalculator sc = new ShantenCalculator(Hand, new WinningHand(Melds), draw);
         int calculated = sc.MinimumShanten;
 
-        if (!IsRiichi() && !IsOpen() && draw && calculated is 0 or 1)
+        if (!IsRiichi() && !IsOpen() && draw && calculated is 0 or -1)
         {
-            WinningValues = sc.Tiles;
+            Callables.Add(Naki.Riichi, sc.Tiles);
         }
         if (draw && calculated == -1)
         {
@@ -267,7 +266,7 @@ public sealed class Player
         }
         else if (!draw && calculated == 0)
         {
-            Callables.Add(Naki.Agari, sc.Tiles);
+            WinningValues = new HashSet<Value>(sc.Tiles);
         }
         if (calculated < Shanten) Shanten = calculated;
     }

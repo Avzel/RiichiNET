@@ -8,6 +8,9 @@ using RiichiNET.Core.Components;
 
 public sealed class TileCount
 {
+    internal static readonly int MAX_HAND_SIZE = 14;
+    internal static readonly int MIN_HAND_SIZE = 13;
+
     private SortedDictionary<Tile, int> _hand { get; }
 
     internal TileCount(TileCount? original = default)

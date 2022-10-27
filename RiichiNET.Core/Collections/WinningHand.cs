@@ -1,5 +1,6 @@
 namespace RiichiNET.Core.Collections;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,7 +24,13 @@ internal sealed class WinningHand
 
     internal WinningHand(WinningHand original)
     {
-        
+        foreach (Mentsu mentsu in Enum.GetValues<Mentsu>())
+        {
+            foreach (Meld meld in original.GetMelds(mentsu))
+            {
+                _hand[mentsu].Add(meld);
+            }
+        }
     }
 
     internal void Add(Meld meld)
