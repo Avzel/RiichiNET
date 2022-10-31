@@ -18,12 +18,12 @@ internal sealed class NakiDict
         {Naki.DaiMinKan, new HashSet<Value>()},
         {Naki.AnKan, new HashSet<Value>()},
         {Naki.Riichi, new HashSet<Value>()},
-        {Naki.Ron, new HashSet<Value>()}
+        {Naki.Agari, new HashSet<Value>()}
     };
 
     internal void Add(Naki naki, Value value)
     {
-        if (naki == Naki.None) return;
+        if (naki == Naki.None || value == Value.None) return;
         else _values[naki].Add(value);
     }
 
@@ -33,10 +33,16 @@ internal sealed class NakiDict
         else foreach (Value value in values) _values[naki].Add(value);
     }
 
-        internal void Add(Naki naki, Tile tile)
+    internal void Add(Naki naki, Tile tile)
+    {
+        if (naki == Naki.None || tile.value == Value.None) return;
+        else _values[naki].Add(tile.value);
+    }
+
+    internal void Remove(Naki naki, Value value)
     {
         if (naki == Naki.None) return;
-        else _values[naki].Add(tile.value);
+        else _values[naki].Remove(value);
     }
 
     internal bool Able(Value value=Value.None, Naki naki=Naki.None)

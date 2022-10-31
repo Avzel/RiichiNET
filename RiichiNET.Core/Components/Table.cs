@@ -71,7 +71,7 @@ public sealed class Table
         return _mountain.DoraCount() < 5 && !_mountain.IsEmpty();
     }
 
-    private void RectifyCallables()
+    private void RectifyCallables()  // If Player ignores a Ron, need to set IchijiFuriten=true
     {
         Player player = GetPlayer();
         if (!CanKan())
@@ -81,11 +81,10 @@ public sealed class Table
             player.Callables.Clear(Naki.DaiMinKan);
         }
 
-        foreach (Value value in player.WinningValues)
+        foreach (Value value in player.Callables[Naki.Agari])
         {
-            if (ValueGivesYaku(player, value)) player.Callables.Add(Naki.Ron, value);
+            if (!HasYaku(player, value)) player.Callables.Remove(Naki.Agari, value);
         }
-        if (player.IsComplete()) Tabulate();
     }
 
     private HashSet<Player> CanCallOnDiscard()
@@ -149,7 +148,7 @@ public sealed class Table
         if (meld.Naki is Naki.ShouMinKan or Naki.AnKan)
             foreach (Player player in GetOtherPlayers())
             {
-                if (player.Callables.Able(meld[0].value, Naki.Ron) &&
+                if (player.Callables.Able(meld[0].value, Naki.Agari) &&
                 (
                     meld.Naki == Naki.ShouMinKan ||
                     YakuCalculator.KokushuMusou(player.Hand)
@@ -212,11 +211,9 @@ public sealed class Table
         return _round > 7 || false;
     }
 
-    private bool ValueGivesYaku(Player player, Value value)
+    private bool HasYaku(Player player, Value value)
     {
         // TODO:
-        if (player.IsRiichi()) return true;
-        if (player.IsFuriten()) return false;
         return false;
     }
 

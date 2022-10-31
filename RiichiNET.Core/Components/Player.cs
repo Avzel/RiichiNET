@@ -29,7 +29,6 @@ public sealed class Player
 
     internal int Shanten { get; private set; } = ShantenCalculator.MAX_SHANTEN;
     internal bool IchijiFuriten { get; set; }
-    internal HashSet<Value> WinningValues { get; private set; } = new HashSet<Value>();
     internal HashSet<WinningHand> WinningHands { get; private set; } = new HashSet<WinningHand>();
     public (int han, int fu) points { get; private set; }
     public HashSet<Yaku> YakuList { get; } = new HashSet<Yaku>();
@@ -71,7 +70,7 @@ public sealed class Player
 
     internal bool IsFuriten()
     {
-        foreach (Value value in Callables[Naki.Ron])
+        foreach (Value value in Callables[Naki.Agari])
         {
             if (GraveyardContents.ContainsTile(value)) return true;
         }
@@ -95,7 +94,7 @@ public sealed class Player
 
     internal bool IsWinner()
     {
-        return points.CompareTo((0, 0)) > 0;
+        return ScoreChange > 0;
     }
 
     private bool CanKanDuringRiichi(Naki naki, Value value)
@@ -106,7 +105,7 @@ public sealed class Player
         WinningHand testMelds = new WinningHand(Melds);
         ShantenCalculator sc;
 
-        foreach (Value winner in Callables[Naki.Ron])
+        foreach (Value winner in Callables[Naki.Agari])
         {
             testHand.Draw(winner);
             sc = new ShantenCalculator(testHand, testMelds, true);
@@ -249,7 +248,6 @@ public sealed class Player
     {
         if (IsRiichi()) return;
         Callables.Clear();
-        WinningValues.Clear();
         WinningHands.Clear();
 
         bool draw = HasDrawn();
@@ -263,10 +261,11 @@ public sealed class Player
         if (draw && calculated == -1)
         {
             WinningHands = new HashSet<WinningHand>(sc.WinningHands);
+            Callables.Add(Naki.Agari, JustDrawn.value);
         }
         else if (!draw && calculated == 0)
         {
-            WinningValues = new HashSet<Value>(sc.Tiles);
+            Callables.Add(Naki.Agari, sc.Tiles);
         }
         if (calculated < Shanten) Shanten = calculated;
     }
@@ -285,7 +284,6 @@ public sealed class Player
         JustCalled = Value.None;
         Shanten = ShantenCalculator.MAX_SHANTEN;
         IchijiFuriten = false;
-        WinningValues.Clear();
         WinningHands.Clear();
         points = (han: 0, fu: 0);
         YakuList.Clear();
