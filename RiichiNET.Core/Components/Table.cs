@@ -83,7 +83,7 @@ public sealed class Table
 
         foreach (Value value in player.Callables[Naki.Agari])
         {
-            if (!HasYaku(player, value)) player.Callables.Remove(Naki.Agari, value);
+            if (!ValueGivesYaku(player, value)) player.Callables.Remove(Naki.Agari, value);
         }
     }
 
@@ -211,8 +211,9 @@ public sealed class Table
         return _round > 7 || false;
     }
 
-    private bool HasYaku(Player player, Value value)
+    private bool ValueGivesYaku(Player player, Value value)
     {
+        if (player.IsFuriten()) return false;
         // TODO:
         return false;
     }

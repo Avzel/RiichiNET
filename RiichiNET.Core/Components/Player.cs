@@ -261,7 +261,6 @@ public sealed class Player
         if (draw && calculated == -1)
         {
             WinningHands = new HashSet<WinningHand>(sc.WinningHands);
-            Callables.Add(Naki.Agari, JustDrawn.value);
         }
         else if (!draw && calculated == 0)
         {
