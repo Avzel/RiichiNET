@@ -15,7 +15,7 @@ internal sealed class MinKou: OpenMeld
         SetKouKanTiles(false, value, called, akadora);
     }
 
-    public override List<Tile> GetSortedTiles()
+    public override IList<Tile> GetSortedTiles()
     {
         return new List<Tile>(OrderedTiles);
     }

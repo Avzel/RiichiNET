@@ -8,7 +8,7 @@ using RiichiNET.Core.Enums;
 
 internal sealed class NakiDict
 {
-    private Dictionary<Naki, HashSet<Value>> _values = new Dictionary<Naki, HashSet<Value>>()
+    private IDictionary<Naki, ISet<Value>> _values = new Dictionary<Naki, ISet<Value>>()
     {
         {Naki.ChiiShimo, new HashSet<Value>()},
         {Naki.ChiiNaka, new HashSet<Value>()},
@@ -72,7 +72,7 @@ internal sealed class NakiDict
         else _values[naki].Clear();
     }
 
-    internal HashSet<Value> this[Naki naki]
+    internal ISet<Value> this[Naki naki]
     {
         get {return _values[naki];}
     }

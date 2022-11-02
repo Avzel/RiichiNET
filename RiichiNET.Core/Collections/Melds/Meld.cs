@@ -12,7 +12,7 @@ public abstract class Meld
     public abstract bool Open { get; }
     internal bool Akadora { get; private protected set; }
 
-    public abstract List<Tile> GetSortedTiles();
+    public abstract IList<Tile> GetSortedTiles();
     internal abstract bool HasYaoChuu();
     internal abstract bool OnlyHonors();
     internal abstract bool OnlyGreens();

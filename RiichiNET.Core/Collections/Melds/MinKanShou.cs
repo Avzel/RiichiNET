@@ -20,7 +20,7 @@ internal sealed class MinKanShou: OpenMeld
         OrderedTiles.Insert(CalledIndex + 1, tile);
     }
 
-    public override List<Tile> GetSortedTiles()
+    public override IList<Tile> GetSortedTiles()
     {
         return new List<Tile>(OrderedTiles);
     }

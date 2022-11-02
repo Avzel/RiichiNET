@@ -12,7 +12,7 @@ internal sealed class AnJan: ClosedMeld
 
     internal AnJan(Value value, bool akadora=false): base(value, akadora) {}
 
-    public override List<Tile> GetSortedTiles()
+    public override IList<Tile> GetSortedTiles()
     {
         return new List<Tile>() {new Tile(_value, Akadora), (Tile)_value};
     }

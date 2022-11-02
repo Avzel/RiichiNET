@@ -18,8 +18,8 @@ public sealed class Player
     internal int ScoreChange { get; set; } = 0;
 
     public TileCount Hand { get; } = new TileCount();
-    public List<Meld> Melds { get; } = new List<Meld>();
-    public List<Tile> Graveyard { get; } = new List<Tile>();
+    public IList<Meld> Melds { get; } = new List<Meld>();
+    public IList<Tile> Graveyard { get; } = new List<Tile>();
     internal TileCount GraveyardContents { get; } = new TileCount();
     private int? _riichiTile = null;
 
@@ -29,9 +29,9 @@ public sealed class Player
 
     internal int Shanten { get; private set; } = HandEvaluator.MAX_SHANTEN;
     internal bool IchijiFuriten { get; set; }
-    internal HashSet<WinningHand> WinningHands { get; private set; } = new HashSet<WinningHand>();
+    internal ISet<WinningHand> WinningHands { get; private set; } = new HashSet<WinningHand>();
     public (int han, int fu) points { get; private set; }
-    public HashSet<Yaku> YakuList { get; internal set; } = new HashSet<Yaku>();
+    public ISet<Yaku> YakuList { get; internal set; } = new HashSet<Yaku>();
 
     internal Player(Seat seat)
     {

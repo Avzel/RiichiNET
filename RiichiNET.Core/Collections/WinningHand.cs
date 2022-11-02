@@ -9,7 +9,7 @@ using RiichiNET.Core.Enums;
 
 internal sealed class WinningHand
 {
-    private Dictionary<Mentsu, List<Meld>> _hand = new Dictionary<Mentsu, List<Meld>>()
+    private IDictionary<Mentsu, List<Meld>> _hand = new Dictionary<Mentsu, List<Meld>>()
     {
         {Mentsu.Jantou, new List<Meld>()},
         {Mentsu.Shuntsu, new List<Meld>()},
@@ -17,7 +17,7 @@ internal sealed class WinningHand
         {Mentsu.Kantsu, new List<Meld>()}
     };
 
-    internal WinningHand(List<Meld>? melds=default)
+    internal WinningHand(IList<Meld>? melds=default)
     {
         if (melds != null) foreach (Meld meld in melds) Add(meld);
     }

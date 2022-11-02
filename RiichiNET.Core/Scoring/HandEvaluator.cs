@@ -14,8 +14,8 @@ internal sealed class HandEvaluator
     internal static int MAX_SHANTEN = 6;
     private bool draw;
     internal int MinimumShanten { get; private set; } = MAX_SHANTEN;
-    internal HashSet<Value> Tiles { get; private set; } = new HashSet<Value>();
-    internal HashSet<WinningHand> WinningHands { get; private set; } = new HashSet<WinningHand>();
+    internal ISet<Value> Tiles { get; private set; } = new HashSet<Value>();
+    internal ISet<WinningHand> WinningHands { get; private set; } = new HashSet<WinningHand>();
 
     internal HandEvaluator(TileCount count, WinningHand hand, bool draw=true)
     {

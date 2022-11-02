@@ -12,7 +12,7 @@ internal sealed class AnJun: ClosedMeld
 
     internal AnJun(Value value, bool akadora=false): base(value, akadora) {}
 
-    public override List<Tile> GetSortedTiles()
+    public override IList<Tile> GetSortedTiles()
     {
         Tile first = _value;
         Tile second = _value + 1;

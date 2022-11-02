@@ -10,7 +10,7 @@ internal abstract class OpenMeld: Meld
 {
     public override bool Open { get => true; }
 
-    public List<Tile> OrderedTiles { get; private protected set; } = new List<Tile>();
+    public IList<Tile> OrderedTiles { get; private protected set; } = new List<Tile>();
     internal int CalledIndex { get; private protected set; }
 
     public Tile GetCalledTile()

@@ -41,7 +41,7 @@ internal abstract class ClosedMeld: Meld
     {
         get
         {
-            List<Tile> tiles = GetSortedTiles();
+            IList<Tile> tiles = GetSortedTiles();
             if (tiles.Count > i) return GetSortedTiles()[i];
             else return (Tile)Value.None;
         }

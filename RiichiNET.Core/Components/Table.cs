@@ -54,9 +54,9 @@ public sealed class Table
         return Players[seat];
     }
 
-    internal HashSet<Player> GetOtherPlayers()
+    internal ISet<Player> GetOtherPlayers()
     {
-        HashSet<Player> others = new HashSet<Player>(Players);
+        ISet<Player> others = new HashSet<Player>(Players);
         others.Remove(GetPlayer());
         return others;
     }
@@ -109,9 +109,9 @@ public sealed class Table
         }
     }
 
-    private HashSet<Player> CanCallOnDiscard()
+    private ISet<Player> CanCallOnDiscard()
     {
-        HashSet<Player> able = new HashSet<Player>();
+        ISet<Player> able = new HashSet<Player>();
 
         foreach (Player player in GetOtherPlayers())
         {
@@ -136,7 +136,7 @@ public sealed class Table
         else return false;
     }
 
-    internal HashSet<Player> Discard(Tile tile, bool riichi = false)
+    internal ISet<Player> Discard(Tile tile, bool riichi = false)
     {
         State = State.Discard;
         Player player = GetPlayer();
@@ -155,7 +155,7 @@ public sealed class Table
         }
     }
 
-    internal HashSet<Player> FormMeld(Meld meld, Seat caller)
+    internal ISet<Player> FormMeld(Meld meld, Seat caller)
     {
         State = State.Call;
         Calls.AddLast(new Call 
@@ -166,7 +166,7 @@ public sealed class Table
         GetPlayer(caller).AddMeld(meld);
         if (caller != _turn) ChangeTurn(caller);
 
-        HashSet<Player> able = new HashSet<Player>();
+        ISet<Player> able = new HashSet<Player>();
         if (meld.Naki is Naki.ShouMinKan or Naki.AnKan)
             foreach (Player player in GetOtherPlayers())
             {
@@ -188,7 +188,7 @@ public sealed class Table
         RectifyCallables();
     }
 
-    internal HashSet<Player> StartRiichi(Tile tile)
+    internal ISet<Player> StartRiichi(Tile tile)
     {
         Discard(tile, riichi: true);
 
@@ -239,7 +239,7 @@ public sealed class Table
         return GetDealer().IsTenpai() ? false : true;
     }
 
-    internal bool Agari(HashSet<Player> winners)
+    internal bool Agari(ISet<Player> winners)
     {
         foreach (Player winner in winners)
         {
