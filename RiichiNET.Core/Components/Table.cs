@@ -19,7 +19,7 @@ public sealed class Table
         internal Naki type;
     }
 
-    internal State State { get; private set; } = State.None;
+    internal State State { get; private set; } = State.Draw;
     public Wind Wind { get; private set; } = Wind.East;
     public int Pool { get; private set; } = 0;
     private int _round = 0;
@@ -235,8 +235,7 @@ public sealed class Table
 
     internal bool Ryuukyoku()
     {
-        // TODO: Point distribution based on Tenpai || Nagashi Mangan
-
+        Tabulator.Ryuukyoku(Players);
         return GetDealer().IsTenpai() ? false : true;
     }
 
@@ -246,8 +245,8 @@ public sealed class Table
         {
             YakuCalculator yc = new YakuCalculator();
             winner.YakuList = yc.DetermineYaku();
-            Tabulator.Tabulate(winner);
         }
+        Tabulator.Agari(winners);
 
         return winners.Contains(GetDealer());
     }
@@ -260,7 +259,7 @@ public sealed class Table
     internal void NextRound(bool overthrow)
     {
         _mountain.Reset();
-        State = State.None;
+        State = State.Draw;
         Elapsed = 0;
         Calls.Clear();
 

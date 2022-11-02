@@ -21,7 +21,7 @@ internal sealed class YakuCalculator
         return true;
 	}
 
-	internal static bool NagashiMangan()
+	internal static bool NagashiMangan(IList<Tile> graveyard)
 	{
 		// TODO:
         return false;
