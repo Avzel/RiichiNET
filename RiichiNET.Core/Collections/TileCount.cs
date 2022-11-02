@@ -18,12 +18,14 @@ public sealed class TileCount
         _hand = new SortedDictionary<Tile, int>();
         if (original != null) foreach (Tile tile in original.Tiles())
         {
-            _hand.Add(tile, original[tile]);
+            this.Draw(tile);
         }
     }
 
     internal void Draw(Tile tile)
     {
+        if (this.Length() == MAX_HAND_SIZE) return;
+
         if (this.ContainsTile(tile)) _hand[tile]++;
 
         else if (this.ContainsTile(~tile) && tile.akadora)

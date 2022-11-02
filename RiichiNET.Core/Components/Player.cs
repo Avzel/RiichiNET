@@ -14,7 +14,7 @@ public sealed class Player
 {
     internal Seat Seat { get; }
     public Wind Wind { get; set; }
-    public int Score { get; private set; } = Tabulation.STARTING_SCORE;
+    public int Score { get; private set; } = Tabulator.STARTING_SCORE;
     internal int ScoreChange { get; set; } = 0;
 
     public TileCount Hand { get; } = new TileCount();
@@ -27,11 +27,11 @@ public sealed class Player
     internal Value JustCalled { get; private set; } = Value.None;
     public Tile JustDrawn { get; private set; } = (Tile)Value.None;
 
-    internal int Shanten { get; private set; } = ShantenCalculator.MAX_SHANTEN;
+    internal int Shanten { get; private set; } = HandEvaluator.MAX_SHANTEN;
     internal bool IchijiFuriten { get; set; }
     internal HashSet<WinningHand> WinningHands { get; private set; } = new HashSet<WinningHand>();
     public (int han, int fu) points { get; private set; }
-    public HashSet<Yaku> YakuList { get; } = new HashSet<Yaku>();
+    public HashSet<Yaku> YakuList { get; internal set; } = new HashSet<Yaku>();
 
     internal Player(Seat seat)
     {
@@ -92,23 +92,18 @@ public sealed class Player
         return Score <= 0;
     }
 
-    internal bool IsWinner()
-    {
-        return ScoreChange > 0;
-    }
-
     private bool CanKanDuringRiichi(Naki naki, Value value)
     {
         if (!IsRiichi()) return true;
 
         TileCount testHand = new TileCount(Hand);
         WinningHand testMelds = new WinningHand(Melds);
-        ShantenCalculator sc;
+        HandEvaluator sc;
 
         foreach (Value winner in Callables[Naki.Agari])
         {
             testHand.Draw(winner);
-            sc = new ShantenCalculator(testHand, testMelds, true);
+            sc = new HandEvaluator(testHand, testMelds, true);
             foreach (WinningHand winners in sc.WinningHands)
             {
                 if (!winners.Contains(Mentsu.Koutsu, value)) return false;
@@ -251,20 +246,21 @@ public sealed class Player
         WinningHands.Clear();
 
         bool draw = HasDrawn();
-        ShantenCalculator sc = new ShantenCalculator(Hand, new WinningHand(Melds), draw);
-        int calculated = sc.MinimumShanten;
+        HandEvaluator he = new HandEvaluator(Hand, new WinningHand(Melds), draw);
+        int calculated = he.MinimumShanten;
 
         if (!IsRiichi() && !IsOpen() && draw && calculated is 0 or -1)
         {
-            Callables.Add(Naki.Riichi, sc.Tiles);
+            Callables.Add(Naki.Riichi, he.Tiles);
         }
         if (draw && calculated == -1)
         {
-            WinningHands = new HashSet<WinningHand>(sc.WinningHands);
+            WinningHands = new HashSet<WinningHand>(he.WinningHands);
+            Callables.Add(Naki.Agari, JustCalled);
         }
         else if (!draw && calculated == 0)
         {
-            Callables.Add(Naki.Agari, sc.Tiles);
+            Callables.Add(Naki.Agari, he.Tiles);
         }
         if (calculated < Shanten) Shanten = calculated;
     }
@@ -281,7 +277,7 @@ public sealed class Player
         _riichiTile = null;
         Callables.Clear();
         JustCalled = Value.None;
-        Shanten = ShantenCalculator.MAX_SHANTEN;
+        Shanten = HandEvaluator.MAX_SHANTEN;
         IchijiFuriten = false;
         WinningHands.Clear();
         points = (han: 0, fu: 0);

@@ -21,6 +21,17 @@ internal sealed class YakuCalculator
         return true;
 	}
 
+	internal static bool NagashiMangan()
+	{
+		// TODO:
+        return false;
+    }
+
+	internal YakuCalculator()
+	{
+		// TODO:
+	}
+
 	internal bool YakuExists()
 	{
         // TODO:

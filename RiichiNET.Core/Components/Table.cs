@@ -71,7 +71,21 @@ public sealed class Table
         return _mountain.DoraCount() < 5 && !_mountain.IsEmpty();
     }
 
-    private void RectifyCallables()  // If Player ignores a Ron, need to set IchijiFuriten=true
+    private bool CanAgari(Player player, Value value)
+    {
+        if (State != State.Draw && player.IsFuriten()) return false;
+
+        WinningHand baseCase = new WinningHand(player.Melds);
+        TileCount includesValue = new TileCount(player.Hand);
+        includesValue.Draw(value);
+
+        HandEvaluator he = new HandEvaluator(includesValue, baseCase);
+        YakuCalculator yc = new YakuCalculator();
+
+        return yc.YakuExists();
+    }
+
+    private void RectifyCallables()
     {
         Player player = GetPlayer();
         if (!CanKan())
@@ -83,7 +97,15 @@ public sealed class Table
 
         foreach (Value value in player.Callables[Naki.Agari])
         {
-            if (!ValueGivesYaku(player, value)) player.Callables.Remove(Naki.Agari, value);
+            if (!CanAgari(player, value)) player.Callables.Remove(Naki.Agari, value);
+        }
+    }
+
+    internal void SetIchijiFuriten(HashSet<Player> players)
+    {
+        foreach (Player player in players)
+        {
+            player.IchijiFuriten = true;
         }
     }
 
@@ -181,8 +203,8 @@ public sealed class Table
     internal void EndRiichi()
     {
         Player player = GetPlayer();
-        player.ScoreChange -= Tabulation.RIICHI_COST;
-        Pool += Tabulation.RIICHI_COST;
+        player.ScoreChange -= Tabulator.RIICHI_COST;
+        Pool += Tabulator.RIICHI_COST;
     }
 
     internal void NextTurn()
@@ -211,18 +233,6 @@ public sealed class Table
         return _round > 7 || false;
     }
 
-    private bool ValueGivesYaku(Player player, Value value)
-    {
-        if (player.IsFuriten()) return false;
-        // TODO:
-        return false;
-    }
-
-    private void Tabulate()
-    {
-        // TODO:
-    }
-
     internal bool Ryuukyoku()
     {
         // TODO: Point distribution based on Tenpai || Nagashi Mangan
@@ -230,22 +240,16 @@ public sealed class Table
         return GetDealer().IsTenpai() ? false : true;
     }
 
-    internal bool Agari()
+    internal bool Agari(HashSet<Player> winners)
     {
-        if (State == State.Draw)
+        foreach (Player winner in winners)
         {
-            // TODO:
-        }
-        else if (State == State.Discard)
-        {
-            // TODO:
-        }
-        else if (State == State.Call)
-        {
-            // TODO:
+            YakuCalculator yc = new YakuCalculator();
+            winner.YakuList = yc.DetermineYaku();
+            Tabulator.Tabulate(winner);
         }
 
-        return GetDealer().IsWinner() ? false : true;
+        return winners.Contains(GetDealer());
     }
 
     private Seat DetermineNextDealer()

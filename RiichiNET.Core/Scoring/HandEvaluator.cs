@@ -9,7 +9,7 @@ using RiichiNET.Core.Collections.Melds;
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
-internal sealed class ShantenCalculator
+internal sealed class HandEvaluator
 {
     internal static int MAX_SHANTEN = 6;
     private bool draw;
@@ -17,7 +17,7 @@ internal sealed class ShantenCalculator
     internal HashSet<Value> Tiles { get; private set; } = new HashSet<Value>();
     internal HashSet<WinningHand> WinningHands { get; private set; } = new HashSet<WinningHand>();
 
-    internal ShantenCalculator(TileCount count, WinningHand hand, bool draw)
+    internal HandEvaluator(TileCount count, WinningHand hand, bool draw=true)
     {
         this.draw = draw;
         EvaluateHand(count, hand);
