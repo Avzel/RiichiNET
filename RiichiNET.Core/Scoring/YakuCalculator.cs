@@ -10,8 +10,10 @@ using RiichiNET.Core.Enums;
 internal sealed class YakuCalculator
 {
     private readonly ISet<Yaku> _best = new HashSet<Yaku>();
+    private readonly Table _table;
+    private readonly Player _player;
 
-	internal static bool KokushuMusou(TileCount hand)
+    internal static bool KokushuMusou(TileCount hand)
 	{
 		if (hand.Length() is not 12 or 13) return false;
         foreach (Tile tile in hand.Tiles())
@@ -27,10 +29,11 @@ internal sealed class YakuCalculator
         return false;
     }
 
-	internal YakuCalculator()
+	internal YakuCalculator(Table table, Player player)
 	{
-		// TODO:
-	}
+        _table = table;
+        _player = player;
+    }
 
 	internal bool YakuExists()
 	{
@@ -41,7 +44,9 @@ internal sealed class YakuCalculator
 	internal ISet<Yaku> DetermineYaku()
 	{
         ISet<Yaku> yaku = new HashSet<Yaku>();
+
 		// TODO:
+
         return yaku;
     }
 }

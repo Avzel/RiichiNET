@@ -80,7 +80,7 @@ public sealed class Table
         includesValue.Draw(value);
 
         HandEvaluator he = new HandEvaluator(includesValue, baseCase);
-        YakuCalculator yc = new YakuCalculator();
+        YakuCalculator yc = new YakuCalculator(this, player);
 
         return yc.YakuExists();
     }
@@ -243,7 +243,7 @@ public sealed class Table
     {
         foreach (Player winner in winners)
         {
-            YakuCalculator yc = new YakuCalculator();
+            YakuCalculator yc = new YakuCalculator(this, winner);
             winner.YakuList = yc.DetermineYaku();
         }
         Tabulator.Agari(winners);
