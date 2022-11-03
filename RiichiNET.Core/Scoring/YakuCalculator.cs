@@ -37,7 +37,10 @@ internal sealed class YakuCalculator
 
 	internal bool YakuExists()
 	{
-        // TODO:
+		if (!_player.IsComplete()) return false;
+
+		// TODO:
+
         return false;
     }
 
@@ -45,8 +48,10 @@ internal sealed class YakuCalculator
 	{
         ISet<Yaku> yaku = new HashSet<Yaku>();
 
-		// TODO:
-
+		foreach (WinningHand wh in _player.WinningHands)
+		{
+			// TODO:
+		}
         return yaku;
     }
 }
