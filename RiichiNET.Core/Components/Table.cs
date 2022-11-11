@@ -173,7 +173,7 @@ public sealed class Table
                 if (player.Callables.Able(meld[0].value, Naki.Agari) &&
                 (
                     meld.Naki == Naki.ShouMinKan ||
-                    YakuCalculator.KokushuMusou(player.Hand)
+                    YakuCalculator.IsTenpaiForKokushi(player.Hand)
                 ))
                 { able.Add(player); }
             }
