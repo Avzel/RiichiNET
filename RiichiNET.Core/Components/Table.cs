@@ -194,7 +194,7 @@ public sealed class Table
 
         Calls.AddLast(new Call 
         {
-            elapsed = Elapsed, caller = GetPlayer().Seat, type = Naki.Riichi 
+            elapsed = Elapsed, caller = GetPlayer(), type = Naki.Riichi 
         });
 
         return CanCallOnDiscard();

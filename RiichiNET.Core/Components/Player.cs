@@ -39,6 +39,11 @@ public sealed class Player
         this.Wind = (Wind) Enum.ToObject(typeof(Wind), (int)seat);
     }
 
+    public static implicit operator Seat(Player p)
+    {
+        return p.Seat;
+    }
+
     internal int HandLength()
     {
         return Hand.Length() + (3 * Melds.Count);
