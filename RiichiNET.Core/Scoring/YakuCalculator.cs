@@ -140,10 +140,19 @@ internal sealed class YakuCalculator
         }
 	}
 
-	private void Pinfu()
+	private void Pinfu(WinningHand wh)
 	{
-		// TODO:
-	}
+		if (
+			!_player.IsOpen() && 
+			wh.GetMelds(Mentsu.Shuntsu).Count() == 4 && 
+			_player.WinningTiles.Count() > 1 && 
+			!wh.GetMelds(Mentsu.Jantou).First().OnlyDragons() &&
+			!wh.Contains(Mentsu.Jantou, _table.Wind.WindToValue()) &&
+			!wh.Contains(Mentsu.Jantou, _player.Wind.WindToValue())
+
+
+		) _current.Add(Yaku.Pinfu);
+    }
 
 	private void TanYaochuu()
 	{
