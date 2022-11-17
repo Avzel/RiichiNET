@@ -16,6 +16,8 @@ public abstract class Meld
     internal abstract bool HasYaoChuu();
     internal abstract bool OnlyHonors();
     internal abstract bool OnlyGreens();
+    internal abstract bool OnlyDragons();
+    internal abstract bool OnlyWinds();
     public abstract bool Contains(Value value);
 
     internal abstract Tile this[int i] { get; }

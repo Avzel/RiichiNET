@@ -32,6 +32,16 @@ internal abstract class ClosedMeld: Meld
         return ((Tile)_value).IsGreen();
     }
 
+    internal override bool OnlyDragons()
+    {
+        return _value is Value.DG or Value.DR or Value.DW;
+    }
+
+    internal override bool OnlyWinds()
+    {
+        return _value is Value.WE or Value.WN or Value.WS or Value.WW;
+    }
+
     public override bool Contains(Value value)
     {
         return _value == value;

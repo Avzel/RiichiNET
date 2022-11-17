@@ -33,6 +33,16 @@ internal abstract class OpenMeld: Meld
         return OrderedTiles[0].IsGreen();
     }
 
+    internal override bool OnlyDragons()
+    {
+        return this[0].value is Value.DG or Value.DR or Value.DW;
+    }
+
+    internal override bool OnlyWinds()
+    {
+        return this[0].value is Value.WE or Value.WN or Value.WS or Value.WW;
+    }
+
     public override bool Contains(Value value)
     {
         foreach (Tile tile in OrderedTiles)
