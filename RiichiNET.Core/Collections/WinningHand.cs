@@ -53,6 +53,11 @@ internal sealed class WinningHand
         return _hand[mentsu].AsReadOnly();
     }
 
+    internal IEnumerable<Meld> GetAllMelds()
+    {
+        return _hand.Values.SelectMany(x => x.AsEnumerable());
+    }
+
     internal int Count(Mentsu mentsu)
     {
         if (_hand.ContainsKey(mentsu)) return _hand[mentsu].Count();
