@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using RiichiNET.Core.Collections;
+using RiichiNET.Core.Collections.Melds;
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
@@ -48,6 +49,15 @@ internal sealed class YakuCalculator
         return false;
     }
 
+	private void OverwriteBest()
+	{
+		if (_current.Any() && _current.Sum(x => (int)x) > _best.Sum(x => (int)x))
+		{
+			_best.Clear();
+			foreach (Yaku yaku in _current) _best.Add(yaku);
+		}
+    }
+
 	internal ISet<Yaku> DetermineYaku()
 	{
         ISet<Yaku> yaku = new HashSet<Yaku>();
@@ -60,15 +70,6 @@ internal sealed class YakuCalculator
             _current.Clear();
         }
         return yaku;
-    }
-
-	private void OverwriteBest()
-	{
-		if (_current.Any() && _current.Sum(x => (int)x) > _best.Sum(x => (int)x))
-		{
-			_best.Clear();
-			foreach (Yaku yaku in _current) _best.Add(yaku);
-		}
     }
 
 	// Yaku:
@@ -154,10 +155,14 @@ internal sealed class YakuCalculator
 		) _current.Add(Yaku.Pinfu);
     }
 
-	private void TanYaochuu()
+	private void TanYaochuu(WinningHand wh)
 	{
-		// TODO:
-	}
+		foreach (Meld meld in wh.GetAllMelds())
+		{
+			if (meld.HasYaoChuu()) return;
+        }
+        _current.Add(Yaku.TanYaochuu);
+    }
 
 	private void Iipeikou()
 	{
