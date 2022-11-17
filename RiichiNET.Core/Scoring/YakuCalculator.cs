@@ -10,6 +10,7 @@ using RiichiNET.Core.Enums;
 internal sealed class YakuCalculator
 {
     private readonly ISet<Yaku> _best = new HashSet<Yaku>();
+    private readonly ISet<Yaku> _current = new HashSet<Yaku>();
     private readonly Table _table;
     private readonly Player _player;
 
@@ -25,8 +26,11 @@ internal sealed class YakuCalculator
 
 	internal static bool NagashiMangan(IList<Tile> graveyard)
 	{
-		// TODO:
-        return false;
+		foreach (Tile tile in graveyard)
+		{
+			if (!tile.IsYaoChuu()) return false;
+        }
+        return true;
     }
 
 	internal YakuCalculator(Table table, Player player)
@@ -50,51 +54,90 @@ internal sealed class YakuCalculator
 
 		foreach (WinningHand wh in _player.WinningHands)
 		{
-			// TODO:
-		}
+            // TODO:
+
+            OverwriteBest();
+            _current.Clear();
+        }
         return yaku;
+    }
+
+	private void OverwriteBest()
+	{
+		if (_current.Any() && _current.Sum(x => (int)x) > _best.Sum(x => (int)x))
+		{
+			_best.Clear();
+			foreach (Yaku yaku in _current) _best.Add(yaku);
+		}
     }
 
 	// Yaku:
 
 	private void Riichi()
 	{
-		// TODO:
-	}
+        if (_player.IsRiichi()) _current.Add(Yaku.Riichi);
+    }
 
 	private void RyanRiichi()
 	{
-		// TODO: Player.IsRiichi() && Calls.First().type == Naki.Riichi && Calls.First().caller == Player && Calls.First().elapsed < 4
-	}
+		if (
+			_player.IsRiichi() && 
+			_table.Calls.First().type == Naki.Riichi && 
+			_table.Calls.First().caller == _player && 
+			_table.Calls.First().elapsed < 4
+
+		) _current.Add(Yaku.RyanRiichi);
+    }
 
 	private void MenzenchinTsumohou()
 	{
-		// TODO: !Player.IsOpen() && Table.State == State.Draw
-	}
+        if (!_player.IsOpen() && _table.State == State.Draw)
+        {
+            _current.Add(Yaku.MenzenchinTsumohou);
+        }
+    }
 
 	private void Chankan()
 	{
-		// TODO: Table.State == State.Call && _turn != Player.Seat
+		if (_table.State == State.Call && _table.GetPlayer() != _player)
+		{
+            _current.Add(Yaku.Chankan);
+        }
 	}
 
 	private void Ippatsu()
 	{
-		// TODO: Player.IsRiichi() && Calls.Last().type == Naki.Riichi && Calls.Last().caller == Player && Table.Elapsed - Calls.Last().elapsed < 5
-	}
+		if (
+			_player.IsRiichi() &&
+			_table.Calls.Last().type == Naki.Riichi && 
+			_table.Calls.Last().caller == _player && 
+			_table.Elapsed - _table.Calls.Last().elapsed < 5
+
+		) _current.Add(Yaku.Ippatsu);
+    }
 
 	private void RinshanKaihou()
 	{
-		// TODO: Table.State == State.Call && _turn == Player.Seat
+		if (_table.State == State.Call && _table.GetPlayer() == _player)
+		{
+            _current.Add(Yaku.RinshanKaihou);
+        }
 	}
 
 	private void HaiteiRaoyue()
 	{
-		// TODO: Table.State == State.Draw && Table.RoundIsOver()
+		if (_table.State == State.Draw && _table.RoundIsOver())
+		{
+            _current.Add(Yaku.HaiteiRaoyue);
+        }
 	}
 
 	private void HouteiYaoyui()
 	{
-		// TODO: Table.State == State.Discard && Table.RoundIsOver()
+		if (_table.State == State.Discard && _table.RoundIsOver())
+		{
+            _current.Add(Yaku.HouteiYaoyui);
+        }
 	}
 
 	private void Pinfu()
@@ -244,18 +287,33 @@ internal sealed class YakuCalculator
 
 	private void TenHou()
 	{
-		// TODO: Table.State == State.Draw && Table.UninterruptedFirstRound() Player == Table.GetDealer()
-	}
+		if (
+			_table.State == State.Draw && 
+			_table.UninterruptedFirstRound() && 
+			_table.GetDealer() == _player
+
+		) _current.Add(Yaku.TenHou);
+    }
 
 	private void RenHou()
 	{
-		// TODO: Table.State == State.Discard && Table.UninterruptedFirstRound() && Player.Graveyard.IsEmpty()
-	}
+		if (
+			_table.State == State.Discard &&
+			_table.UninterruptedFirstRound() &&
+			!_player.Graveyard.Any()
+
+		) _current.Add(Yaku.RenHou);
+    }
 
 	private void ChiiHou()
 	{
-		// TODO: Table.State == State.Draw && Table.UninterruptedFirstRound() && Player != Table.GetDealer()
-	}
+		if (
+			_table.State == State.Draw &&
+			_table.UninterruptedFirstRound() &&
+			_table.GetDealer() != _player
+
+		) _current.Add(Yaku.ChiiHou);
+    }
 
 	private void ChuurenPoutou()
 	{
