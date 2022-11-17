@@ -73,7 +73,7 @@ public sealed class Table
 
     private bool CanAgari(Player player, Value value)
     {
-        if (State != State.Draw && player.IsFuriten()) return false;
+        if (player.IsFuriten() && State != State.Draw) return false;
 
         WinningHand baseCase = new WinningHand(player.Melds);
         TileCount includesValue = new TileCount(player.Hand);
@@ -97,7 +97,7 @@ public sealed class Table
 
         foreach (Value value in player.Callables[Naki.Agari])
         {
-            if (!CanAgari(player, value)) player.Callables.Remove(Naki.Agari, value);
+            if (CanAgari(player, value)) player.Callables.Add(Naki.Agari, value);
         }
     }
 

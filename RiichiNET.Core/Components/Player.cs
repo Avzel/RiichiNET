@@ -30,6 +30,7 @@ public sealed class Player
     internal int Shanten { get; private set; } = HandEvaluator.MAX_SHANTEN;
     internal bool IchijiFuriten { get; set; }
     internal ISet<WinningHand> WinningHands { get; private set; } = new HashSet<WinningHand>();
+    internal ISet<Value> WinningTiles { get; private set; } = new HashSet<Value>();
     public (int han, int fu) points { get; private set; }
     public ISet<Yaku> YakuList { get; internal set; } = new HashSet<Yaku>();
 
@@ -261,11 +262,11 @@ public sealed class Player
         if (draw && calculated == -1)
         {
             WinningHands = new HashSet<WinningHand>(he.WinningHands);
-            Callables.Add(Naki.Agari, JustCalled);
+            WinningTiles.Add(JustCalled);
         }
         else if (!draw && calculated == 0)
         {
-            Callables.Add(Naki.Agari, he.Tiles);
+            WinningTiles = new HashSet<Value>(he.Tiles);
         }
         if (calculated < Shanten) Shanten = calculated;
     }
@@ -285,6 +286,7 @@ public sealed class Player
         Shanten = HandEvaluator.MAX_SHANTEN;
         IchijiFuriten = false;
         WinningHands.Clear();
+        WinningTiles.Clear();
         points = (han: 0, fu: 0);
         YakuList.Clear();
     }
