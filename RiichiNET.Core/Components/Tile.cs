@@ -24,6 +24,11 @@ public struct Tile : IComparable<Tile>
         };
     }
 
+    public static implicit operator Value(Tile t)
+    {
+        return t.value;
+    }
+
     public static implicit operator Tile(int n)
     {
         try

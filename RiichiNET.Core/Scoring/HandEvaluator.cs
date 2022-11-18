@@ -160,14 +160,14 @@ internal sealed class HandEvaluator
         {
             foreach (Meld meld in hand.GetMelds(Mentsu.Jantou))
             {
-                Tiles.Add(meld[0].value);
+                Tiles.Add(meld[0]);
             }
         }
         else if (singles is 1 or 13)
         {
             foreach (Tile tile in count.Tiles())
             {
-                Tiles.Add(tile.value);
+                Tiles.Add(tile);
             }
         }
         else if (singles == 2)
@@ -175,10 +175,10 @@ internal sealed class HandEvaluator
             Tile tile = count.First();
             if (count.ContainsValue(tile+1))
             {
-                if (!tile.IsYaoChuu()) Tiles.Add((tile-1).value);
-                if (!(tile+1).IsYaoChuu()) Tiles.Add((tile+2).value);
+                if (!tile.IsYaoChuu()) Tiles.Add((tile-1));
+                if (!(tile+1).IsYaoChuu()) Tiles.Add((tile+2));
             }
-            else Tiles.Add((tile+1).value);
+            else Tiles.Add((tile+1));
         }
         else if (singles == 11)
         {
@@ -189,7 +189,7 @@ internal sealed class HandEvaluator
                 (
                     tile.IsYaoChuu() && 
                     !count.ContainsValue(tile) &&
-                    value != hand.GetMelds(Mentsu.Jantou)[0][0].value
+                    value != hand.GetMelds(Mentsu.Jantou)[0][0]
                 )
                 {
                     Tiles.Add(value);
@@ -204,7 +204,7 @@ internal sealed class HandEvaluator
         int singles = count.Count();
         if (singles is 1 or 2)
         {
-            foreach (Tile tile in count.Tiles()) Tiles.Add(tile.value);
+            foreach (Tile tile in count.Tiles()) Tiles.Add(tile);
         }
         else if (singles == 3)
         {
@@ -213,7 +213,7 @@ internal sealed class HandEvaluator
             foreach (Tile tile in count.Tiles())
             {
                 tester.Discard(tile);
-                if ((taatsu = TaatsuCount(tester)) == 1) Tiles.Add(tile.value);
+                if ((taatsu = TaatsuCount(tester)) == 1) Tiles.Add(tile);
                 tester.Draw(tile);
             }
         }
@@ -223,7 +223,7 @@ internal sealed class HandEvaluator
             {
                 if (!tile.IsYaoChuu())
                 {
-                    Tiles.Add(tile.value);
+                    Tiles.Add(tile);
                     break;
                 }
             }

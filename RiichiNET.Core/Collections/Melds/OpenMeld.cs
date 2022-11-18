@@ -47,7 +47,7 @@ internal abstract class OpenMeld: Meld
     {
         foreach (Tile tile in OrderedTiles)
         {
-            if (tile.value == value) return true;
+            if (tile == value) return true;
         }
         return false;
     }

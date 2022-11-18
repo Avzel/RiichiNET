@@ -35,8 +35,8 @@ internal sealed class NakiDict
 
     internal void Add(Naki naki, Tile tile)
     {
-        if (naki == Naki.None || tile.value == Value.None) return;
-        else _values[naki].Add(tile.value);
+        if (naki == Naki.None || tile == Value.None) return;
+        else _values[naki].Add(tile);
     }
 
     internal void Remove(Naki naki, Value value)

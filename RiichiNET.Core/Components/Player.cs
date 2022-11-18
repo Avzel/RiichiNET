@@ -125,7 +125,7 @@ public sealed class Player
 
         foreach (Tile tile in Hand.Tiles())
         {
-            if (Hand[tile] == 4 && CanKanDuringRiichi(Naki.AnKan, tile.value))
+            if (Hand[tile] == 4 && CanKanDuringRiichi(Naki.AnKan, tile))
             {
                 Callables.Add(Naki.AnKan, tile);
             }
@@ -135,9 +135,9 @@ public sealed class Player
         {
             if (meld.Mentsu == Mentsu.Koutsu &&
                 Hand.ContainsValue(meld[0]) && 
-                CanKanDuringRiichi(Naki.ShouMinKan, meld[0].value))
+                CanKanDuringRiichi(Naki.ShouMinKan, meld[0]))
             {
-                Callables.Add(Naki.ShouMinKan, meld[0].value);
+                Callables.Add(Naki.ShouMinKan, meld[0]);
             }
         }
     }
@@ -156,15 +156,13 @@ public sealed class Player
 
         foreach (Tile tile in Hand.Tiles())
         {
-            Value value = tile.value;
-
             if (Hand[tile] is 2 or 3)
             {
-                Callables.Add(Naki.Pon, value);
+                Callables.Add(Naki.Pon, tile);
             }
-            if (Hand[tile] == 3 && CanKanDuringRiichi(Naki.DaiMinKan, value))
+            if (Hand[tile] == 3 && CanKanDuringRiichi(Naki.DaiMinKan, tile))
             {
-                Callables.Add(Naki.DaiMinKan, value);
+                Callables.Add(Naki.DaiMinKan, tile);
             }
             if (!tile.IsYaoChuu() && Hand.ContainsTile(tile + 1))
             {
@@ -187,7 +185,7 @@ public sealed class Player
         if (success)
         {
             Graveyard.Add(tile);
-            GraveyardContents.Draw(tile.value);
+            GraveyardContents.Draw(tile);
             DetermineCallOnDiscard();
         }
     }
@@ -196,7 +194,7 @@ public sealed class Player
     {
         Tile popped = Graveyard.Last();
         Graveyard.RemoveAt(Graveyard.Count() - 1);
-        GraveyardContents.Discard(popped.value);
+        GraveyardContents.Discard(popped);
         return popped;
     }
 
@@ -205,13 +203,13 @@ public sealed class Player
         if (meld.Open && ((OpenMeld)meld).Naki != Naki.ShouMinKan)
         {
             Tile called = ((OpenMeld)meld).GetCalledTile();
-            JustCalled = called.value;
+            JustCalled = called;
             Draw(called);
             Hand.Discard(meld);
         }
         else
         {
-            JustCalled = meld[0].value;
+            JustCalled = meld[0];
             if (meld.Open)
             {
                 Meld? pon = GetPon(JustCalled);

@@ -13,9 +13,9 @@ internal class MinJunNaka: OpenMeld
     internal MinJunNaka(Value value, bool akadora=false)
     {
         CalledIndex = 0;
-        OrderedTiles[0] = (Tile)value;
-        OrderedTiles[1] = (Tile)value - 1;
-        OrderedTiles[2] = (Tile)value + 1;
+        OrderedTiles[0] = value;
+        OrderedTiles[1] = value - 1;
+        OrderedTiles[2] = value + 1;
         SetShuntsuAkadora(akadora);
     }
 

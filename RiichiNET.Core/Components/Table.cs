@@ -115,7 +115,7 @@ public sealed class Table
 
         foreach (Player player in GetOtherPlayers())
         {
-            if (player.Callables.Able(_justDiscarded.value))
+            if (player.Callables.Able(_justDiscarded))
             {
                 able.Add(player);
             }
@@ -127,7 +127,7 @@ public sealed class Table
     {
         State = State.Draw;
         Tile tile = _mountain.Draw();
-        if (tile.value != Value.None)
+        if (tile != Value.None)
         {
             GetPlayer(turn).Draw(tile);
             RectifyCallables();
@@ -170,7 +170,7 @@ public sealed class Table
         if (meld.Naki is Naki.ShouMinKan or Naki.AnKan)
             foreach (Player player in GetOtherPlayers())
             {
-                if (player.Callables.Able(meld[0].value, Naki.Agari) &&
+                if (player.Callables.Able(meld[0], Naki.Agari) &&
                 (
                     meld.Naki == Naki.ShouMinKan ||
                     YakuCalculator.IsTenpaiForKokushi(player.Hand)
