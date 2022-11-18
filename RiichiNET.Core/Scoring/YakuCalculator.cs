@@ -164,137 +164,137 @@ internal sealed class YakuCalculator
         _current.Add(Yaku.TanYaochuu);
     }
 
-	private void Iipeikou()
+	private void Peikou(WinningHand wh)
+	{
+        // TODO:
+	}
+
+	private void YakuhaiHatsu(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void YakuhaiHatsu()
+	private void YakuhaiHaku(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void YakuhaiHaku()
+	private void YakuhaiChun(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void YakuhaiChun()
+	private void YakuhaiJikaze(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void YakuhaiJikaze()
+	private void YakuhaiBakaze(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void YakuhaiBakaze()
+	private void SanshokuDoujun(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void SanshokuDoujun()
+	private void IkkiTsuukan(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void IkkiTsuukan()
+	private void HonChantaiYaochuu(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void HonChantaiYaochuu()
+	private void ChiiToitsu(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void ChiiToitsu()
+	private void ToitoiHou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void ToitoiHou()
+	private void SanAnkou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void SanAnkou()
+	private void SanshokuDoukou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void SanshokuDoukou()
+	private void SanKantsu(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void SanKantsu()
+	private void HonRoutou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void HonRoutou()
+	private void ShouSangen(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void ShouSangen()
+	private void JunChantaiYaochuu(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void JunChantaiYaochuu()
+	private void HonIisou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void HonIisou()
+	private void RyanPeikou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void RyanPeikou()
+	private void ChinIisou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void ChinIisou()
+	private void KokushiMusou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void KokushiMusou()
+	private void SuuKantsu(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void SuuKantsu()
+	private void DaiSangen(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void DaiSangen()
+	private void ShouSuushii(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void ShouSuushii()
+	private void TsuuIisou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void TsuuIisou()
+	private void ChinRoutou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void ChinRoutou()
-	{
-		// TODO:
-	}
-
-	private void RyuuIisou()
+	private void RyuuIisou(WinningHand wh)
 	{
 		// TODO:
 	}
@@ -329,17 +329,17 @@ internal sealed class YakuCalculator
 		) _current.Add(Yaku.ChiiHou);
     }
 
-	private void ChuurenPoutou()
+	private void ChuurenPoutou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void SuuAnkou()
+	private void SuuAnkou(WinningHand wh)
 	{
 		// TODO:
 	}
 
-	private void DaiSuuShii()
+	private void DaiSuuShii(WinningHand wh)
 	{
 		// TODO:
 	}
