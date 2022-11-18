@@ -21,4 +21,14 @@ public abstract class Meld
     public abstract bool Contains(Value value);
 
     internal abstract Tile this[int i] { get; }
+
+    internal bool SameValues(Meld other)
+    {
+        if (
+            this.Mentsu == other.Mentsu && 
+            this[0].value == other[0].value
+
+        ) return true;
+        else return false;
+    }
 }
