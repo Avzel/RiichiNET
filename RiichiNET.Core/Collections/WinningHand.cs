@@ -35,7 +35,7 @@ internal sealed class WinningHand
 
     internal void Add(Meld meld)
     {
-        _hand[meld.Mentsu].Add(meld);
+        if (Count(meld.Mentsu) < 4) _hand[meld.Mentsu].Add(meld);
     }
     
     internal bool Contains(Mentsu mentsu, Value value=Value.None)
@@ -62,6 +62,16 @@ internal sealed class WinningHand
     {
         if (_hand.ContainsKey(mentsu)) return _hand[mentsu].Count();
         else return 0;
+    }
+
+    internal int Count(Meld meld)
+    {
+        int count = 0;
+        foreach (Meld here in _hand[meld.Mentsu])
+        {
+            if (here == meld) count++;
+        }
+        return count;
     }
 
     internal int Doubles()
