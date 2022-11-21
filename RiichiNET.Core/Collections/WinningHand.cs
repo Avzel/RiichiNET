@@ -69,7 +69,7 @@ internal sealed class WinningHand
         int count = 0;
         foreach (Meld here in _hand[meld.Mentsu])
         {
-            if (here == meld) count++;
+            if (here.SameValues(meld)) count++;
         }
         return count;
     }
