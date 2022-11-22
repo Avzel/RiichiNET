@@ -4,16 +4,13 @@ using System;
 
 using RiichiNET.Core.Enums;
 
-public struct Tile : IComparable<Tile>
+public record struct Tile : IComparable<Tile>
 {
     public Value value;
     public bool akadora;
 
-    public Tile(Value value, bool akadora=false)
-    {
-        this.value = value;
-        this.akadora = akadora;
-    }
+    public Tile(Value value, bool akadora = false)
+        => (this.value, this.akadora) = (value, akadora);
 
     public static implicit operator Tile(Value v)
     {
