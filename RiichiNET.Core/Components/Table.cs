@@ -12,12 +12,7 @@ using RiichiNET.Util.Extensions;
 
 public sealed class Table
 {
-    internal struct Call
-    {
-        internal int elapsed;
-        internal Seat caller;
-        internal Naki type;
-    }
+    internal readonly record struct Call(int elapsed, Seat caller, Naki type);
 
     private static readonly int SEATS = 4;
 
@@ -153,10 +148,7 @@ public sealed class Table
     internal ISet<Player> FormMeld(Meld meld, Seat caller)
     {
         State = State.Call;
-        Calls.AddLast(new Call 
-        {
-            elapsed = Elapsed, caller = caller, type = meld.Naki
-        });
+        Calls.AddLast(new Call(Elapsed, caller, meld.Naki));
 
         GetPlayer(caller).AddMeld(meld);
         if (caller != _turn) ChangeTurn(caller);
@@ -187,10 +179,7 @@ public sealed class Table
     {
         Discard(tile, riichi: true);
 
-        Calls.AddLast(new Call 
-        {
-            elapsed = Elapsed, caller = GetPlayer(), type = Naki.Riichi 
-        });
+        Calls.AddLast(new Call(Elapsed, GetPlayer(), Naki.Riichi));
 
         return CanCallOnDiscard();
     }
