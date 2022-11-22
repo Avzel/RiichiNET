@@ -1,11 +1,12 @@
 namespace RiichiNET.Core.Collections.Melds;
 
+using System;
 using System.Collections.Generic;
 
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
-public abstract class Meld
+public abstract class Meld: IEquatable<Meld>
 {
     internal abstract Mentsu Mentsu { get; }
     public abstract Naki Naki { get; }
@@ -22,13 +23,20 @@ public abstract class Meld
 
     internal abstract Tile this[int i] { get; }
 
-    internal bool SameValues(Meld other)
+    public override int GetHashCode()
     {
-        if (
-            this.Mentsu == other.Mentsu && 
-            this[0].value == other[0].value
-
-        ) return true;
-        else return false;
+        unchecked
+        {
+            int hash = 17;
+            hash = hash * 23 + this[0].value.GetHashCode();
+            hash = hash * 23 + Mentsu.GetHashCode();
+            return hash;
+        }
     }
+
+    public override bool Equals(object? obj)
+        => this.Equals(obj as Meld);
+
+    public bool Equals(Meld? other)
+        => other != null ? this.GetHashCode() == other.GetHashCode() : false;
 }
