@@ -23,26 +23,25 @@ internal sealed class NakiDict
 
     internal void Add(Naki naki, Value value)
     {
-        if (naki == Naki.None || value == Value.None) return;
-        else _values[naki].Add(value);
+        if (naki != Naki.None && value != Value.None) _values[naki].Add(value);
     }
 
     internal void Add(Naki naki, IEnumerable<Value> values)
     {
-        if (naki == Naki.None) return;
-        else foreach (Value value in values) _values[naki].Add(value);
+        if (naki != Naki.None) foreach (Value value in values)
+        {
+            _values[naki].Add(value);
+        }
     }
 
     internal void Add(Naki naki, Tile tile)
     {
-        if (naki == Naki.None || tile == Value.None) return;
-        else _values[naki].Add(tile);
+        if (naki != Naki.None && tile != Value.None) _values[naki].Add(tile);
     }
 
     internal void Remove(Naki naki, Value value)
     {
-        if (naki == Naki.None) return;
-        else _values[naki].Remove(value);
+        if (naki != Naki.None) _values[naki].Remove(value);
     }
 
     internal bool Able(Value value=Value.None, Naki naki=Naki.None)

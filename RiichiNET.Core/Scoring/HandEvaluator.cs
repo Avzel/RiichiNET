@@ -11,7 +11,9 @@ using RiichiNET.Core.Enums;
 
 internal sealed class HandEvaluator
 {
-    internal static int MAX_SHANTEN = 6;
+    internal static readonly int MAX_SHANTEN = 6;
+    internal static readonly int TENPAI = 0;
+    internal static readonly int COMPLETE = -1;
     private bool draw;
     internal int MinimumShanten { get; private set; } = MAX_SHANTEN;
     internal ISet<Value> Tiles { get; private set; } = new HashSet<Value>();
@@ -241,7 +243,7 @@ internal sealed class HandEvaluator
 
         int shanten = CalculateShanten(count, hand);
 
-        if (shanten == -1) WinningHands.Add(hand);
+        if (shanten == COMPLETE) WinningHands.Add(hand);
 
         else if (shanten == 0)
         {

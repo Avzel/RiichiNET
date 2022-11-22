@@ -20,12 +20,10 @@ internal class MinJunNaka: OpenMeld
     }
 
     public override IList<Tile> GetSortedTiles()
-    {
-        return new List<Tile>()
+        => new List<Tile>()
         {
             OrderedTiles[1],
             OrderedTiles[0],
             OrderedTiles[2]
         };
-    }
 }

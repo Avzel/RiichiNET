@@ -20,26 +20,20 @@ internal sealed class AnJun: ClosedMeld
 
         if (Akadora)
         {
-            if ((int)first.value % 5 == 0) first.akadora = true;
-            else if ((int)second.value % 5 == 0) second.akadora = true;
-            else if ((int)third.value % 5 == 0) third.akadora = true;
+            if (first.IsFive()) first = first with { akadora = true };
+            else if (second.IsFive()) second = second with { akadora = true };
+            else if (third.IsFive()) third = third with { akadora = true };
         }
 
         return new List<Tile>() {first, second, third};
     }
 
     internal override bool HasYaoChuu()
-    {
-        return base.HasYaoChuu() || ((Tile)_value + 2).IsYaoChuu();
-    }
+        => base.HasYaoChuu() || ((Tile)_value + 2).IsYaoChuu();
 
     internal override bool OnlyHonors()
-    {
-        return false;
-    }
+        => false;
 
     public override bool Contains(Value value)
-    {
-        return _value - value is <= 0 and >= -2;
-    }
+        => _value - value is <= 0 and >= -2;
 }

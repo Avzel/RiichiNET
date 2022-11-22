@@ -11,12 +11,8 @@ internal sealed class MinKou: OpenMeld
     public override Naki Naki { get => Naki.Pon; }
 
     internal MinKou(Value value, Direction called, (bool exists, bool taken) akadora=default)
-    {
-        SetKouKanTiles(false, value, called, akadora);
-    }
+        => SetKouKanTiles(false, value, called, akadora);
 
     public override IList<Tile> GetSortedTiles()
-    {
-        return new List<Tile>(OrderedTiles);
-    }
+        => new List<Tile>(OrderedTiles);
 }

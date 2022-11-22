@@ -20,7 +20,5 @@ internal class MinJunShimo: OpenMeld
     }
 
     public override IList<Tile> GetSortedTiles()
-    {
-        return new List<Tile>(OrderedTiles);
-    }
+        => new List<Tile>(OrderedTiles);
 }

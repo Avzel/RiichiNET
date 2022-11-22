@@ -77,49 +77,27 @@ public sealed class TileCount
         return true;
     }
 
-    internal void Clear()
-    {
-        _hand.Clear();
-    }
+    internal void Clear() => _hand.Clear();
 
-    internal bool ContainsTile(Tile tile)
-    {
-        return _hand.ContainsKey(tile);
-    }
+    internal bool ContainsTile(Tile tile) => _hand.ContainsKey(tile);
 
     internal bool ContainsValue(Tile tile)
-    {
-        return
-            this.ContainsTile(tile) ||
-            this.ContainsTile(~tile);
-    }
+        => this.ContainsTile(tile) || this.ContainsTile(~tile);
 
     internal int AgnosticCount(Tile tile)
-    {
-        Tile original = tile;
-        Tile other = ~tile;
-        return (new int[] {this[original], this[other]}).Max();
-    }
+        => (new int[] {this[tile], this[~tile]}).Max();
 
     internal int Length()
-    {
-        return _hand.Values.Sum();
-    }
+        => _hand.Values.Sum();
 
     internal int Count()
-    {
-        return Tiles().Count();
-    }
+        => Tiles().Count();
 
     internal Tile First()
-    {
-        return _hand.Keys.First();
-    }
+        => _hand.Keys.First();
 
     public IEnumerable<Tile> Tiles()
-    {
-        return _hand.Keys;
-    }
+        => _hand.Keys;
 
     public int this[Tile tile]
     {

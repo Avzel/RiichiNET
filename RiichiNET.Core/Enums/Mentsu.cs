@@ -2,8 +2,8 @@ namespace RiichiNET.Core.Enums;
 
 public enum Mentsu
 {
-    Jantou,
-    Shuntsu,
-    Koutsu,
-    Kantsu
+    Jantou=2,
+    Shuntsu=3,
+    Koutsu=3,
+    Kantsu=4
 }

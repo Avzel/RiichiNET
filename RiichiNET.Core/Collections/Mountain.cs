@@ -23,25 +23,13 @@ public sealed class Mountain
     internal Dictionary<Value, int> DoraList { get; } = new Dictionary<Value, int>();
     internal Dictionary<Value, int> UraDoraList { get; } = new Dictionary<Value, int>();
 
-    internal Mountain()
-    {
-        Reset();
-    }
+    internal Mountain() => Reset();
 
-    internal bool IsEmpty()
-    {
-        return !_wall.Any();
-    }
+    internal bool IsEmpty() => !_wall.Any();
 
-    public int Count()
-    {
-        return _wall.Count();
-    }
+    public int Count() => _wall.Count();
 
-    internal int DoraCount()
-    {
-        return DoraList.Values.Sum();
-    }
+    internal int DoraCount() => DoraList.Values.Sum();
 
     internal void Reset()
     {
@@ -73,10 +61,9 @@ public sealed class Mountain
                     (tile == Value.P5 && i == p5) ||
                     (tile == Value.S5 && i == s5))
                 {
-                    tile.akadora = true;
+                    _wall.AddFirst(~tile);
                 }
-
-                _wall.AddFirst(tile);
+                else _wall.AddFirst(tile);
             }
         }
     }

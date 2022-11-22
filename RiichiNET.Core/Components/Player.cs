@@ -40,20 +40,13 @@ public sealed class Player
         this.Wind = (Wind) Enum.ToObject(typeof(Wind), (int)seat);
     }
 
-    public static implicit operator Seat(Player p)
-    {
-        return p.Seat;
-    }
+    public static implicit operator Seat(Player p) => p.Seat;
 
     internal int HandLength()
-    {
-        return Hand.Length() + (3 * Melds.Count);
-    }
+        => Hand.Length() + (3 * Melds.Count);
 
     internal bool HasDrawn()
-    {
-        return HandLength() == TileCount.MAX_HAND_SIZE;
-    }
+        => HandLength() == TileCount.MAX_HAND_SIZE;
 
     internal bool IsOpen()
     {
@@ -65,14 +58,10 @@ public sealed class Player
     }
 
     internal bool IsTenpai()
-    {
-        return Shanten == 0;
-    }
+        => Shanten == HandEvaluator.TENPAI;
 
     internal bool IsComplete()
-    {
-        return Shanten == -1;
-    }
+        => Shanten == HandEvaluator.COMPLETE;
 
     internal bool IsFuriten()
     {
@@ -84,19 +73,13 @@ public sealed class Player
     }
 
     internal bool PendingRiichi()
-    {
-        return _riichiTile == Graveyard.Count();
-    }
+        => _riichiTile == Graveyard.Count();
 
     internal bool IsRiichi()
-    {
-        return _riichiTile != null && !PendingRiichi();
-    }
+        => _riichiTile != null && !PendingRiichi();
 
     internal bool IsDefeated()
-    {
-        return Score <= 0;
-    }
+        => Score <= Tabulator.DEFEAT;
 
     private bool CanKanDuringRiichi(Naki naki, Value value)
     {
@@ -125,7 +108,7 @@ public sealed class Player
 
         foreach (Tile tile in Hand.Tiles())
         {
-            if (Hand[tile] == 4 && CanKanDuringRiichi(Naki.AnKan, tile))
+            if (Hand[tile] == (int)Mentsu.Kantsu && CanKanDuringRiichi(Naki.AnKan, tile))
             {
                 Callables.Add(Naki.AnKan, tile);
             }
@@ -164,7 +147,7 @@ public sealed class Player
             {
                 Callables.Add(Naki.DaiMinKan, tile);
             }
-            if (!tile.IsYaoChuu() && Hand.ContainsTile(tile + 1))
+            if (!tile.IsYaoChuu() && Hand.ContainsTile(tile+1))
             {
                 Callables.Add(Naki.ChiiShimo, tile-1);
             }
@@ -172,7 +155,7 @@ public sealed class Player
             {
                 Callables.Add(Naki.ChiiNaka, tile+1);
             }
-            if (!tile.IsYaoChuu() && Hand.ContainsTile(tile - 1))
+            if (!tile.IsYaoChuu() && Hand.ContainsTile(tile-1))
             {
                 Callables.Add(Naki.ChiiKami, tile+1);
             }
@@ -257,12 +240,12 @@ public sealed class Player
         {
             Callables.Add(Naki.Riichi, he.Tiles);
         }
-        if (draw && calculated == -1)
+        if (draw && calculated == HandEvaluator.COMPLETE)
         {
             WinningHands = new HashSet<WinningHand>(he.WinningHands);
             WinningTiles.Add(JustCalled);
         }
-        else if (!draw && calculated == 0)
+        else if (!draw && calculated == HandEvaluator.TENPAI)
         {
             WinningTiles = new HashSet<Value>(he.Tiles);
         }

@@ -14,34 +14,22 @@ internal abstract class OpenMeld: Meld
     internal int CalledIndex { get; private protected set; }
 
     public Tile GetCalledTile()
-    {
-        return OrderedTiles[CalledIndex];
-    }
+        => OrderedTiles[CalledIndex];
 
     internal override bool HasYaoChuu()
-    {
-        return OrderedTiles[0].IsYaoChuu();
-    }
+        => OrderedTiles[0].IsYaoChuu();
 
     internal override bool OnlyHonors()
-    {
-        return OrderedTiles[0].IsHonor();
-    }
+        => OrderedTiles[0].IsHonor();
 
     internal override bool OnlyGreens()
-    {
-        return OrderedTiles[0].IsGreen();
-    }
+        => OrderedTiles[0].IsGreen();
 
     internal override bool OnlyDragons()
-    {
-        return this[0].value is Value.DG or Value.DR or Value.DW;
-    }
+        => this[0].value is Value.DG or Value.DR or Value.DW;
 
     internal override bool OnlyWinds()
-    {
-        return this[0].value is Value.WE or Value.WN or Value.WS or Value.WW;
-    }
+        => this[0].value is Value.WE or Value.WN or Value.WS or Value.WW;
 
     public override bool Contains(Value value)
     {

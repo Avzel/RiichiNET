@@ -19,6 +19,8 @@ public sealed class Table
         internal Naki type;
     }
 
+    private static readonly int SEATS = 4;
+
     internal State State { get; private set; } = State.Draw;
     public Wind Wind { get; private set; } = Wind.East;
     public int Pool { get; private set; } = 0;
@@ -39,18 +41,14 @@ public sealed class Table
     };
 
     internal Table()
-    {
-        InitialDraw();
-    }
+        => InitialDraw();
 
     public Player GetPlayer(Seat? seat=null)
-    {
-        return seat == null ? Players[(int)_turn] : Players[(int)seat];
-    }
+        => seat == null ? Players[(int)_turn] : Players[(int)seat];
 
     internal Player GetDealer()
     {
-        int seat = _round > 3 ? _round - 4 : _round;
+        int seat = _round > SEATS - 1 ? _round - SEATS : _round;
         return Players[seat];
     }
 
@@ -62,14 +60,10 @@ public sealed class Table
     }
 
     internal bool UninterruptedFirstRound()
-    {
-        return !Calls.Any() && Elapsed < 4;
-    }
+        => !Calls.Any() && Elapsed < SEATS;
 
     private bool CanKan()
-    {
-        return _mountain.DoraCount() < 5 && !_mountain.IsEmpty();
-    }
+        => _mountain.DoraCount() <= SEATS && !_mountain.IsEmpty();
 
     private bool CanAgari(Player player, Value value)
     {
@@ -151,7 +145,8 @@ public sealed class Table
     {
         foreach (Seat seat in Enum.GetValues(typeof(Seat)))
         {
-            for (int i = seat == _turn ? 14 : 13; i > 0; i--) Draw(seat);
+            int i = seat == _turn ? TileCount.MAX_HAND_SIZE : TileCount.MIN_HAND_SIZE;
+            for (; i > 0; i--) Draw(seat);
         }
     }
 
@@ -220,9 +215,7 @@ public sealed class Table
     }
 
     internal bool RoundIsOver()
-    {
-        return _mountain.IsEmpty();
-    }
+        => _mountain.IsEmpty();
 
     internal bool GameIsOver()
     {
@@ -251,10 +244,8 @@ public sealed class Table
         return winners.Contains(GetDealer());
     }
 
-    private Seat DetermineNextDealer()
-    {
-        return GetDealer().Seat.Next<Seat>();
-    }
+    private Seat GetNextDealer()
+        => GetDealer().Seat.Next<Seat>();
 
     internal void NextRound(bool overthrow)
     {
@@ -267,7 +258,7 @@ public sealed class Table
         {
             Wind = Wind.Next<Wind>();
             _round++;
-            _turn = DetermineNextDealer();
+            _turn = GetNextDealer();
         }
         foreach (Player player in Players) player.NextRound(overthrow);
 

@@ -6,25 +6,17 @@ using RiichiNET.Core.Enums;
 
 public record struct Tile : IComparable<Tile>
 {
-    public Value value;
-    public bool akadora;
+    public Value value { get; init; }
+    public bool akadora { get; init; }
 
     public Tile(Value value, bool akadora = false)
         => (this.value, this.akadora) = (value, akadora);
 
     public static implicit operator Tile(Value v)
-    {
-        return new Tile()
-        {
-            value = v,
-            akadora = false
-        };
-    }
+        => new Tile(v, false);
 
     public static implicit operator Value(Tile t)
-    {
-        return t.value;
-    }
+        => t.value;
 
     public static implicit operator Tile(int n)
     {
@@ -65,61 +57,32 @@ public record struct Tile : IComparable<Tile>
         else return new Tile((Value)Enum.ToObject(typeof(Value), val));
     }
 
-    public static Tile operator~ (Tile tile)
-    {
-        if (tile.IsFive()) return tile;
-
-        if (tile.akadora) tile.akadora = false;
-        else tile.akadora = true;
-
-        return tile;
-    }
+    public static Tile operator ~(Tile tile)
+        => tile.IsFive() ? tile with { akadora = !tile.akadora } : tile;
 
     public int CompareTo(Tile other)
-    {
-        return this.value.CompareTo(other.value);
-    }
+        => this.value.CompareTo(other.value);
 
     internal bool IsTerminal()
-    {
-        int val = (int)value;
-
-        return val % 10 is 1 or 9;
-    }
+        => (int)value % 10 is 1 or 9;
 
     internal bool IsHonor()
-    {
-        return (int)value > 60;
-    }
+        => (int)value > 60;
 
     internal bool IsYaoChuu()
-    {
-        return IsHonor() || IsTerminal();
-    }
+        => IsHonor() || IsTerminal();
 
     internal bool IsGreen()
-    {
-        int val = (int)value;
-
-        return val is 46 or 48 or 82 or (>= 42 and <= 44);
-    }
+        => (int)value is 46 or 48 or 82 or (>= 42 and <= 44);
 
     internal bool IsFive()
-    {
-        return value is Value.M5 or Value.P5 or Value.S5;
-    }
+        => value is Value.M5 or Value.P5 or Value.S5;
 
     internal bool CanStartShuntsu()
-    {
-        return (int)value % 10 < 8;
-    }
+        =>  (int)value % 10 < 8;
 
     internal bool CanStartAkadoraShuntsu()
-    {
-        int val = (int)value;
-
-        return val % 10 is >= 3 and <= 5;
-    }
+        => (int)value % 10 is >= 3 and <= 5;
 
     internal Value DoraValue()
     {
