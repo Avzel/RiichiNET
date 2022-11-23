@@ -7,6 +7,7 @@ using RiichiNET.Core.Collections;
 using RiichiNET.Core.Collections.Melds;
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
+using RiichiNET.Util.Collections;
 
 internal sealed class YakuCalculator
 {
@@ -157,47 +158,59 @@ internal sealed class YakuCalculator
 
 	private void TanYaochuu(WinningHand wh)
 	{
-		foreach (Meld meld in wh.GetAllMelds())
-		{
-			if (meld.HasYaoChuu()) return;
-        }
+		foreach (Meld meld in wh.GetAllMelds()) if (meld.HasYaoChuu()) return;
         _current.Add(Yaku.TanYaochuu);
     }
 
 	private void Peikou(WinningHand wh)
 	{
-        // TODO:
-	}
+        ObjectCounter<Meld> shuntsu = new ObjectCounter<Meld>();
+		foreach (Meld meld in wh.GetMelds(Mentsu.Shuntsu))
+		{
+			shuntsu.Draw(meld);
 
-	private void YakuhaiHatsu(WinningHand wh)
-	{
-		// TODO:
-	}
+			if (shuntsu[meld] == 2) _current.Add(Yaku.Iipeikou);
+			if (shuntsu[meld] == 4)
+			{
+				_current.Remove(Yaku.Iipeikou);
+				_current.Add(Yaku.RyanPeikou);
+			}
+		}
+    }
 
-	private void YakuhaiHaku(WinningHand wh)
+	private void Yakuhai(WinningHand wh)
 	{
-		// TODO:
-	}
-
-	private void YakuhaiChun(WinningHand wh)
-	{
-		// TODO:
-	}
-
-	private void YakuhaiJikaze(WinningHand wh)
-	{
-		// TODO:
-	}
-
-	private void YakuhaiBakaze(WinningHand wh)
-	{
-		// TODO:
-	}
+        var koukan = wh.GetMelds(Mentsu.Koutsu).Concat(wh.GetMelds(Mentsu.Kantsu)).ToList();
+		foreach (Meld meld in koukan)
+		{
+			if (meld.Contains(Value.DG)) 
+				_current.Add(Yaku.YakuhaiHatsu);
+			else if (meld.Contains(Value.DW)) 
+				_current.Add(Yaku.YakuhaiHaku);
+			else if (meld.Contains(Value.DR)) 
+				_current.Add(Yaku.YakuhaiChun);
+			else if (meld.Contains(_player.Wind.WindToValue())) 
+				_current.Add(Yaku.YakuhaiJikaze);
+			else if (meld.Contains(_table.Wind.WindToValue())) 
+				_current.Add(Yaku.YakuhaiBakaze);
+        }
+    }
 
 	private void SanshokuDoujun(WinningHand wh)
 	{
-		// TODO:
-	}
+        IList<Meld> shuntsu = wh.GetMelds(Mentsu.Shuntsu);
+        if (wh.Count(Mentsu.Shuntsu) > 2) foreach (Meld meld in shuntsu)
+		{
+			Meld second = new AnJun(meld[0].NextSuit());
+			Meld third = new AnJun(second[0].NextSuit());
+			if (shuntsu.Contains(second) && shuntsu.Contains(third))
+			{
+				if (_player.IsOpen()) _current.Add(Yaku.SanshokuDoujunOpen);
+				else _current.Add(Yaku.SanshokuDoujunClosed);
+				break;
+			}
+		}
+    }
 
 	private void IkkiTsuukan(WinningHand wh)
 	{
