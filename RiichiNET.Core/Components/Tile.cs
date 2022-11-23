@@ -95,4 +95,21 @@ public record struct Tile : IComparable<Tile>
 
         return (Value) Enum.ToObject(typeof(Value), val);
     }
+
+    internal Value NextSuit()
+    {
+        if (value > Value.S9) return value;
+        if (value > Value.P9) return value - 40;
+        else return value + 20;
+    }
+
+    internal bool SameValueDifferentSuit(Tile other)
+        =>  !this.IsHonor() && 
+            !other.IsHonor() && 
+            Math.Abs(value - other.value) is 20 or 40;
+
+    internal bool SameSuit(Tile other)
+        =>  !this.IsHonor() &&
+            !other.IsHonor() &&
+            Math.Abs(value - other.value) < 9;
 }
