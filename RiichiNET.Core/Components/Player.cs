@@ -222,8 +222,11 @@ public sealed class Player
 
     internal void DeclareRiichi(Tile tile)
     {
-        Discard(tile);
-        _riichiTile = Graveyard.Count() - 1;
+        if (!IsOpen())
+        {
+            Discard(tile);
+            _riichiTile = Graveyard.Count() - 1;
+        }
     }
 
     private void EvaluateHand()
