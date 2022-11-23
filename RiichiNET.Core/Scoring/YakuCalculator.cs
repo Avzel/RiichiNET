@@ -18,7 +18,7 @@ internal sealed class YakuCalculator
     internal static bool IsTenpaiForKokushi(TileCount hand)
 	{
 		if (hand.Length() is not 12 or 13) return false;
-        foreach (Tile tile in hand.Tiles())
+        foreach (Tile tile in hand.Held())
         {
             if (!tile.IsYaoChuu()) return false;
         }

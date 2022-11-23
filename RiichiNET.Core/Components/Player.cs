@@ -67,7 +67,7 @@ public sealed class Player
     {
         foreach (Value value in Callables[Naki.Agari])
         {
-            if (GraveyardContents.ContainsTile(value)) return true;
+            if (GraveyardContents.Has(value)) return true;
         }
         return false || IchijiFuriten;
     }
@@ -106,7 +106,7 @@ public sealed class Player
     {
         EvaluateHand();
 
-        foreach (Tile tile in Hand.Tiles())
+        foreach (Tile tile in Hand.Held())
         {
             if (Hand[tile] == (int)Mentsu.Kantsu && CanKanDuringRiichi(Naki.AnKan, tile))
             {
@@ -137,7 +137,7 @@ public sealed class Player
     {
         EvaluateHand();
 
-        foreach (Tile tile in Hand.Tiles())
+        foreach (Tile tile in Hand.Held())
         {
             if (Hand[tile] is 2 or 3)
             {
@@ -147,15 +147,15 @@ public sealed class Player
             {
                 Callables.Add(Naki.DaiMinKan, tile);
             }
-            if (!tile.IsYaoChuu() && Hand.ContainsTile(tile+1))
+            if (!tile.IsYaoChuu() && Hand.Has(tile+1))
             {
                 Callables.Add(Naki.ChiiShimo, tile-1);
             }
-            if (Hand.ContainsTile(tile + 2))
+            if (Hand.Has(tile + 2))
             {
                 Callables.Add(Naki.ChiiNaka, tile+1);
             }
-            if (!tile.IsYaoChuu() && Hand.ContainsTile(tile-1))
+            if (!tile.IsYaoChuu() && Hand.Has(tile-1))
             {
                 Callables.Add(Naki.ChiiKami, tile+1);
             }

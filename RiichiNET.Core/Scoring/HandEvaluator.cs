@@ -27,9 +27,9 @@ internal sealed class HandEvaluator
 
     private int ShuntsuCount(TileCount count, Tile tile)
     {
-        int firstCount = count.AgnosticCount(tile);
-        int secondCount = count.AgnosticCount(tile+1);
-        int thirdCount = count.AgnosticCount(tile+2);
+        int firstCount = count.ValueCount(tile);
+        int secondCount = count.ValueCount(tile+1);
+        int thirdCount = count.ValueCount(tile+2);
 
         if
         (
@@ -47,12 +47,12 @@ internal sealed class HandEvaluator
     private int TaatsuCount(TileCount count)
     {
         if (count.Count() <= 1) return 0;
-        else foreach (Tile tile in count.Tiles())
+        else foreach (Tile tile in count.Held())
         {
             if
             (
-                count.AgnosticCount(tile+1) > 0 ||
-                count.AgnosticCount(tile+2) > 0
+                count.ValueCount(tile+1) > 0 ||
+                count.ValueCount(tile+2) > 0
             )
             {
                 return 1;
@@ -70,7 +70,7 @@ internal sealed class HandEvaluator
     private int UniqueTerminals(TileCount count)
     {
         int uniqueTerminals = 0;
-        foreach (Tile tile in count.Tiles())
+        foreach (Tile tile in count.Held())
         {
             if (tile.IsYaoChuu()) uniqueTerminals++;
         }
@@ -88,7 +88,7 @@ internal sealed class HandEvaluator
 
     private bool GetShuntsuAkadora(TileCount count, Tile tile)
     {
-        return tile.akadora || count.ContainsTile(~(tile + 1)) || count.ContainsTile(~(tile + 2));
+        return tile.akadora || count.Has(~(tile + 1)) || count.Has(~(tile + 2));
     }
 
     private TileCount UpdatedCount(TileCount count, Meld meld)
@@ -167,7 +167,7 @@ internal sealed class HandEvaluator
         }
         else if (singles is 1 or 13)
         {
-            foreach (Tile tile in count.Tiles())
+            foreach (Tile tile in count.Held())
             {
                 Tiles.Add(tile);
             }
@@ -206,13 +206,13 @@ internal sealed class HandEvaluator
         int singles = count.Count();
         if (singles is 1 or 2)
         {
-            foreach (Tile tile in count.Tiles()) Tiles.Add(tile);
+            foreach (Tile tile in count.Held()) Tiles.Add(tile);
         }
         else if (singles == 3)
         {
             int taatsu;
             TileCount tester = new TileCount(count);
-            foreach (Tile tile in count.Tiles())
+            foreach (Tile tile in count.Held())
             {
                 tester.Discard(tile);
                 if ((taatsu = TaatsuCount(tester)) == 1) Tiles.Add(tile);
@@ -221,7 +221,7 @@ internal sealed class HandEvaluator
         }
         else if (singles >= 13)
         {
-            foreach (Tile tile in count.Tiles())
+            foreach (Tile tile in count.Held())
             {
                 if (!tile.IsYaoChuu())
                 {
@@ -234,7 +234,7 @@ internal sealed class HandEvaluator
 
     private void EvaluateHand(TileCount count, WinningHand hand)
     {
-        foreach (Tile tile in count.Tiles())
+        foreach (Tile tile in count.Held())
         {
             BranchJantou(tile, count, hand);
             BranchKoutsu(tile, count, hand);
