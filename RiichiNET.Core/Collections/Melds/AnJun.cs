@@ -31,8 +31,8 @@ internal sealed class AnJun: ClosedMeld
     internal override bool HasYaoChuu()
         => base.HasYaoChuu() || ((Tile)_value + 2).IsYaoChuu();
 
-    internal override bool OnlyHonors()
-        => false;
+    internal override bool HasTerminals()
+        => base.HasTerminals() || ((Tile)_value + 2).IsTerminal();
 
     public override bool Contains(Value value)
         => _value - value is <= 0 and >= -2;
