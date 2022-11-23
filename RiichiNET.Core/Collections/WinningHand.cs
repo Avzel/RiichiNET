@@ -49,7 +49,7 @@ internal sealed class WinningHand
     }
 
     internal IList<Meld> GetMelds(Mentsu mentsu)
-        => _hand[mentsu].AsReadOnly();
+        => _hand[mentsu].AsReadOnly().OrderBy(x => x).ToList();
 
     internal IEnumerable<Meld> GetAllMelds()
         => _hand.Values.SelectMany(x => x.AsEnumerable());
