@@ -13,6 +13,11 @@ public class ObjectCounter<T> where T: notnull, IComparable<T>
         if (original != null) foreach (T t in original.Held()) _count.Add(t, original[t]);
     }
 
+    public ObjectCounter(ICollection<T> collection)
+    {
+        foreach (T t in collection) Draw(t);
+    }
+
     public void Draw(T t)
         => this[t]++;
 
