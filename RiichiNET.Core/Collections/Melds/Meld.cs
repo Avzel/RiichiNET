@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
-public abstract class Meld: IEquatable<Meld>
+public abstract class Meld: IEquatable<Meld>, IComparable<Meld>
 {
     internal abstract Mentsu Mentsu { get; }
     public abstract Naki Naki { get; }
@@ -39,4 +39,7 @@ public abstract class Meld: IEquatable<Meld>
 
     public bool Equals(Meld? other)
         => other != null ? this.GetHashCode() == other.GetHashCode() : false;
+
+    public int CompareTo(Meld? other)
+    => other != null ? GetHashCode().CompareTo(other.GetHashCode()) : GetHashCode();
 }
