@@ -50,6 +50,9 @@ internal sealed class WinningHand
 
     internal IList<Meld> GetMelds(Mentsu mentsu)
         => _hand[mentsu].AsReadOnly().OrderBy(x => x).ToList();
+    
+    internal IEnumerable<Meld> GetKouKan()
+        => GetMelds(Mentsu.Koutsu).Concat(GetMelds(Mentsu.Kantsu)).ToList();
 
     internal IEnumerable<Meld> GetAllMelds()
         => _hand.Values.SelectMany(x => x.AsEnumerable());
