@@ -107,15 +107,22 @@ public record struct Tile : IComparable<Tile>
         else return value + 20;
     }
 
+    internal Suit GetSuit()
+    {
+        if ((int)value is > 0 and < 10) return Suit.M;
+        else if ((int)value < 40) return Suit.P;
+        else if ((int)value < 60) return Suit.S;
+        else if ((int)value < 80) return Suit.W;
+        else return Suit.D;
+    }
+
     internal bool SameValueDifferentSuit(Tile other)
         =>  !this.IsHonor() && 
             !other.IsHonor() && 
             Math.Abs(value - other.value) is 20 or 40;
 
     internal bool SameSuit(Tile other)
-        =>  !this.IsHonor() &&
-            !other.IsHonor() &&
-            Math.Abs(value - other.value) < 9;
+        => this.GetSuit() == other.GetSuit();
 
     internal static bool SameValuesDifferentSuits(Tile first, Tile second, Tile third)
         => first.SameValueDifferentSuit(second) &&
