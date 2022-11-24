@@ -49,7 +49,7 @@ public enum Yaku
     RenHou=13,
     ChiiHou=13,
     ChuurenPoutou=13,
-    ChuurenPoutouNineWait=26,
+    JunseiChuurenPoutou=26,
     SuuAnkou=13,
     SuuAnkouSingleWait=26,
     DaiSuuShii=26
