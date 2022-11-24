@@ -51,8 +51,11 @@ internal sealed class YakuCalculator
 	{
 		if (!_player.IsComplete()) return false;
 
-		// TODO:
-
+		foreach (WinningHand wh in _player.WinningHands)
+		{
+            YakuCalcInParallel(wh);
+			if (_current.Any() || _yakuman.Any()) return true;
+        }
         return false;
     }
 
