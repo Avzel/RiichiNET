@@ -13,5 +13,6 @@ internal sealed class AnKan: ClosedMeld
     internal AnKan(Value value, bool akadora=false): base(value, akadora) {}
 
     public override IList<Tile> GetSortedTiles()
-        => new List<Tile>() {new Tile(_value, Akadora), (Tile)_value, (Tile)_value, (Tile)_value};
+        =>  (new List<Tile>() {new Tile(_value, Akadora), (Tile)_value, (Tile)_value, (Tile)_value})
+            .AsReadOnly();
 }

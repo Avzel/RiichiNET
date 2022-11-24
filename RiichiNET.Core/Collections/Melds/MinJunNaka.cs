@@ -20,10 +20,11 @@ internal class MinJunNaka: OpenMeld
     }
 
     public override IList<Tile> GetSortedTiles()
-        => new List<Tile>()
+        => (new List<Tile>()
         {
             OrderedTiles[1],
             OrderedTiles[0],
             OrderedTiles[2]
-        };
+
+        }).AsReadOnly();
 }

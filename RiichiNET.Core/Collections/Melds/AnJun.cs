@@ -25,7 +25,7 @@ internal sealed class AnJun: ClosedMeld
             else if (third.IsFive()) third = third with { akadora = true };
         }
 
-        return new List<Tile>() {first, second, third};
+        return (new List<Tile>() {first, second, third}).AsReadOnly();
     }
 
     internal override bool HasYaoChuu()
