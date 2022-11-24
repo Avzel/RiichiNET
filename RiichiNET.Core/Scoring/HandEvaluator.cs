@@ -63,7 +63,7 @@ internal sealed class HandEvaluator
 
     private int JantouCount(WinningHand hand)
     {
-        int jantou = hand.Doubles();
+        int jantou = hand.Count(Mentsu.Jantou);
         return jantou > 2 ? 2 : jantou;
     }
 
@@ -140,12 +140,14 @@ internal sealed class HandEvaluator
     }
     private int CalculateShanten(TileCount count, WinningHand hand)
     {
+        int doubles = hand.Count(Mentsu.Jantou);
+        int triples = hand.Count(Mentsu.Shuntsu, Mentsu.Koutsu, Mentsu.Kantsu);
         int shanten =
         (
             new int[]
             {
-                8 - (2*hand.Triples()) - JantouCount(hand) + TaatsuCount(count),
-                6 - hand.Doubles(),
+                8 - (2*triples) - JantouCount(hand) + TaatsuCount(count),
+                6 - doubles,
                 13 - UniqueTerminals(count) - TerminalPairs(hand)
             }
         ).Min();

@@ -13,6 +13,8 @@ internal sealed class YakuCalculator
 {
     private readonly ISet<Yaku> _best = new HashSet<Yaku>();
     private readonly ISet<Yaku> _current = new HashSet<Yaku>();
+    private readonly ISet<Yaku> _yakuman = new HashSet<Yaku>();
+
     private readonly Table _table;
     private readonly Player _player;
 
@@ -164,24 +166,26 @@ internal sealed class YakuCalculator
 
 	private void Peikou(WinningHand wh)
 	{
-        ObjectCounter<Meld> shuntsu = new ObjectCounter<Meld>();
-		foreach (Meld meld in wh.GetMelds(Mentsu.Shuntsu))
+		if (!_player.IsOpen())
 		{
-			shuntsu.Draw(meld);
-
-			if (shuntsu[meld] == 2) _current.Add(Yaku.Iipeikou);
-			if (shuntsu[meld] == 4)
+			ObjectCounter<Meld> shuntsu = new ObjectCounter<Meld>();
+			foreach (Meld meld in wh.GetMelds(Mentsu.Shuntsu))
 			{
-				_current.Remove(Yaku.Iipeikou);
-				_current.Add(Yaku.RyanPeikou);
+				shuntsu.Draw(meld);
+
+				if (shuntsu[meld] == 2) _current.Add(Yaku.Iipeikou);
+				if (shuntsu[meld] == 4)
+				{
+					_current.Remove(Yaku.Iipeikou);
+					_current.Add(Yaku.RyanPeikou);
+				}
 			}
 		}
     }
 
 	private void Yakuhai(WinningHand wh)
 	{
-        var koukan = wh.GetMelds(Mentsu.Koutsu).Concat(wh.GetMelds(Mentsu.Kantsu)).ToList();
-		foreach (Meld meld in koukan)
+		foreach (Meld meld in wh.GetMelds(Mentsu.Koutsu, Mentsu.Kantsu))
 		{
 			if (meld.Contains(Value.DG)) 
 				_current.Add(Yaku.YakuhaiHatsu);
@@ -214,60 +218,132 @@ internal sealed class YakuCalculator
 
 	private void IkkiTsuukan(WinningHand wh)
 	{
-		// TODO:
+		IList<Meld> shuntsu = wh.GetMelds(Mentsu.Shuntsu);
+		if (wh.Count(Mentsu.Shuntsu) > 2) foreach (Meld meld in shuntsu)
+		{
+			if (meld[0].IsTerminal())
+			{
+				Meld second = new AnJun(meld[0] + 3);
+				Meld third = new AnJun(second[0] + 3);
+				if (shuntsu.Contains(second) && shuntsu.Contains(third))
+				{
+					if (_player.IsOpen()) _current.Add(Yaku.IkkiTsuukanOpen);
+					else _current.Add(Yaku.IkkiTsuukanClosed);
+					break;
+				}
+			}
+		}
 	}
 
 	private void HonChantaiYaochuu(WinningHand wh)
 	{
-		// TODO:
-	}
+        bool honor = false;
+        bool terminal = false;
+        foreach (Meld meld in wh.GetAllMelds())
+		{
+			if (!meld.HasYaoChuu()) return;
+			if (!terminal && meld.HasTerminals()) terminal = true;
+			else if (!honor && meld.OnlyHonors()) honor = true;
+        }
+		if (honor && terminal)
+		{
+			if (_player.IsOpen()) _current.Add(Yaku.HonChantaiYaochuuOpen);
+			else _current.Add(Yaku.HonChantaiYaochuuClosed);
+		}
+    }
 
 	private void ChiiToitsu(WinningHand wh)
 	{
-		// TODO:
-	}
+		if (wh.Count(Mentsu.Jantou) == 7) _current.Add(Yaku.ChiiToitsu);
+    }
 
 	private void ToitoiHou(WinningHand wh)
 	{
-		// TODO:
-	}
+		if (wh.Count(Mentsu.Shuntsu, Mentsu.Koutsu, Mentsu.Kantsu) == 4)
+			_current.Add(Yaku.ToitoiHou);
+    }
 
-	private void SanAnkou(WinningHand wh)
+	private void Ankou(WinningHand wh)
 	{
-		// TODO:
-	}
+        int count = 0;
+		foreach (Meld meld in wh.GetMelds(Mentsu.Koutsu, Mentsu.Kantsu))
+		{
+			if (
+				!meld.Open && 
+				!(_table.State == State.Discard && meld.Contains(_player.JustDrawn))
+
+			) count++;
+        }
+		if (count == 3) _current.Add(Yaku.SanAnkou);
+		else if (count == 4) _yakuman.Add(Yaku.SuuAnkou);
+    }
 
 	private void SanshokuDoukou(WinningHand wh)
 	{
-		// TODO:
-	}
+		IEnumerable<Meld> koukan = wh.GetMelds(Mentsu.Koutsu, Mentsu.Kantsu);
+        var sd = 	from item1 in koukan
+					from item2 in koukan
+					from item3 in koukan
+					where Tile.SameValuesDifferentSuits(item1[0], item2[0], item3[0])
+					select true;
+		
+		if (sd.Any()) _current.Add(Yaku.SanshokuDoukou);
+    }
 
-	private void SanKantsu(WinningHand wh)
+	private void Kantsu(WinningHand wh)
 	{
-		// TODO:
-	}
+        int count = wh.Count(Mentsu.Kantsu);
+        if (count == 3) _current.Add(Yaku.SanKantsu);
+		else if (count == 4) _yakuman.Add(Yaku.SuuKantsu);
+    }
 
 	private void HonRoutou(WinningHand wh)
 	{
-		// TODO:
-	}
+        bool honor = false;
+        bool terminal = false;
+		foreach (Meld meld in wh.GetAllMelds())
+		{
+			if (!meld.OnlyYaoChuu()) return;
+			if (!terminal && meld.OnlyTerminals()) terminal = true;
+			else if (!honor && meld.OnlyHonors()) honor = true;
+        }
+		if (honor && terminal) _current.Add(Yaku.HonRoutou);
+    }
 
-	private void ShouSangen(WinningHand wh)
+	private void Sangen(WinningHand wh)
 	{
-		// TODO:
-	}
+        if (wh.Count(Mentsu.Koutsu, Mentsu.Kantsu) > 1)
+        {
+            HashSet<Value> values = new HashSet<Value>();
+            foreach (Meld meld in wh.GetMelds(Mentsu.Jantou, Mentsu.Koutsu, Mentsu.Kantsu))
+            {
+                if (meld.OnlyDragons()) values.Add(meld[0]);
+            }
+            if (values.Count() == 3)
+			{
+				if (wh.GetMelds(Mentsu.Jantou)[0].OnlyDragons())
+                    _current.Add(Yaku.ShouSangen);
+				else _yakuman.Add(Yaku.DaiSangen);
+            }
+        }
+    }
 
 	private void JunChantaiYaochuu(WinningHand wh)
 	{
-		// TODO:
-	}
+        bool normal = false;
+		foreach (Meld meld in wh.GetAllMelds())
+		{
+			if (!meld.HasTerminals()) return;
+			if (!normal && !meld.OnlyTerminals()) normal = true;
+        }
+        if (normal)
+        {
+            if (_player.IsOpen()) _current.Add(Yaku.JunChantaiYaochuuOpen);
+			else _current.Add(Yaku.JunChantaiYaochuuClosed);
+        }
+    }
 
 	private void HonIisou(WinningHand wh)
-	{
-		// TODO:
-	}
-
-	private void RyanPeikou(WinningHand wh)
 	{
 		// TODO:
 	}
@@ -278,16 +354,6 @@ internal sealed class YakuCalculator
 	}
 
 	private void KokushiMusou(WinningHand wh)
-	{
-		// TODO:
-	}
-
-	private void SuuKantsu(WinningHand wh)
-	{
-		// TODO:
-	}
-
-	private void DaiSangen(WinningHand wh)
 	{
 		// TODO:
 	}
@@ -343,11 +409,6 @@ internal sealed class YakuCalculator
     }
 
 	private void ChuurenPoutou(WinningHand wh)
-	{
-		// TODO:
-	}
-
-	private void SuuAnkou(WinningHand wh)
 	{
 		// TODO:
 	}

@@ -50,15 +50,34 @@ internal sealed class WinningHand
 
     internal IList<Meld> GetMelds(Mentsu mentsu)
         => _hand[mentsu].AsReadOnly().OrderBy(x => x).ToList();
-    
-    internal IEnumerable<Meld> GetKouKan()
-        => GetMelds(Mentsu.Koutsu).Concat(GetMelds(Mentsu.Kantsu)).ToList();
+
+    internal IList<Meld> GetMelds(params Mentsu[] mentsu)
+    {
+        var list = GetMelds(mentsu[0]);
+        for (int i = 1; i < mentsu.Length; i++)
+        {
+            list = list.Concat(GetMelds(mentsu[i])).ToList();
+        }
+        return list;
+    }
 
     internal IEnumerable<Meld> GetAllMelds()
         => _hand.Values.SelectMany(x => x.AsEnumerable());
 
+
+
     internal int Count(Mentsu mentsu)
         => _hand.ContainsKey(mentsu) ? _hand[mentsu].Count() : 0;
+
+    internal int Count(params Mentsu[] mentsu)
+    {
+        int count = 0;
+        foreach (Mentsu specified in mentsu)
+        {
+            count += Count(specified);
+        }
+        return count;
+    }
 
     internal int Count(Meld meld)
     {
@@ -69,12 +88,4 @@ internal sealed class WinningHand
         }
         return count;
     }
-
-    internal int Doubles()
-        => this.Count(Mentsu.Jantou);
-
-    internal int Triples()
-        =>  this.Count(Mentsu.Shuntsu) + 
-            this.Count(Mentsu.Koutsu) + 
-            this.Count(Mentsu.Kantsu);
 }
