@@ -1,7 +1,10 @@
 namespace RiichiNET.Core.Scoring;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using RiichiNET.Core.Collections;
 using RiichiNET.Core.Collections.Melds;
@@ -14,6 +17,7 @@ internal sealed class YakuCalculator
     private readonly ISet<Yaku> _best = new HashSet<Yaku>();
     private readonly ISet<Yaku> _current = new HashSet<Yaku>();
     private readonly ISet<Yaku> _yakuman = new HashSet<Yaku>();
+    private static Mutex mut = new Mutex();
 
     private readonly Table _table;
     private readonly Player _player;
@@ -59,27 +63,72 @@ internal sealed class YakuCalculator
 			_best.Clear();
 			foreach (Yaku yaku in _current) _best.Add(yaku);
 		}
+		_current.Clear();
     }
 
 	internal ISet<Yaku> DetermineYaku()
 	{
-        ISet<Yaku> yaku = new HashSet<Yaku>();
-
-		foreach (WinningHand wh in _player.WinningHands)
+		if (!_player.IsComplete()) return _current;
+        foreach (WinningHand wh in _player.WinningHands)
 		{
-            // TODO:
-
+            YakuCalcInParallel(wh);
             OverwriteBest();
-            _current.Clear();
         }
-        return yaku;
+        return _yakuman.Any() ? _yakuman : _best;
     }
 
-	// Yaku:
+	private void YakuCalcInParallel(WinningHand wh)
+	{
+        Parallel.Invoke
+        (
+            () => { Riichi(); }, 
+			() => { RyanRiichi(); }, 
+			() => { MenzenchinTsumohou(); }, 
+			() => { Chankan(); }, 
+			() => { Ippatsu(); }, 
+			() => { RinshanKaihou(); }, 
+			() => { HaiteiRaoyue(); }, 
+			() => { HouteiYaoyui(); }, 
+
+			() => { Pinfu(wh); }, 
+			() => { TanYaochuu(wh); }, 
+			() => { Peikou(wh); }, 
+			() => { Yakuhai(wh); }, 
+			() => { SanshokuDoujun(wh); }, 
+			() => { IkkiTsuukan(wh); }, 
+			() => { HonChantaiYaochuu(wh); }, 
+			() => { ChiiToitsu(wh); }, 
+			() => { ToitoiHou(wh); }, 
+			() => { Ankou(wh); }, 
+			() => { SanshokuDoukou(wh); }, 
+			() => { Kantsu(wh); }, 
+			() => { HonRoutou(wh); }, 
+			() => { Sangen(wh); }, 
+			() => { JunChantaiYaochuu(wh); }, 
+			() => { Iisou(wh); }, 
+			() => { KokushiMusou(wh); }, 
+			() => { Suushii(wh); }, 
+			() => { TsuuIisou(wh); }, 
+			() => { ChinRoutou(wh); }, 
+			() => { RyuuIisou(wh); }, 
+			() => { ChuurenPoutou(wh); }, 
+
+			() => { TenHou(); }, 
+			() => { RenHou(); }, 
+			() => { ChiiHou(); }
+        );
+    }
+
+	private void EditYaku(Yaku yaku, Func<Yaku, bool> Edit)
+	{
+        mut.WaitOne();
+		Edit(yaku);
+        mut.ReleaseMutex();
+    }
 
 	private void Riichi()
 	{
-        if (_player.IsRiichi()) _current.Add(Yaku.Riichi);
+        if (_player.IsRiichi()) EditYaku(Yaku.Riichi, _current.Add);
     }
 
 	private void RyanRiichi()
@@ -90,14 +139,14 @@ internal sealed class YakuCalculator
 			_table.Calls.First().caller == _player && 
 			_table.Calls.First().elapsed < 4
 
-		) _current.Add(Yaku.RyanRiichi);
+		) EditYaku(Yaku.RyanRiichi, _current.Add);
     }
 
 	private void MenzenchinTsumohou()
 	{
         if (!_player.IsOpen() && _table.State == State.Draw)
         {
-            _current.Add(Yaku.MenzenchinTsumohou);
+            EditYaku(Yaku.MenzenchinTsumohou, _current.Add);
         }
     }
 
@@ -105,7 +154,7 @@ internal sealed class YakuCalculator
 	{
 		if (_table.State == State.Call && _table.GetPlayer() != _player)
 		{
-            _current.Add(Yaku.Chankan);
+            EditYaku(Yaku.Chankan, _current.Add);
         }
 	}
 
@@ -117,14 +166,14 @@ internal sealed class YakuCalculator
 			_table.Calls.Last().caller == _player && 
 			_table.Elapsed - _table.Calls.Last().elapsed < 5
 
-		) _current.Add(Yaku.Ippatsu);
+		) EditYaku(Yaku.Ippatsu, _current.Add);
     }
 
 	private void RinshanKaihou()
 	{
 		if (_table.State == State.Call && _table.GetPlayer() == _player)
 		{
-            _current.Add(Yaku.RinshanKaihou);
+            EditYaku(Yaku.RinshanKaihou, _current.Add);
         }
 	}
 
@@ -132,7 +181,7 @@ internal sealed class YakuCalculator
 	{
 		if (_table.State == State.Draw && _table.RoundIsOver())
 		{
-            _current.Add(Yaku.HaiteiRaoyue);
+            EditYaku(Yaku.HaiteiRaoyue, _current.Add);
         }
 	}
 
@@ -140,7 +189,7 @@ internal sealed class YakuCalculator
 	{
 		if (_table.State == State.Discard && _table.RoundIsOver())
 		{
-            _current.Add(Yaku.HouteiYaoyui);
+            EditYaku(Yaku.HouteiYaoyui, _current.Add);
         }
 	}
 
@@ -155,13 +204,13 @@ internal sealed class YakuCalculator
 			!wh.Contains(Mentsu.Jantou, _player.Wind.WindToValue())
 
 
-		) _current.Add(Yaku.Pinfu);
+		) EditYaku(Yaku.Pinfu, _current.Add);
     }
 
 	private void TanYaochuu(WinningHand wh)
 	{
 		foreach (Meld meld in wh.GetAllMelds()) if (meld.HasYaoChuu()) return;
-        _current.Add(Yaku.TanYaochuu);
+        EditYaku(Yaku.TanYaochuu, _current.Add);
     }
 
 	private void Peikou(WinningHand wh)
@@ -173,11 +222,11 @@ internal sealed class YakuCalculator
 			{
 				shuntsu.Draw(meld);
 
-				if (shuntsu[meld] == 2) _current.Add(Yaku.Iipeikou);
+				if (shuntsu[meld] == 2) EditYaku(Yaku.Iipeikou, _current.Add);
 				if (shuntsu[meld] == 4)
 				{
-					_current.Remove(Yaku.Iipeikou);
-					_current.Add(Yaku.RyanPeikou);
+					EditYaku(Yaku.Iipeikou, _current.Remove);
+					EditYaku(Yaku.RyanPeikou, _current.Add);
 				}
 			}
 		}
@@ -188,15 +237,15 @@ internal sealed class YakuCalculator
 		foreach (Meld meld in wh.GetMelds(Mentsu.Koutsu, Mentsu.Kantsu))
 		{
 			if (meld.Contains(Value.DG)) 
-				_current.Add(Yaku.YakuhaiHatsu);
+				EditYaku(Yaku.YakuhaiHatsu, _current.Add);
 			else if (meld.Contains(Value.DW)) 
-				_current.Add(Yaku.YakuhaiHaku);
+				EditYaku(Yaku.YakuhaiHaku, _current.Add);
 			else if (meld.Contains(Value.DR)) 
-				_current.Add(Yaku.YakuhaiChun);
+				EditYaku(Yaku.YakuhaiChun, _current.Add);
 			else if (meld.Contains(_player.Wind.WindToValue())) 
-				_current.Add(Yaku.YakuhaiJikaze);
+				EditYaku(Yaku.YakuhaiJikaze, _current.Add);
 			else if (meld.Contains(_table.Wind.WindToValue())) 
-				_current.Add(Yaku.YakuhaiBakaze);
+				EditYaku(Yaku.YakuhaiBakaze, _current.Add);
         }
     }
 
@@ -209,8 +258,8 @@ internal sealed class YakuCalculator
 			Meld third = new AnJun(second[0].NextSuit());
 			if (shuntsu.Contains(second) && shuntsu.Contains(third))
 			{
-				if (_player.IsOpen()) _current.Add(Yaku.SanshokuDoujunOpen);
-				else _current.Add(Yaku.SanshokuDoujunClosed);
+				if (_player.IsOpen()) EditYaku(Yaku.SanshokuDoujunOpen, _current.Add);
+				else EditYaku(Yaku.SanshokuDoujunClosed, _current.Add);
 				break;
 			}
 		}
@@ -227,8 +276,8 @@ internal sealed class YakuCalculator
 				Meld third = new AnJun(second[0] + 3);
 				if (shuntsu.Contains(second) && shuntsu.Contains(third))
 				{
-					if (_player.IsOpen()) _current.Add(Yaku.IkkiTsuukanOpen);
-					else _current.Add(Yaku.IkkiTsuukanClosed);
+					if (_player.IsOpen()) EditYaku(Yaku.IkkiTsuukanOpen, _current.Add);
+					else EditYaku(Yaku.IkkiTsuukanClosed, _current.Add);
 					break;
 				}
 			}
@@ -247,20 +296,20 @@ internal sealed class YakuCalculator
         }
 		if (honor && terminal)
 		{
-			if (_player.IsOpen()) _current.Add(Yaku.HonChantaiYaochuuOpen);
-			else _current.Add(Yaku.HonChantaiYaochuuClosed);
+			if (_player.IsOpen()) EditYaku(Yaku.HonChantaiYaochuuOpen, _current.Add);
+			else EditYaku(Yaku.HonChantaiYaochuuClosed, _current.Add);
 		}
     }
 
 	private void ChiiToitsu(WinningHand wh)
 	{
-		if (wh.Count(Mentsu.Jantou) == 7) _current.Add(Yaku.ChiiToitsu);
+		if (wh.Count(Mentsu.Jantou) == 7) EditYaku(Yaku.ChiiToitsu, _current.Add);
     }
 
 	private void ToitoiHou(WinningHand wh)
 	{
 		if (wh.Count(Mentsu.Shuntsu, Mentsu.Koutsu, Mentsu.Kantsu) == 4)
-			_current.Add(Yaku.ToitoiHou);
+			EditYaku(Yaku.ToitoiHou, _current.Add);
     }
 
 	private void Ankou(WinningHand wh)
@@ -274,11 +323,12 @@ internal sealed class YakuCalculator
 
 			) count++;
         }
-		if (count == 3) _current.Add(Yaku.SanAnkou);
+		if (count == 3) EditYaku(Yaku.SanAnkou, _current.Add);
 		else if (count == 4)
         {
-			if (_player.WinningTiles.Count() == 1) _yakuman.Add(Yaku.SuuAnkouSingleWait);
-            else _yakuman.Add(Yaku.SuuAnkou);
+			if (_player.WinningTiles.Count() == 1) 
+				EditYaku(Yaku.SuuAnkouSingleWait, _yakuman.Add);
+            else EditYaku(Yaku.SuuAnkou, _yakuman.Add);
         }
     }
 
@@ -291,14 +341,14 @@ internal sealed class YakuCalculator
 					where Tile.SameValuesDifferentSuits(item1[0], item2[0], item3[0])
 					select true;
 		
-		if (sd.Any()) _current.Add(Yaku.SanshokuDoukou);
+		if (sd.Any()) EditYaku(Yaku.SanshokuDoukou, _current.Add);
     }
 
 	private void Kantsu(WinningHand wh)
 	{
         int count = wh.Count(Mentsu.Kantsu);
-        if (count == 3) _current.Add(Yaku.SanKantsu);
-		else if (count == 4) _yakuman.Add(Yaku.SuuKantsu);
+        if (count == 3) EditYaku(Yaku.SanKantsu, _current.Add);
+		else if (count == 4) EditYaku(Yaku.SuuKantsu, _yakuman.Add);
     }
 
 	private void HonRoutou(WinningHand wh)
@@ -311,7 +361,7 @@ internal sealed class YakuCalculator
 			if (!terminal && meld.OnlyTerminals()) terminal = true;
 			else if (!honor && meld.OnlyHonors()) honor = true;
         }
-		if (honor && terminal) _current.Add(Yaku.HonRoutou);
+		if (honor && terminal) EditYaku(Yaku.HonRoutou, _current.Add);
     }
 
 	private void Sangen(WinningHand wh)
@@ -326,8 +376,8 @@ internal sealed class YakuCalculator
             if (values.Count() == 3)
 			{
 				if (wh.GetMelds(Mentsu.Jantou)[0].OnlyDragons())
-                    _current.Add(Yaku.ShouSangen);
-				else _yakuman.Add(Yaku.DaiSangen);
+                    EditYaku(Yaku.ShouSangen, _current.Add);
+				else EditYaku(Yaku.DaiSangen, _yakuman.Add);
             }
         }
     }
@@ -342,8 +392,8 @@ internal sealed class YakuCalculator
         }
         if (normal)
         {
-            if (_player.IsOpen()) _current.Add(Yaku.JunChantaiYaochuuOpen);
-			else _current.Add(Yaku.JunChantaiYaochuuClosed);
+            if (_player.IsOpen()) EditYaku(Yaku.JunChantaiYaochuuOpen, _current.Add);
+			else EditYaku(Yaku.JunChantaiYaochuuClosed, _current.Add);
         }
     }
 
@@ -358,19 +408,19 @@ internal sealed class YakuCalculator
         }
 		if (honor && suits.Count() == 1)
 		{
-			if (_player.IsOpen()) _current.Add(Yaku.HonIisouOpen);
-			else _current.Add(Yaku.HonIisouClosed);
+			if (_player.IsOpen()) EditYaku(Yaku.HonIisouOpen, _current.Add);
+			else EditYaku(Yaku.HonIisouClosed, _current.Add);
         }
 		else if (!honor && suits.Count() == 1)
 		{
-			if (_player.IsOpen()) _current.Add(Yaku.ChinIisouOpen);
-			else _current.Add(Yaku.ChinIisouClosed);
+			if (_player.IsOpen()) EditYaku(Yaku.ChinIisouOpen, _current.Add);
+			else EditYaku(Yaku.ChinIisouClosed, _current.Add);
 		}
     }
 
 	private void KokushiMusou(WinningHand wh)
 	{
-		if (wh.GetAllMelds().Count() == 1) _yakuman.Add(Yaku.KokushiMusou);
+		if (wh.GetAllMelds().Count() == 1) EditYaku(Yaku.KokushiMusou, _yakuman.Add);
     }
 
 	private void Suushii(WinningHand wh)
@@ -385,8 +435,8 @@ internal sealed class YakuCalculator
             if (values.Count() == 4)
 			{
 				if (wh.GetMelds(Mentsu.Jantou)[0].OnlyWinds())
-                    _yakuman.Add(Yaku.ShouSuushii);
-				else _yakuman.Add(Yaku.DaiSuuShii);
+                    EditYaku(Yaku.ShouSuushii, _yakuman.Add);
+				else EditYaku(Yaku.DaiSuuShii, _yakuman.Add);
             }
         }
 	}
@@ -397,7 +447,7 @@ internal sealed class YakuCalculator
 		{
 			if (!meld.OnlyHonors()) return;
         }
-        _yakuman.Add(Yaku.TsuuIisou);
+        EditYaku(Yaku.TsuuIisou, _yakuman.Add);
     }
 
 	private void ChinRoutou(WinningHand wh)
@@ -406,7 +456,7 @@ internal sealed class YakuCalculator
 		{
 			if (!meld.OnlyTerminals()) return;
         }
-        _yakuman.Add(Yaku.ChinRoutou);
+        EditYaku(Yaku.ChinRoutou, _yakuman.Add);
 	}
 
 	private void RyuuIisou(WinningHand wh)
@@ -415,7 +465,7 @@ internal sealed class YakuCalculator
 		{
 			if (!meld.OnlyGreens()) return;
         }
-        _yakuman.Add(Yaku.RyuuIisou);
+        EditYaku(Yaku.RyuuIisou, _yakuman.Add);
 	}
 
 	private void TenHou()
@@ -425,7 +475,7 @@ internal sealed class YakuCalculator
 			_table.UninterruptedFirstRound() && 
 			_table.GetDealer() == _player
 
-		) _current.Add(Yaku.TenHou);
+		) EditYaku(Yaku.TenHou, _yakuman.Add);
     }
 
 	private void RenHou()
@@ -435,7 +485,7 @@ internal sealed class YakuCalculator
 			_table.UninterruptedFirstRound() &&
 			!_player.Graveyard.Any()
 
-		) _current.Add(Yaku.RenHou);
+		) EditYaku(Yaku.RenHou, _yakuman.Add);
     }
 
 	private void ChiiHou()
@@ -445,7 +495,7 @@ internal sealed class YakuCalculator
 			_table.UninterruptedFirstRound() &&
 			_table.GetDealer() != _player
 
-		) _current.Add(Yaku.ChiiHou);
+		) EditYaku(Yaku.ChiiHou, _yakuman.Add);
     }
 
 	private void ChuurenPoutou(WinningHand wh)
@@ -471,8 +521,9 @@ internal sealed class YakuCalculator
                 _player.Hand.ValueCount((int)suits.First() + 7) is 1 or 2 &&
                 _player.Hand.ValueCount((int)suits.First() + 8) is 1 or 2
             ){
-				if (_player.WinningTiles.Count() == 9) _yakuman.Add(Yaku.JunseiChuurenPoutou);
-				else _yakuman.Add(Yaku.ChuurenPoutou);
+				if (_player.WinningTiles.Count() == 9) 
+					EditYaku(Yaku.JunseiChuurenPoutou, _yakuman.Add);
+				else EditYaku(Yaku.ChuurenPoutou, _yakuman.Add);
             }
         }
     }
