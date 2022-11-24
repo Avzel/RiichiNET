@@ -20,20 +20,17 @@ internal abstract class ClosedMeld: Meld
     internal override bool HasTerminals()
         => ((Tile)_value).IsTerminal();
 
-    internal override bool Honors()
+    internal override bool OnlyHonors()
         => ((Tile)_value).IsHonor();
-
-    internal override bool OnlyTerminals()
-        => HasTerminals();
 
     internal override bool OnlyGreens()
         => ((Tile)_value).IsGreen();
 
-    internal override bool Dragons()
-        => _value is Value.DG or Value.DR or Value.DW;
+    internal override bool OnlyDragons()
+        => ((Tile)_value).IsDragon();
 
-    internal override bool Winds()
-        => _value is Value.WE or Value.WN or Value.WS or Value.WW;
+    internal override bool OnlyWinds()
+        => ((Tile)_value).IsWind();
 
     public override bool Contains(Value value)
         => _value == value;

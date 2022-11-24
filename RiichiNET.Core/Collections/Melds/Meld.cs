@@ -16,11 +16,15 @@ public abstract class Meld: IEquatable<Meld>, IComparable<Meld>
     public abstract IList<Tile> GetSortedTiles();
     internal abstract bool HasYaoChuu();
     internal abstract bool HasTerminals();
-    internal abstract bool Honors();
-    internal abstract bool OnlyTerminals();
+    internal abstract bool OnlyHonors();
     internal abstract bool OnlyGreens();
-    internal abstract bool Dragons();
-    internal abstract bool Winds();
+    internal abstract bool OnlyDragons();
+    internal abstract bool OnlyWinds();
+    internal bool OnlyTerminals()
+        => Mentsu != Mentsu.Shuntsu && HasTerminals();
+    internal bool OnlyYaoChuu()
+        => OnlyHonors() || OnlyTerminals();
+
     public abstract bool Contains(Value value);
 
     internal abstract Tile this[int i] { get; }

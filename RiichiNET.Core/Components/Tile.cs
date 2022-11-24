@@ -1,6 +1,7 @@
 namespace RiichiNET.Core.Components;
 
 using System;
+using System.Linq;
 
 using RiichiNET.Core.Enums;
 
@@ -68,9 +69,15 @@ public record struct Tile : IComparable<Tile>
 
     internal bool IsHonor()
         => (int)value > 60;
-
+    
     internal bool IsYaoChuu()
         => IsHonor() || IsTerminal();
+
+    internal bool IsWind()
+        => (int)value is > 60 and < 80;
+
+    internal bool IsDragon()
+        => (int)value > 80;
 
     internal bool IsGreen()
         => (int)value is 46 or 48 or 82 or (>= 42 and <= 44);
@@ -80,9 +87,6 @@ public record struct Tile : IComparable<Tile>
 
     internal bool CanStartShuntsu()
         =>  (int)value % 10 < 8;
-
-    internal bool CanStartAkadoraShuntsu()
-        => (int)value % 10 is >= 3 and <= 5;
 
     internal Value DoraValue()
     {
@@ -112,4 +116,23 @@ public record struct Tile : IComparable<Tile>
         =>  !this.IsHonor() &&
             !other.IsHonor() &&
             Math.Abs(value - other.value) < 9;
+
+    internal static bool SameValuesDifferentSuits(Tile first, Tile second, Tile third)
+        => first.SameValueDifferentSuit(second) &&
+            first.SameValueDifferentSuit(third) &&
+            second.SameValueDifferentSuit(third)
+            ? true : false;
+    
+    internal static bool SameSuits(params Tile[] tiles)
+    {
+        var pairs =     from item1 in tiles
+                        from item2 in tiles
+                        select Tuple.Create(item1, item2);
+        
+        foreach (Tuple<Tile, Tile> pair in pairs)
+        {
+            if (!pair.Item1.SameSuit(pair.Item2)) return false;
+        }
+        return true;
+    }
 }

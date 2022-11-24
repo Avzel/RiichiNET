@@ -24,20 +24,17 @@ internal abstract class OpenMeld: Meld
         =>  GetSortedTiles()[0].IsTerminal() || 
             (Mentsu == Mentsu.Shuntsu &&  GetSortedTiles()[2].IsTerminal());
 
-    internal override bool Honors()
+    internal override bool OnlyHonors()
         => GetSortedTiles()[0].IsHonor();
-
-    internal override bool OnlyTerminals()
-        => Mentsu != Mentsu.Shuntsu ? HasTerminals() : false;
 
     internal override bool OnlyGreens()
         => GetSortedTiles()[0].IsGreen();
 
-    internal override bool Dragons()
-        => this[0].value is Value.DG or Value.DR or Value.DW;
+    internal override bool OnlyDragons()
+        => this[0].IsDragon();
 
-    internal override bool Winds()
-        => this[0].value is Value.WE or Value.WN or Value.WS or Value.WW;
+    internal override bool OnlyWinds()
+        => this[0].IsWind();
 
     public override bool Contains(Value value)
     {
