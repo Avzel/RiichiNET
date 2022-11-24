@@ -169,6 +169,7 @@ public sealed class Player
         {
             Graveyard.Add(tile);
             GraveyardContents.Draw(tile);
+            JustDrawn = JustCalled = Value.None;
             DetermineCallOnDiscard();
         }
     }
