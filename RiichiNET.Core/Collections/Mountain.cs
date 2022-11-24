@@ -54,8 +54,7 @@ public sealed class Mountain
 
             foreach (int j in vals)
             {
-                Value val = (Value) Enum.ToObject(typeof(Value), j);
-                Tile tile = new Tile(val);
+                Tile tile = (Tile)j;
 
                 if ((tile == Value.M5 && i == m5) ||
                     (tile == Value.P5 && i == p5) ||
