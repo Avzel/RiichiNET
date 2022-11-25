@@ -17,6 +17,7 @@ internal sealed class YakuCalculator
     private readonly ISet<Yaku> _best = new HashSet<Yaku>();
     private readonly ISet<Yaku> _current = new HashSet<Yaku>();
     private readonly ISet<Yaku> _yakuman = new HashSet<Yaku>();
+    private WinningHand final = null!;
     private static Mutex mut = new Mutex();
 
     private readonly Table _table;
@@ -59,25 +60,32 @@ internal sealed class YakuCalculator
         return false;
     }
 
-	private void OverwriteBest()
+	private void OverwriteBest(WinningHand wh)
 	{
 		if (_current.Any() && _current.Sum(x => (int)x) > _best.Sum(x => (int)x))
 		{
 			_best.Clear();
 			foreach (Yaku yaku in _current) _best.Add(yaku);
-		}
-		_current.Clear();
+			_current.Clear();
+            final = wh;
+        }
     }
 
-	internal ISet<Yaku> DetermineYaku()
+	internal void DetermineYaku()
 	{
-		if (!_player.IsComplete()) return _current;
+		if (!_player.IsComplete()) return;
         foreach (WinningHand wh in _player.WinningHands)
 		{
             YakuCalcInParallel(wh);
-            OverwriteBest();
+            OverwriteBest(wh);
+			if (_yakuman.Contains(Yaku.ChuurenPoutou)) break;
         }
-        return _yakuman.Any() ? _yakuman : _best;
+        if (final != null)
+        {
+            _player.WinningHands.Clear();
+            _player.WinningHands.Add(final);
+        }
+        _player.YakuList =  _yakuman.Any() ? _yakuman : _best;
     }
 
 	private void YakuCalcInParallel(WinningHand wh)

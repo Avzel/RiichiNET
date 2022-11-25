@@ -226,7 +226,7 @@ public sealed class Table
         foreach (Player winner in winners)
         {
             YakuCalculator yc = new YakuCalculator(this, winner);
-            winner.YakuList = yc.DetermineYaku();
+            yc.DetermineYaku();
         }
         Tabulator.Agari(winners);
 
