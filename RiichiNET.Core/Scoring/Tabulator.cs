@@ -3,7 +3,6 @@ namespace RiichiNET.Core.Scoring;
 using System.Collections.Generic;
 
 using RiichiNET.Core.Components;
-using RiichiNET.Core.Enums;
 
 internal static class Tabulator
 {
@@ -18,6 +17,6 @@ internal static class Tabulator
 
     internal static void Agari(IEnumerable<Player> winners)
     {
-        // TODO:
+        // TODO: (no fu tabulation for yakuman)
     }
 }
