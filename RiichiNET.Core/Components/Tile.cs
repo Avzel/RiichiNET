@@ -1,7 +1,6 @@
 namespace RiichiNET.Core.Components;
 
 using System;
-using System.Linq;
 
 using RiichiNET.Core.Enums;
 
@@ -64,30 +63,6 @@ public record struct Tile : IComparable<Tile>
     public int CompareTo(Tile other)
         => this.value.CompareTo(other.value);
 
-    internal bool IsTerminal()
-        => (int)value % 10 is 1 or 9;
-
-    internal bool IsHonor()
-        => (int)value > 60;
-    
-    internal bool IsYaoChuu()
-        => IsHonor() || IsTerminal();
-
-    internal bool IsWind()
-        => (int)value is > 60 and < 80;
-
-    internal bool IsDragon()
-        => (int)value > 80;
-
-    internal bool IsGreen()
-        => (int)value is 46 or 48 or 82 or (>= 42 and <= 44);
-
-    internal bool IsFive()
-        => value is Value.M5 or Value.P5 or Value.S5;
-
-    internal bool CanStartShuntsu()
-        =>  (int)value % 10 < 8;
-
     internal Value DoraValue()
     {
         int val = (int)value;
@@ -100,13 +75,6 @@ public record struct Tile : IComparable<Tile>
         return (Value) Enum.ToObject(typeof(Value), val);
     }
 
-    internal Value NextSuit()
-    {
-        if (value > Value.S9) return value;
-        if (value > Value.P9) return value - 40;
-        else return value + 20;
-    }
-
     internal Suit GetSuit()
     {
         if ((int)value is > 0 and < 10) return Suit.M;
@@ -116,30 +84,48 @@ public record struct Tile : IComparable<Tile>
         else return Suit.D;
     }
 
-    internal bool SameValueDifferentSuit(Tile other)
-        =>  !this.IsHonor() && 
-            !other.IsHonor() && 
-            Math.Abs(value - other.value) is 20 or 40;
+    internal Value NextSuit()
+    {
+        if (GetSuit() is Suit.D or Suit.W) return value;
+        if (GetSuit() is Suit.S) return value - 40;
+        return value + 20;
+    }
 
-    internal bool SameSuit(Tile other)
-        => this.GetSuit() == other.GetSuit();
+    internal int GetNumericalValue()
+        => GetSuit() is not Suit.W or Suit.D? (int)value % 10 : 0;
+
+    internal bool IsTerminal()
+        => GetNumericalValue() is 1 or 9;
+
+    internal bool IsHonor()
+        => GetSuit() is Suit.W or Suit.D;
+
+    internal bool IsYaoChuu()
+        => IsHonor() || IsTerminal();
+
+    internal bool IsWind()
+        => GetSuit() == Suit.W;
+
+    internal bool IsDragon()
+        => GetSuit() == Suit.D;
+
+    internal bool IsGreen()
+        => (int)value is 46 or 48 or 82 or (>= 42 and <= 44);
+
+    internal bool IsFive()
+        => GetNumericalValue() == 5;
+
+    internal bool CanStartShuntsu()
+        => GetNumericalValue() is > 0 and < 8;
+
+    internal bool SameValueDifferentSuit(Tile other)
+        => !this.IsHonor() &&
+            this.GetNumericalValue() == other.GetNumericalValue() &&
+            this.GetSuit() != other.GetSuit();
 
     internal static bool SameValuesDifferentSuits(Tile first, Tile second, Tile third)
         => first.SameValueDifferentSuit(second) &&
             first.SameValueDifferentSuit(third) &&
             second.SameValueDifferentSuit(third)
             ? true : false;
-    
-    internal static bool SameSuits(params Tile[] tiles)
-    {
-        var pairs =     from item1 in tiles
-                        from item2 in tiles
-                        select Tuple.Create(item1, item2);
-        
-        foreach (Tuple<Tile, Tile> pair in pairs)
-        {
-            if (!pair.Item1.SameSuit(pair.Item2)) return false;
-        }
-        return true;
-    }
 }
