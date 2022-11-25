@@ -1,13 +1,11 @@
 namespace RiichiNET.Core.Collections.Melds;
 
-using System.Collections.Generic;
-
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
 internal abstract class ClosedMeld: Meld
 {
-    public override bool Open { get => false; }
+    internal override bool Open { get => false; }
 
     private protected Value _value;
 
@@ -32,16 +30,6 @@ internal abstract class ClosedMeld: Meld
     internal override bool OnlyWinds()
         => ((Tile)_value).IsWind();
 
-    public override bool Contains(Value value)
+    internal override bool Contains(Value value)
         => _value == value;
-
-    internal override Tile this[int i]
-    {
-        get
-        {
-            IList<Tile> tiles = GetSortedTiles();
-            if (tiles.Count > i) return GetSortedTiles()[i];
-            else return (Tile)Value.None;
-        }
-    }
 }

@@ -12,7 +12,7 @@ internal sealed class AnKou: ClosedMeld
 
     internal AnKou(Value value, bool akadora=false): base(value, akadora) {}
 
-    public override IList<Tile> GetSortedTiles()
+    internal override IList<Tile> GetSortedTiles()
         =>  (new List<Tile>() {new Tile(_value, Akadora), (Tile)_value, (Tile)_value})
             .AsReadOnly();
 }

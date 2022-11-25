@@ -20,6 +20,6 @@ internal class MinJunShimo: OpenMeld
         SetShuntsuAkadora(akadora);
     }
 
-    public override IList<Tile> GetSortedTiles()
+    internal override IList<Tile> GetSortedTiles()
         => OrderedTiles.ToList().AsReadOnly();
 }

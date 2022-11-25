@@ -1,7 +1,6 @@
 namespace RiichiNET.Core.Collections.Melds;
 
 using System.Collections.Generic;
-using System.Linq;
 
 using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
@@ -20,7 +19,4 @@ internal sealed class MinKanShou: OpenMeld
 
         OrderedTiles.Insert(CalledIndex + 1, tile);
     }
-
-    public override IList<Tile> GetSortedTiles()
-        => OrderedTiles.ToList().AsReadOnly();
 }

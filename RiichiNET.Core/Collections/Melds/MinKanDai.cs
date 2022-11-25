@@ -1,9 +1,5 @@
 namespace RiichiNET.Core.Collections.Melds;
 
-using System.Collections.Generic;
-using System.Linq;
-
-using RiichiNET.Core.Components;
 using RiichiNET.Core.Enums;
 
 internal sealed class MinKanDai: OpenMeld
@@ -13,7 +9,4 @@ internal sealed class MinKanDai: OpenMeld
 
     internal MinKanDai(Value value, Direction called, (bool exists, bool taken) akadora=default)
         => SetKouKanTiles(true, value, called, akadora);
-
-    public override IList<Tile> GetSortedTiles()
-        => OrderedTiles.ToList().AsReadOnly();
 }

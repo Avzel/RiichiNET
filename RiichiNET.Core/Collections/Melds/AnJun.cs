@@ -12,7 +12,7 @@ internal sealed class AnJun: ClosedMeld
 
     internal AnJun(Value value, bool akadora=false): base(value, akadora) {}
 
-    public override IList<Tile> GetSortedTiles()
+    internal override IList<Tile> GetSortedTiles()
     {
         Tile first = _value;
         Tile second = _value + 1;
@@ -34,6 +34,6 @@ internal sealed class AnJun: ClosedMeld
     internal override bool HasTerminals()
         => base.HasTerminals() || ((Tile)_value + 2).IsTerminal();
 
-    public override bool Contains(Value value)
+    internal override bool Contains(Value value)
         => _value - value is <= 0 and >= -2;
 }

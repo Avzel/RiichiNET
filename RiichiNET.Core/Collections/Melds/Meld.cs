@@ -10,10 +10,10 @@ public abstract class Meld: IEquatable<Meld>, IComparable<Meld>
 {
     internal abstract Mentsu Mentsu { get; }
     public abstract Naki Naki { get; }
-    public abstract bool Open { get; }
+    internal abstract bool Open { get; }
     internal bool Akadora { get; private protected set; }
 
-    public abstract IList<Tile> GetSortedTiles();
+    internal abstract IList<Tile> GetSortedTiles();
     internal abstract bool HasYaoChuu();
     internal abstract bool HasTerminals();
     internal abstract bool OnlyHonors();
@@ -25,9 +25,17 @@ public abstract class Meld: IEquatable<Meld>, IComparable<Meld>
     internal bool OnlyYaoChuu()
         => OnlyHonors() || OnlyTerminals();
 
-    public abstract bool Contains(Value value);
+    internal abstract bool Contains(Value value);
 
-    internal abstract Tile this[int i] { get; }
+    internal Tile this[int i]
+    {
+        get
+        {
+            IList<Tile> tiles = GetSortedTiles();
+            if (tiles.Count > i) return GetSortedTiles()[i];
+            else return (Tile)Value.None;
+        }
+    }
 
     public override int GetHashCode()
     {

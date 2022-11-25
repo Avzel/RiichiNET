@@ -19,7 +19,7 @@ internal class MinJunKami: OpenMeld
         SetShuntsuAkadora(akadora);
     }
 
-    public override IList<Tile> GetSortedTiles()
+    internal override IList<Tile> GetSortedTiles()
         => (new List<Tile>()
         {
             OrderedTiles[1],

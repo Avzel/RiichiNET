@@ -8,13 +8,16 @@ using RiichiNET.Core.Enums;
 
 public abstract class OpenMeld: Meld
 {
-    public override bool Open { get => true; }
+    internal override bool Open { get => true; }
 
     public IList<Tile> OrderedTiles { get; private protected set; } = new List<Tile>();
     internal int CalledIndex { get; private protected set; }
 
     public Tile GetCalledTile()
         => OrderedTiles[CalledIndex];
+
+    internal override IList<Tile> GetSortedTiles()
+        => OrderedTiles.ToList().AsReadOnly();
 
     internal override bool HasYaoChuu()
         =>  GetSortedTiles()[0].IsYaoChuu() || 
@@ -36,22 +39,13 @@ public abstract class OpenMeld: Meld
     internal override bool OnlyWinds()
         => this[0].IsWind();
 
-    public override bool Contains(Value value)
+    internal override bool Contains(Value value)
     {
         foreach (Tile tile in OrderedTiles)
         {
             if (tile == value) return true;
         }
         return false;
-    }
-
-    internal override Tile this[int i]
-    {
-        get
-        {
-            if (i < OrderedTiles.Count() - 1) return OrderedTiles[i];
-            else return (Tile)Value.None;
-        }
     }
 
     private protected void SetShuntsuAkadora(bool akadora)
