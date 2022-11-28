@@ -25,7 +25,7 @@ internal sealed class YakuCalculator
 
     internal static bool IsTenpaiForKokushi(TileCount hand)
 	{
-		if (hand.Length() is not 12 or 13) return false;
+		if (hand.Length() != TileCount.MIN_HAND_SIZE) return false;
         foreach (Tile tile in hand.Held())
         {
             if (!tile.IsYaoChuu()) return false;
@@ -33,9 +33,10 @@ internal sealed class YakuCalculator
         return true;
 	}
 
-	internal static bool NagashiMangan(IList<Tile> graveyard)
+	internal static bool NagashiMangan(Table table, Player player)
 	{
-		foreach (Tile tile in graveyard)
+		if (table.IsCallVictim(player)) return false;
+        foreach (Tile tile in player.GraveyardContents.Held())
 		{
 			if (!tile.IsYaoChuu()) return false;
         }
