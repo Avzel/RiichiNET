@@ -8,8 +8,8 @@ using RiichiNET.Util.Collections;
 
 public sealed class TileCount: ObjectCounter<Tile>
 {
-    internal static readonly int MAX_HAND_SIZE = 14;
-    internal static readonly int MIN_HAND_SIZE = 13;
+    internal const int MAX_HAND_SIZE = 14;
+    internal const int MIN_HAND_SIZE = 13;
 
     internal TileCount(TileCount? original = null): base(original) {}
 

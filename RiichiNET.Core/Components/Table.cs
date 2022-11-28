@@ -14,7 +14,7 @@ public sealed class Table
 {
     internal readonly record struct Call(int elapsed, Seat caller, Seat callee, Naki type);
 
-    private static readonly int SEATS = 4;
+    private const int SEATS = 4;
 
     internal State State { get; private set; } = State.Draw;
     public Wind Wind { get; private set; } = Wind.East;
