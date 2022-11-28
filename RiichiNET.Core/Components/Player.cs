@@ -31,7 +31,7 @@ public sealed class Player
     internal bool IchijiFuriten { get; set; }
     internal ISet<WinningHand> WinningHands { get; private set; } = new HashSet<WinningHand>();
     internal ISet<Value> WinningTiles { get; private set; } = new HashSet<Value>();
-    public (int han, int fu) points { get; private set; }
+    public (int han, int fu) Points { get; internal set; }
     public ISet<Yaku> YakuList { get; internal set; } = new HashSet<Yaku>();
 
     internal Player(Seat seat)
@@ -272,7 +272,7 @@ public sealed class Player
         IchijiFuriten = false;
         WinningHands.Clear();
         WinningTiles.Clear();
-        points = (han: 0, fu: 0);
+        Points = (han: 0, fu: 0);
         YakuList.Clear();
     }
 }

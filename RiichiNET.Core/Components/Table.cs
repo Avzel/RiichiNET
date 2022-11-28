@@ -12,13 +12,14 @@ using RiichiNET.Util.Extensions;
 
 public sealed class Table
 {
-    internal readonly record struct Call(int elapsed, Seat caller, Naki type);
+    internal readonly record struct Call(int elapsed, Seat caller, Seat callee, Naki type);
 
     private static readonly int SEATS = 4;
 
     internal State State { get; private set; } = State.Draw;
     public Wind Wind { get; private set; } = Wind.East;
     public int Pool { get; private set; } = 0;
+    public int Honba { get; private set; } = 0;
     private int _round = 0;
     private Seat _turn = 0;
 
@@ -26,7 +27,7 @@ public sealed class Table
     internal LinkedList<Call> Calls { get; } = new LinkedList<Call>();
     private Tile _justDiscarded;
 
-    private Mountain _mountain = new Mountain();
+    internal Mountain Mountain = new Mountain();
     internal Player[] Players { get; } = new Player[4]
     {
         new Player(Seat.First),
@@ -56,9 +57,18 @@ public sealed class Table
 
     internal bool UninterruptedFirstRound()
         => !Calls.Any() && Elapsed < SEATS;
+    
+    internal bool IsCallVictim(Player candidate)
+    {
+        foreach (Call call in Calls)
+        {
+            if (call.callee == candidate) return true;
+        }
+        return false;
+    }
 
     private bool CanKan()
-        => _mountain.DoraCount() <= SEATS && !_mountain.IsEmpty();
+        => Mountain.DoraCount() <= SEATS && !Mountain.IsEmpty();
 
     private bool CanAgari(Player player, Value value)
     {
@@ -115,7 +125,7 @@ public sealed class Table
     internal bool Draw(Seat? turn = null)
     {
         State = State.Draw;
-        Tile tile = _mountain.Draw();
+        Tile tile = Mountain.Draw();
         if (tile != Value.None)
         {
             GetPlayer(turn).Draw(tile);
@@ -148,7 +158,7 @@ public sealed class Table
     internal ISet<Player> FormMeld(Meld meld, Seat caller)
     {
         State = State.Call;
-        Calls.AddLast(new Call(Elapsed, caller, meld.Naki));
+        Calls.AddLast(new Call(Elapsed, caller, _turn, meld.Naki));
 
         GetPlayer(caller).AddMeld(meld);
         if (caller != _turn) ChangeTurn(caller);
@@ -170,7 +180,7 @@ public sealed class Table
     internal void Rinshan()
     {
         Player player = GetPlayer();
-        Tile tile = _mountain.Rinshan();
+        Tile tile = Mountain.Rinshan();
         player.Draw(tile);
         RectifyCallables();
     }
@@ -179,7 +189,7 @@ public sealed class Table
     {
         Discard(tile, riichi: true);
 
-        Calls.AddLast(new Call(Elapsed, GetPlayer(), Naki.Riichi));
+        Calls.AddLast(new Call(Elapsed, GetPlayer(), _turn, Naki.Riichi));
 
         return CanCallOnDiscard();
     }
@@ -204,7 +214,7 @@ public sealed class Table
     }
 
     internal bool RoundIsOver()
-        => _mountain.IsEmpty();
+        => Mountain.IsEmpty();
 
     internal bool GameIsOver()
     {
@@ -217,20 +227,39 @@ public sealed class Table
 
     internal bool Ryuukyoku()
     {
-        Tabulator.Ryuukyoku(Players);
+        Tabulator.Ryuukyoku(this);
+        Honba++;
         return GetDealer().IsTenpai() ? false : true;
+    }
+
+    private Player DetermineWinner(ISet<Player> winners)
+    {
+        if (winners.Count() == 1) return winners.First();
+
+        Seat priorty = _turn;
+        Player candidate;
+        while (true)
+        {
+            priorty = priorty.Next<Seat>();
+            candidate = GetPlayer(priorty);
+            if (winners.Contains(candidate)) return candidate;
+        }
     }
 
     internal bool Agari(ISet<Player> winners)
     {
-        foreach (Player winner in winners)
-        {
-            YakuCalculator yc = new YakuCalculator(this, winner);
-            yc.DetermineYaku();
-        }
-        Tabulator.Agari(winners);
+        Player winner = DetermineWinner(winners);
+        Tabulator t = new Tabulator(this, winner);
+        t.Agari();
 
-        return winners.Contains(GetDealer());
+        Pool = 0;
+        bool overthrow = true;
+        if (winner == GetDealer())
+        {
+            Honba++;
+            overthrow = false;
+        }
+        return overthrow;
     }
 
     private Seat GetNextDealer()
@@ -238,7 +267,7 @@ public sealed class Table
 
     internal void NextRound(bool overthrow)
     {
-        _mountain.Reset();
+        Mountain.Reset();
         State = State.Draw;
         Elapsed = 0;
         Calls.Clear();
@@ -248,7 +277,9 @@ public sealed class Table
             Wind = Wind.Next<Wind>();
             _round++;
             _turn = GetNextDealer();
+            Honba = 0;
         }
+
         foreach (Player player in Players) player.NextRound(overthrow);
 
         InitialDraw();
